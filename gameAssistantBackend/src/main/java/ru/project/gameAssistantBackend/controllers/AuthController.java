@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.project.gameAssistantBackend.dto.JwtRequest;
 import ru.project.gameAssistantBackend.dto.JwtResponse;
 import ru.project.gameAssistantBackend.dto.RefreshJwtRequest;
+import ru.project.gameAssistantBackend.models.UserDTO;
 import ru.project.gameAssistantBackend.service.AuthService;
 
 @RestController
@@ -27,6 +28,12 @@ public class AuthController {
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
         final JwtResponse token = authService.login(authRequest);
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registration(@RequestBody UserDTO userDTO){
+        authService.register(userDTO);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("token")

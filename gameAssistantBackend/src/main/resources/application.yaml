@@ -3,6 +3,20 @@ spring:
     name:
       gameAssistantBackend
 
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/game_assistant_db
+    username: postgres
+    password: postgres
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+  liquibase:
+    enabled: true
+
 jwt:
   secret:
     access:
