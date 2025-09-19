@@ -36,6 +36,13 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("logout")
+    public ResponseEntity<?> logout(@RequestBody RefreshJwtRequest request) throws AuthException {
+        authService.logout(request.getRefreshToken());
+        return ResponseEntity.ok().build();
+    }
+
+
     @PostMapping("token")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody RefreshJwtRequest request) throws AuthException {
         final JwtResponse token = authService.getAccessToken(request.getRefreshToken());

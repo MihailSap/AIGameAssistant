@@ -19,6 +19,9 @@ public class User {
 
     private Role role;
 
+    @OneToOne(mappedBy = "user")
+    private Token refreshToken;
+
     public User(String email, String login, String password, Role role) {
         this.email = email;
         this.login = login;
@@ -58,5 +61,13 @@ public class User {
 
     public void setRole(Role roles) {
         this.role = roles;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public Token getRefreshToken() {
+        return refreshToken;
     }
 }
