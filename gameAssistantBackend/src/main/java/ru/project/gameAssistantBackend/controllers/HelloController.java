@@ -1,6 +1,6 @@
 package ru.project.gameAssistantBackend.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,34 +10,35 @@ import ru.project.gameAssistantBackend.models.JwtAuthentication;
 import ru.project.gameAssistantBackend.service.AuthService;
 
 @RestController
-@RequestMapping("/api")
-public class Controller {
+@RequestMapping("/api/hello")
+@RequiredArgsConstructor
+public class HelloController {
 
     private final AuthService authService;
 
-    @Autowired
-    public Controller(AuthService authService) {
-        this.authService = authService;
-    }
-
     @PreAuthorize("hasAuthority('USER')")
-    @GetMapping("/hello/user")
+    @GetMapping("/user")
     public ResponseEntity<String> helloUser(){
         final JwtAuthentication authInfo = authService.getAuthInfo();
         return ResponseEntity.ok("Hello user " + authInfo.getPrincipal() + "!");
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/hello/admin")
+    @GetMapping("/admin")
     public ResponseEntity<String> helloAdmin(){
         final JwtAuthentication authInfo = authService.getAuthInfo();
         return ResponseEntity.ok("Hello admin " + authInfo.getPrincipal() + "!");
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/hello/authenticated")
+    @GetMapping("/authenticated")
     public ResponseEntity<String> helloAuthenticated() {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         return ResponseEntity.ok("Привет, " + authInfo.getUsername() + "! Ты успешно аутентифицирован");
+    }
+
+    @GetMapping("/some-user")
+    public String helloSomeUser(){
+        return "Hello!";
     }
 }

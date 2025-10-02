@@ -3,3 +3,9 @@ databaseChangeLog:
       file: db/changelog/001-create-user-table.yaml
   - include:
       file: db/changelog/002-create-token-table.yaml
+  - include:
+      file: db/changelog/003-create-game.yaml
+  - include:
+      file: db/changelog/004-update-token.yaml
+  - include:
+      file: db/changelog/005-update-user.yaml

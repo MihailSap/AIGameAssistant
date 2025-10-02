@@ -19,7 +19,7 @@ public class User {
 
     private Role role;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Token refreshToken;
 
     public User(String email, String login, String password, Role role) {
@@ -69,5 +69,12 @@ public class User {
 
     public Token getRefreshToken() {
         return refreshToken;
+    }
+
+    public void setRefreshToken(Token token) {
+        this.refreshToken = token;
+        if (token != null) {
+            token.setUser(this);
+        }
     }
 }

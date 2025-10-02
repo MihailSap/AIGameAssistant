@@ -12,8 +12,8 @@ public class Token {
 
     private String body;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "uzer_id")
+    @OneToOne
+    @JoinColumn(name = "uzer_id", nullable = false, unique = true)
     private User user;
 
     public Token(User user, String body) {
