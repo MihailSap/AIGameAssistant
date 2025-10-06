@@ -1,10 +1,13 @@
 package ru.project.gameAssistantBackend.service;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -49,12 +52,8 @@ public class FileService {
         }
     }
 
-    public byte[] loadFileAsBytes(String fileName) {
-        try {
-            var filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-            return Files.readAllBytes(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при загрузке файла", e);
-        }
+    public Resource getFile(String fileTitle) throws MalformedURLException {
+        var path = Paths.get(String.format("uploads/%s", fileTitle));
+        return new UrlResource(path.toUri());
     }
 }

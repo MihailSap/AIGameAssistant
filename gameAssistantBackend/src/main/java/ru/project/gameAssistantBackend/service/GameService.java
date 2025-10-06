@@ -9,6 +9,9 @@ import ru.project.gameAssistantBackend.dto.GameResponseDTO;
 import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.repository.GameRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -75,6 +78,18 @@ public class GameService {
         fileService.delete(rulesFileTitle);
         gameRepository.delete(game);
         log.info("Игра с id={} была удалена", id);
+    }
+
+    public List<Game> getAll(){
+        return gameRepository.findAll();
+    }
+
+    public List<GameResponseDTO> mapToDTOs(List<Game> games){
+        List<GameResponseDTO> gameDTOs = new ArrayList<>();
+        for (var game : games){
+            gameDTOs.add(mapToDTO(game));
+        }
+        return gameDTOs;
     }
 
     public Game getById(Long id){

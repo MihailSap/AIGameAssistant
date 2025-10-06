@@ -6,7 +6,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.GameRequestDTO;
 import ru.project.gameAssistantBackend.dto.GameResponseDTO;
+import ru.project.gameAssistantBackend.service.FileService;
 import ru.project.gameAssistantBackend.service.GameService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/game")
@@ -14,6 +17,7 @@ import ru.project.gameAssistantBackend.service.GameService;
 public class GameController {
 
     private final GameService gameService;
+    private final FileService fileService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create")
@@ -21,7 +25,6 @@ public class GameController {
         return gameService.create(gameRequestDTO);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/{id}")
     public GameResponseDTO read(@PathVariable("id") Long id){
         return gameService.getGameDTOById(id);
@@ -37,5 +40,11 @@ public class GameController {
     @DeleteMapping("/{id}/delete")
     public void delete(@PathVariable("id") Long id){
         gameService.delete(id);
+    }
+
+    @GetMapping("/all")
+    public List<GameResponseDTO> readAll(){
+        var games = gameService.getAll();
+        return gameService.mapToDTOs(games);
     }
 }
