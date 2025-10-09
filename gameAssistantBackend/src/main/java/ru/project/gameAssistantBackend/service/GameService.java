@@ -98,6 +98,11 @@ public class GameService {
     }
 
     public GameResponseDTO mapToDTO(Game game){
-        return new GameResponseDTO(game.getTitle(), game.getDescription(), game.getImageFileTitle(), game.getRulesFileTitle());
+        return new GameResponseDTO(
+                game.getId(),
+                game.getTitle(),
+                game.getDescription(),
+                game.getImageFileTitle(),
+                game.getRulesFileTitle());
     }
 }

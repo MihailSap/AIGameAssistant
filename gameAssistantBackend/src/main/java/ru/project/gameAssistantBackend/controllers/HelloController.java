@@ -30,13 +30,6 @@ public class HelloController {
         return ResponseEntity.ok("Hello admin " + authInfo.getPrincipal() + "!");
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/authenticated")
-    public ResponseEntity<String> helloAuthenticated() {
-        final JwtAuthentication authInfo = authService.getAuthInfo();
-        return ResponseEntity.ok("Привет, " + authInfo.getUsername() + "! Ты успешно аутентифицирован");
-    }
-
     @GetMapping("/some-user")
     public String helloSomeUser(){
         return "Hello!";
