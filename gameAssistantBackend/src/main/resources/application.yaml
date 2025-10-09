@@ -8,6 +8,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  config:
+    import:
+      optional:application-secret.yaml
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/game_assistant_db}
@@ -26,3 +30,8 @@ jwt:
   secret:
     access: ${JWT_SECRET_ACCESS:qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==}
     refresh: ${JWT_SECRET_REFRESH:zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==}
+
+yandex-cloud:
+  gpt:
+    api-key: ${YANDEX_API_KEY}
+    catalog-id: ${CATALOG_ID}
