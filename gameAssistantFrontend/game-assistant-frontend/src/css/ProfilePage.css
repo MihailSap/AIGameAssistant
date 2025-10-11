@@ -1,0 +1,214 @@
+:root {
+    --text: #e9eef8;
+    --muted-text: #9aa4b2;
+    --danger: #e25555;
+    --success: #4BB543;
+    --max-content-width: 1200px;
+}
+
+.profile-root {
+    max-width: var(--max-content-width);
+    margin: 20px auto;
+    padding: 18px;
+    box-sizing: border-box;
+    color: var(--text);
+    min-height: calc(100vh - 80px);
+}
+
+.profile-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.profile-top .link-like {
+    color: var(--muted-text);
+    text-decoration: none;
+}
+
+.profile-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "left right"
+        "sessions sessions";
+    gap: 18px;
+    align-items: start;
+}
+
+.profile-panel-left {
+    grid-area: left;
+}
+
+.profile-panel-right {
+    grid-area: right;
+}
+
+.sessions-panel {
+    grid-area: sessions;
+}
+
+.profile-panel {
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.03) 0%,
+            rgba(255, 255, 255, 0.015) 40%,
+            transparent 100%);
+    backdrop-filter: blur(8px) saturate(1.05);
+    -webkit-backdrop-filter: blur(8px) saturate(1.05);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    height: 100%;
+}
+
+.profile-panel-inner {
+    padding: 16px;
+    height: calc(100% - 32px);
+}
+
+.user-info {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.user-field-label {
+    color: var(--muted-text);
+    font-size: 13px;
+}
+
+.user-field-value {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.profile-section-title {
+    font-size: 16px;
+    margin: 0 0 12px 0;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.profile-section-title.small {
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+.password-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    height: calc(100% - 34px);
+}
+
+.profile-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.profile-input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.005));
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+}
+
+.profile-input:focus {
+    box-shadow: 0 8px 30px rgba(58, 123, 253, 0.08);
+    transform: translateY(-1px);
+}
+
+.user-field-error {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: -6px;
+}
+
+.profile-password-actions {
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.divider {
+    margin: 18px 0;
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+}
+
+.sessions-block {
+    margin-top: 6px;
+}
+
+.profile-sessions-placeholder {
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.03);
+    margin-top: 8px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-text);
+}
+
+.profile-empty-note {
+    color: var(--muted-text);
+    font-size: 14px;
+}
+
+.profile-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--muted-text);
+    padding: 12px 0;
+    font-size: 24px;
+}
+
+.profile-error {
+    color: var(--danger);
+    padding: 12px 0;
+}
+
+.profile-success-note {
+    color: var(--success);
+    padding: 12px 0;
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "left"
+            "right"
+            "sessions";
+    }
+}

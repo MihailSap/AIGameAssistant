@@ -1,0 +1,115 @@
+:root {
+  --panel: #111111;
+  --text: #e8e8e8;
+  --muted-text: #a9a9a9;
+  --radius: 8px;
+  --transition: 160ms ease;
+}
+
+.admin-root {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.admin-root h1, .admin-root h2, .admin-root h3, .admin-root h4, .admin-root h5, .admin-root h6 {
+  color: var(--text);
+  margin: 0;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.03);
+  margin-bottom: 20px;
+}
+
+.admin-title {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 0.2px;
+}
+
+.main-link {
+  color: var(--muted-text);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: transparent;
+  transition: all var(--transition);
+  font-size: 16px;
+}
+
+.main-link:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.02);
+  transform: translateY(-2px);
+}
+
+.admin-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.admin-section {
+  background: var(--panel);
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+.admin-loading, .admin-error {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted-text);
+}
+
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 680px) {
+  
+}
+
+@media (max-width: 480px) {
+  .admin-header {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .admin-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-title h1 {
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  .admin-title .main-link {
+    order: 2;
+    align-self: flex-start;
+    padding: 0;
+  }
+
+  .admin-header > div:last-child {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

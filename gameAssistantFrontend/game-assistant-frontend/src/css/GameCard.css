@@ -1,0 +1,143 @@
+:root {
+    --shadow-1: 0 8px 30px rgba(0, 0, 0, 0.6);
+    --transition: 220ms cubic-bezier(.2, .9, .2, 1);
+}
+
+.game-card {
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 12px;
+    position: relative;
+    width: 100%;
+    transition: transform var(--transition), box-shadow var(--transition);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+.game-card:focus {
+    outline: 2px solid rgba(58, 123, 253, 0.16);
+    transform: translateY(-2px);
+}
+
+.game-card:hover {
+    transform: scale(1.03);
+    box-shadow: var(--shadow-1);
+}
+
+.game-card:hover .game-image {
+    filter: blur(3px) saturate(1.05);
+    transform: scale(1.06);
+}
+
+.game-card:hover .game-overlay {
+    opacity: 0;
+}
+
+.game-card:hover .game-hover {
+    opacity: 1;
+}
+
+.game-card:focus .game-image {
+    filter: blur(2px);
+    transform: scale(1.03);
+}
+
+.game-card:focus .game-overlay {
+    opacity: 0;
+}
+
+.game-card:focus .game-hover {
+    opacity: 1;
+}
+
+.game-image-wrap {
+    position: relative;
+    width: 254px;
+    height: 0;
+    padding-bottom: 56%;
+    overflow: hidden;
+    background: #0d0d0d;
+    display: block;
+    min-height: 120px;
+}
+
+.game-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform-origin: center;
+    transition: filter var(--transition), transform var(--transition), opacity var(--transition);
+    backface-visibility: hidden;
+    display: block;
+    opacity: 1;
+}
+
+.game-image.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  background: linear-gradient(90deg, #111, #131316);
+  border-radius: 8px;
+}
+
+.loading-text {
+  color: var(--muted-text);
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+.game-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.40) 40%, rgba(0, 0, 0, 0.0) 100%);
+    transition: opacity var(--transition), transform var(--transition);
+}
+
+.game-title {
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 20px;
+}
+
+.game-title,
+.game-desc {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.game-hover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    opacity: 0;
+    transition: opacity var(--transition), transform var(--transition);
+    pointer-events: none;
+}
+
+.game-desc {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1.4;
+    max-width: 80%;
+    text-align: left;
+}

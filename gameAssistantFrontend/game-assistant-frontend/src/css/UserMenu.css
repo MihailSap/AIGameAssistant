@@ -1,0 +1,131 @@
+:root {
+    --panel: #0f1113;
+    --muted: #16171a;
+    --text: #e9eef8;
+    --muted-text: #9aa4b2;
+    --accent: #3a7bfd;
+    --accent-2: #3267db;
+    --transition: 220ms cubic-bezier(.2, .9, .2, 1);
+}
+
+.user-menu-root {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.user-icon {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: box-shadow var(--transition), transform var(--transition), background var(--transition);
+}
+
+.user-icon:focus {
+    outline: 2px solid rgba(58, 123, 253, 0.2);
+    box-shadow: 0 6px 18px rgba(58, 123, 253, 0.08);
+    transform: translateY(-2px);
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.user-popup {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 20px);
+    background: linear-gradient(180deg, var(--panel), var(--muted));
+    padding: 12px;
+    border-radius: 10px;
+    min-width: 220px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    z-index: 80;
+    transform-origin: top right;
+    animation: popup-in var(--transition) cubic-bezier(.2, .9, .2, 1);
+}
+
+@keyframes popup-in {
+    from {
+        transform: translateY(-6px) scale(.98);
+        opacity: 0
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1
+    }
+}
+
+.user-popup-header {
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    margin-bottom: 8px;
+}
+
+.user-popup-name {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.user-popup-email {
+    color: var(--muted-text);
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.user-popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.user-popup-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    text-decoration: none;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.user-popup-btn:hover {
+    background: rgba(255, 255, 255, 0.02);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 520px) {
+    .user-popup {
+        min-width: 160px;
+    }
+
+    .user-popup-btn {
+        font-size: 14px;
+        padding: 6px 8px;
+    }
+    .user-popup-name {
+        font-size: 13px;
+    }
+    .user-popup-email {
+        font-size: 12px;
+    }
+    
+}
