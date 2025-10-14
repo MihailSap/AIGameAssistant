@@ -17,7 +17,6 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-    private final FileService fileService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create")

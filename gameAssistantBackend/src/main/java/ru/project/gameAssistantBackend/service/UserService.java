@@ -77,4 +77,17 @@ public class UserService {
         var user = getById(userId);
         userRepository.delete(user);
     }
+
+    @Transactional
+    public void makeUserAdmin(Long id){
+        var user = getById(id);
+        user.setRole(Role.ADMIN);
+        userRepository.save(user);
+    }
+
+    public void makeAdminUser(Long id){
+        var user = getById(id);
+        user.setRole(Role.USER);
+        userRepository.save(user);
+    }
 }

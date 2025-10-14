@@ -3,6 +3,7 @@ package ru.project.gameAssistantBackend.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.project.gameAssistantBackend.dto.ResponseDTO;
 import ru.project.gameAssistantBackend.dto.UpdatePasswordDTO;
 import ru.project.gameAssistantBackend.dto.UserDataDTO;
 import ru.project.gameAssistantBackend.models.JwtAuthentication;
@@ -49,5 +50,21 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id){
         userService.deleteUser(id);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PatchMapping("/{id}/make-admin")
+    public ResponseDTO makeAdmin(@PathVariable("id") Long id){
+        userService.makeUserAdmin(id);
+        String message = String.format("Пользователь с id = %d теперь имеет роль ADMIN", id);
+        return new ResponseDTO(message);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PatchMapping("/{id}/make-not-admin")
+    public ResponseDTO makeNotAdmin(@PathVariable("id") Long id){
+        userService.makeAdminUser(id);
+        String message = String.format("Пользователь с id = %d теперь имеет роль USER", id);
+        return new ResponseDTO(message);
     }
 }

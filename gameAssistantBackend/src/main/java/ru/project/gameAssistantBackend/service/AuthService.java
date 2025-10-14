@@ -28,7 +28,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthService(UserService userService, JwtProvider jwtProvider, UserRepository userRepository, TokenRepository tokenRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserService userService,
+                       JwtProvider jwtProvider,
+                       UserRepository userRepository,
+                       TokenRepository tokenRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
         this.userRepository = userRepository;
