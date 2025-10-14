@@ -8,9 +8,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.JwtRequest;
 import ru.project.gameAssistantBackend.dto.JwtResponse;
-import ru.project.gameAssistantBackend.dto.UserDTO;
+import ru.project.gameAssistantBackend.dto.UserRequestDTO;
 import ru.project.gameAssistantBackend.enums.Role;
 import ru.project.gameAssistantBackend.models.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.Token;
@@ -26,18 +27,20 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileService fileService;
 
     @Autowired
     public AuthService(UserService userService,
                        JwtProvider jwtProvider,
                        UserRepository userRepository,
                        TokenRepository tokenRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder, FileService fileService) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
+        this.fileService = fileService;
     }
 
     @Transactional
@@ -65,23 +68,27 @@ public class AuthService {
 
 
     @Transactional
-    public void register(UserDTO userDTO) {
-        var email = userDTO.email();
+    public User register(UserRequestDTO userRequestDTO) {
+        var email = userRequestDTO.email();
         if(userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Пользователь с таким email уже существует!");
         }
-        var newUser = new User(
-                userDTO.email(),
-                userDTO.login(),
-                passwordEncoder.encode(userDTO.password()),
-                Role.USER
-        );
 
-        if(userDTO.isAdmin()){
+        var newUser = new User();
+        newUser.setEmail(userRequestDTO.email());
+        newUser.setLogin(userRequestDTO.login());
+        newUser.setPassword(passwordEncoder.encode(userRequestDTO.password()));
+        newUser.setRole(Role.USER);
+
+        MultipartFile imageFile = userRequestDTO.imageFile();
+        String imageFileTitle = fileService.save(imageFile);
+        newUser.setImageFileTitle(imageFileTitle);
+
+        if(userRequestDTO.isAdmin()){
             newUser.setRole(Role.ADMIN);
         }
 
-        userRepository.save(newUser);
+        return userRepository.save(newUser);
     }
 
     public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthException {

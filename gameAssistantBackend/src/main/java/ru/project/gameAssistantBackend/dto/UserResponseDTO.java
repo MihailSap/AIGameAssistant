@@ -1,8 +1,9 @@
 package ru.project.gameAssistantBackend.dto;
 
-public record UserDataDTO(
+public record UserResponseDTO(
         Long id,
         String email,
         String login,
-        boolean isAdmin) {
+        boolean isAdmin,
+        String imageFileTitle) {
 }

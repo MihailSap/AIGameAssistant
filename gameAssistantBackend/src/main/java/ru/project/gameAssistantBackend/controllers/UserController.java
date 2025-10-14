@@ -5,8 +5,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.ResponseDTO;
 import ru.project.gameAssistantBackend.dto.UpdatePasswordDTO;
-import ru.project.gameAssistantBackend.dto.UserDataDTO;
+import ru.project.gameAssistantBackend.dto.UserRequestDTO;
+import ru.project.gameAssistantBackend.dto.UserResponseDTO;
 import ru.project.gameAssistantBackend.models.JwtAuthentication;
+import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.AuthService;
 import ru.project.gameAssistantBackend.service.UserService;
 
@@ -21,9 +23,9 @@ public class UserController {
     private final AuthService authService;
 
     @GetMapping("/{id}")
-    public UserDataDTO getUser(@PathVariable("id") Long id){
+    public UserResponseDTO getUser(@PathVariable("id") Long id){
         var user = userService.getById(id);
-        return userService.mapToDTO(user);
+        return userService.mapToResponseDTO(user);
     }
 
     @PatchMapping("/{id}/update/password")
@@ -31,17 +33,23 @@ public class UserController {
         userService.updatePassword(id, updatePasswordDTO);
     }
 
+    @PatchMapping("/{id}/update/image")
+    public UserResponseDTO updateImage(@PathVariable("id") Long id, @ModelAttribute UserRequestDTO userRequestDTO){
+        User user = userService.updateImage(id, userRequestDTO.imageFile());
+        return userService.mapToResponseDTO(user);
+    }
+
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/authenticated")
-    public UserDataDTO getAuthenticatedUser() {
+    public UserResponseDTO getAuthenticatedUser() {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         var personEmail = authInfo.getPrincipal().toString();
-        return userService.getUserDataDTOByEmail(personEmail);
+        return userService.getResponseDTOByEmail(personEmail);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
-    public List<UserDataDTO> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         var usersData = userService.getAllUsers();
         return userService.mapAllUsersDTO(usersData);
     }

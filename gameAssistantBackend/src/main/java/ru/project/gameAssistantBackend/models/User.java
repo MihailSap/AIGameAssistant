@@ -22,11 +22,14 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Token refreshToken;
 
-    public User(String email, String login, String password, Role role) {
+    private String imageFileTitle;
+
+    public User(String email, String login, String password, Role role, String imageFileTitle) {
         this.email = email;
         this.login = login;
         this.password = password;
         this.role = role;
+        this.imageFileTitle = imageFileTitle;
     }
 
     public User() {}
@@ -69,6 +72,14 @@ public class User {
 
     public Token getRefreshToken() {
         return refreshToken;
+    }
+
+    public String getImageFileTitle() {
+        return imageFileTitle;
+    }
+
+    public void setImageFileTitle(String imageFileTitle) {
+        this.imageFileTitle = imageFileTitle;
     }
 
     public void setRefreshToken(Token token) {

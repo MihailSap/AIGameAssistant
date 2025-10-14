@@ -5,8 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.UpdatePasswordDTO;
-import ru.project.gameAssistantBackend.dto.UserDataDTO;
+import ru.project.gameAssistantBackend.dto.UserResponseDTO;
 import ru.project.gameAssistantBackend.enums.Role;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.UserRepository;
@@ -21,20 +22,22 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileService fileService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.fileService = fileService;
     }
 
     public Optional<User> getByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public UserDataDTO getUserDataDTOByEmail(String email) {
+    public UserResponseDTO getResponseDTOByEmail(String email) {
         var user = getByEmail(email).orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        return mapToDTO(user);
+        return mapToResponseDTO(user);
     }
 
     public User getById(Long id){
@@ -42,12 +45,13 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Пользователь с таким id не найден"));
     }
 
-    public UserDataDTO mapToDTO(User user) {
-        return new UserDataDTO(
+    public UserResponseDTO mapToResponseDTO(User user) {
+        return new UserResponseDTO(
                 user.getId(),
                 user.getEmail(),
                 user.getLogin(),
-                user.getRole().equals(Role.ADMIN)
+                user.getRole().equals(Role.ADMIN),
+                user.getImageFileTitle()
         );
     }
 
@@ -60,16 +64,30 @@ public class UserService {
         log.info("Пароль успешно обновлен");
     }
 
+    @Transactional
+    public User updateImage(Long userId, MultipartFile imageFile){
+        User user = getById(userId);
+
+        var oldUserImageTitle = user.getImageFileTitle();
+        fileService.delete(oldUserImageTitle);
+
+        var newUserImageTitle = fileService.save(imageFile);
+        user.setImageFileTitle(newUserImageTitle);
+        userRepository.save(user);
+
+        return user;
+    }
+
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
 
-    public List<UserDataDTO> mapAllUsersDTO(List<User> users){
-        List<UserDataDTO> userDataDTOs = new ArrayList<>();
+    public List<UserResponseDTO> mapAllUsersDTO(List<User> users){
+        List<UserResponseDTO> userResponseDTOS = new ArrayList<>();
         for(var user : users){
-            userDataDTOs.add(mapToDTO(user));
+            userResponseDTOS.add(mapToResponseDTO(user));
         }
-        return userDataDTOs;
+        return userResponseDTOS;
     }
 
     @Transactional

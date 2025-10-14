@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.*;
+import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.AuthService;
+import ru.project.gameAssistantBackend.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -13,6 +15,7 @@ import ru.project.gameAssistantBackend.service.AuthService;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
@@ -21,9 +24,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registration(@RequestBody UserDTO userDTO){
-        authService.register(userDTO);
-        return ResponseEntity.ok().build();
+    public UserResponseDTO registration(@ModelAttribute UserRequestDTO userRequestDTO){
+        User user = authService.register(userRequestDTO);
+        return userService.mapToResponseDTO(user);
     }
 
     @PostMapping("/logout")
