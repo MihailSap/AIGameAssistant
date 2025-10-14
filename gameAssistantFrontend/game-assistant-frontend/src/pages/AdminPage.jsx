@@ -1,0 +1,282 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import { userApi } from "../api/users";
+import { gameApi } from "../api/game";
+import { fileApi } from "../api/file";
+
+import UsersTable from "../components/UsersTable";
+import GamesTable from "../components/GamesTable";
+import Modal from "../components/Modal";
+import GameForm from "../components/GameForm";
+
+import "../css/AdminPage.css";
+
+export default function AdminPage() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [currentUser, setCurrentUser] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [games, setGames] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [usersSearch, setUsersSearch] = useState("");
+  const [gamesSearch, setGamesSearch] = useState("");
+
+  const [confirmState, setConfirmState] = useState({ open: false, title: "", text: "", onConfirm: null });
+  const [gameFormState, setGameFormState] = useState({ open: false, mode: "create", initial: null });
+
+  useEffect(() => {
+    let mounted = true;
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const authUser = await userApi.getAuthenticated();
+        if (!mounted) return;
+
+        if (!authUser?.isAdmin) {
+          navigate("/", { replace: true });
+          return;
+        }
+
+        setCurrentUser(authUser);
+
+        const [allUsers, allGames] = await Promise.all([userApi.getAll(), gameApi.getAll()]);
+        if (!mounted) return;
+
+        const others = (allUsers || []).filter(u => u.id !== authUser.id);
+        const admins = others.filter(u => u.isAdmin);
+        const regulars = others.filter(u => !u.isAdmin);
+        setUsers([authUser, ...admins, ...regulars]);
+        setGames(allGames || []);
+        setError(null);
+      } catch (err) {
+        console.error(err);
+        setError(err?.response?.data?.message || err?.message || "Ошибка при загрузке данных");
+        if (err?.response?.status === 401) navigate("/login", { replace: true });
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    loadData();
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
+
+  const refreshData = async () => {
+    try {
+      const [allUsers, allGames] = await Promise.all([userApi.getAll(), gameApi.getAll()]);
+      const authUser = await userApi.getAuthenticated();
+      const others = (allUsers || []).filter(u => u.id !== authUser.id);
+      const admins = others.filter(u => u.isAdmin);
+      const regulars = others.filter(u => !u.isAdmin);
+      setUsers([authUser, ...admins, ...regulars]);
+      setGames(allGames || []);
+      setCurrentUser(authUser);
+    } catch (err) {
+      console.error("refresh error", err);
+    }
+  };
+
+  const handleDeleteUser = (user) => {
+    setConfirmState({
+      open: true,
+      title: `Удалить пользователя ${user.login}?`,
+      text: `Вы уверены, что хотите удалить пользователя "${user.login}" (${user.email})? Это действие нельзя отменить.`,
+      onConfirm: async () => {
+        try {
+          await userApi.delete(user.id);
+          setConfirmState({ open: false });
+          if (currentUser && user.id === currentUser.id) {
+            await logout();
+            navigate("/login", { replace: true });
+            return;
+          }
+          await refreshData();
+        } catch (err) {
+          console.error(err);
+          alert("Не удалось удалить пользователя.");
+          setConfirmState({ open: false });
+        }
+      },
+    });
+  };
+
+  const handleToggleAdmin = (user) => {
+    alert(`Требуется реализация: сменить роль для ${user.login}`);
+  };
+
+  const handleOpenCreateGame = () => {
+    setGameFormState({ open: true, mode: "create", initial: null });
+  };
+
+  const handleOpenEditGame = (game) => {
+    setGameFormState({ open: true, mode: "edit", initial: game });
+  };
+
+  const handleDeleteGame = (game) => {
+    setConfirmState({
+      open: true,
+      title: `Удалить игру "${game.title}"?`,
+      text: `Вы действительно хотите удалить игру "${game.title}"? Это действие нельзя отменить.`,
+      onConfirm: async () => {
+        try {
+          await gameApi.delete(game.id);
+          setConfirmState({ open: false });
+          await refreshData();
+        } catch (err) {
+          console.error(err);
+          alert("Не удалось удалить игру.");
+          setConfirmState({ open: false });
+        }
+      },
+    });
+  };
+
+  const handleDownloadFile = async (fileType, fileTitle) => {
+    try {
+      if (!fileTitle) return;
+      let blob;
+      if (fileType === "image") {
+        blob = await fileApi.getImageBlob(fileTitle);
+      } else {
+        blob = await fileApi.getRulesBlob(fileTitle);
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileTitle;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error("download error", err);
+      alert("Не удалось скачать файл.");
+    }
+  };
+
+  const handleGameFormSave = async (formData, mode, id) => {
+    try {
+      if (mode === "create") {
+        await gameApi.create(formData);
+      } else {
+        await gameApi.update(id, formData);
+      }
+      setGameFormState({ open: false, mode: "create", initial: null });
+      await refreshData();
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка при сохранении игры.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="admin-root">
+        <div className="admin-header">
+          <h1>Админская панель</h1>
+        </div>
+        <div className="admin-loading">Загрузка...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="admin-root">
+        <div className="admin-header">
+          <h1>Админская панель</h1>
+          <Link to="/" className="main-link">На главную</Link>
+        </div>
+        <div className="admin-error">{error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-root">
+      <header className="admin-header">
+        <div className="admin-title">
+          <h1>Админская панель</h1>
+          <Link to="/" className="main-link">На главную</Link>
+        </div>
+        <div>
+          <button className="btn btn-logout" onClick={logout}>Выйти</button>
+        </div>
+      </header>
+
+      <main className="admin-main">
+        <section className="admin-section">
+          <div className="admin-table-header">
+            <h2 className="admin-table-title">Пользователи</h2>
+            <div className="admin-table-controls">
+              <input
+                className="admin-table-search"
+                placeholder="Поиск пользователей..."
+                value={usersSearch}
+                onChange={(e) => setUsersSearch(e.target.value)}
+              />
+            </div>
+          </div>
+          <UsersTable
+            users={users}
+            currentUser={currentUser}
+            onDelete={handleDeleteUser}
+            onToggleAdmin={handleToggleAdmin}
+            search={usersSearch}
+          />
+        </section>
+
+        <section className="admin-section">
+          <div className="admin-table-header">
+            <h2 className="admin-table-title">Игры</h2>
+            <div className="admin-table-controls">
+              <input
+                className="admin-table-search"
+                placeholder="Поиск игр..."
+                value={gamesSearch}
+                onChange={(e) => setGamesSearch(e.target.value)}
+              />
+              <button className="btn btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
+            </div>
+          </div>
+
+          <GamesTable
+            games={games}
+            onEdit={handleOpenEditGame}
+            onDelete={handleDeleteGame}
+            onDownloadFile={handleDownloadFile}
+            search={gamesSearch}
+          />
+        </section>
+      </main>
+
+      {confirmState.open && (
+        <Modal title={confirmState.title} onClose={() => setConfirmState({ open: false })}>
+          <p>{confirmState.text}</p>
+          <div className="admin-modal-actions">
+            <button className="btn btn-ghost" onClick={() => setConfirmState({ open: false })}>Отмена</button>
+            <button className="btn btn-danger" onClick={confirmState.onConfirm}>Удалить</button>
+          </div>
+        </Modal>
+      )}
+
+      {gameFormState.open && (
+        <Modal title={gameFormState.mode === "create" ? "Создать игру" : "Редактировать игру"} onClose={() => setGameFormState({ open: false })}>
+          <GameForm
+            mode={gameFormState.mode}
+            initial={gameFormState.initial}
+            onCancel={() => setGameFormState({ open: false })}
+            onSave={handleGameFormSave}
+          />
+        </Modal>
+      )}
+    </div>
+  );
+}

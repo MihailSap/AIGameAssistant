@@ -1,0 +1,189 @@
+:root {
+  --text: #e8e8e8;
+  --muted-text: #a9a9a9;
+  --accent: #3a7bfd;
+  --danger: #e25555;
+  --transition: 160ms ease;
+}
+
+.table-wrap {
+  overflow: auto;
+  border-radius: 8px;
+}
+
+.admin-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.admin-table-title {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.admin-table-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-table-search {
+  min-width: 220px;
+  max-width: 420px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.03);
+  color: var(--text);
+  outline: none;
+  transition: box-shadow var(--transition), transform var(--transition);
+  font-size: 14px;
+}
+
+.admin-table-search::placeholder {
+  color: var(--muted-text);
+}
+
+.admin-table-search:focus {
+  box-shadow: 0 8px 30px rgba(58,123,253,0.12);
+  transform: translateY(-2px);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 580px;
+}
+
+.admin-table thead th {
+  text-align: center;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--muted-text);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+}
+
+.admin-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  vertical-align: middle;
+  text-align: center;
+  font-size: 14px;
+}
+
+.admin-table tbody tr.row-current {
+  background: linear-gradient(90deg, rgba(58,123,253,0.06), rgba(255,255,255,0.01));
+  box-shadow: inset 4px 0 0 0 rgba(58,123,253,0.18);
+}
+
+.admin-table tbody tr.row-admin {
+  background: linear-gradient(90deg, rgba(255, 48, 48, 0.06), transparent);
+  box-shadow: inset 4px 0 0 0 rgba(255,165,0,0.12);
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.pagination-btn {
+  min-width: 44px;
+  width: 44px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 0;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.pagination-indicator {
+  font-size: 14px;
+  color: var(--muted-text);
+  min-width: 64px;
+  text-align: center;
+}
+
+.icon-btn, .link-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.icon-btn:hover, .link-btn:hover {
+  background: rgba(255,255,255,0.02);
+  transform: translateY(-2px);
+}
+
+.icon-btn.danger {
+  color: var(--danger);
+}
+
+@media (max-width: 680px) {
+  .admin-section {
+    min-width: 0;
+  }
+
+  .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  .admin-table {
+    width: max-content;
+    min-width: 580px;
+    table-layout: auto;
+    white-space: nowrap;
+  }
+
+  .admin-table thead th {
+    padding: 12px 4px;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    white-space: nowrap;
+  }
+
+  .admin-table tbody td {
+    padding: 12px 4px;
+    white-space: nowrap;
+  }
+
+  .admin-table-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .admin-table-search {
+    width: 100%;
+    max-width: none;
+  }
+}
+
