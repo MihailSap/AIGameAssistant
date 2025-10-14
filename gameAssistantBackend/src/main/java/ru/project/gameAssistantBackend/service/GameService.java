@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.project.gameAssistantBackend.dto.GameRequestDTO;
-import ru.project.gameAssistantBackend.dto.GameResponseDTO;
+import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
+import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
+import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
 import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.repository.GameRepository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -50,19 +52,21 @@ public class GameService {
         game.setTitle(gameDTO.title());
         game.setDescription(gameDTO.description());
 
-        var oldImageFileTitle = game.getImageFileTitle();
-        fileService.delete(oldImageFileTitle);
-
-        var oldRulesFileTitle = game.getRulesFileTitle();
-        fileService.delete(oldRulesFileTitle);
-
         var newImageFile = gameDTO.imageFile();
-        var newImageFileTitle = fileService.save(newImageFile);
-        game.setImageFileTitle(newImageFileTitle);
+        if(!newImageFile.isEmpty()){
+            var oldImageFileTitle = game.getImageFileTitle();
+            fileService.delete(oldImageFileTitle);
+            var newImageFileTitle = fileService.save(newImageFile);
+            game.setImageFileTitle(newImageFileTitle);
+        }
 
         var newRulesFile = gameDTO.rulesFile();
-        var newRulesFileTitle = fileService.save(newRulesFile);
-        game.setRulesFileTitle(newRulesFileTitle);
+        if(!newRulesFile.isEmpty()){
+            var oldRulesFileTitle = game.getRulesFileTitle();
+            fileService.delete(oldRulesFileTitle);
+            var newRulesFileTitle = fileService.save(newRulesFile);
+            game.setRulesFileTitle(newRulesFileTitle);
+        }
 
         gameRepository.save(game);
         log.info("Игра с id {} была обновлена", id);
@@ -104,5 +108,22 @@ public class GameService {
                 game.getDescription(),
                 game.getImageFileTitle(),
                 game.getRulesFileTitle());
+    }
+
+    public List<GamePreviewDTO> mapToPreviews(Collection<Game> games){
+        List<GamePreviewDTO> gamePreviewDTOs = new ArrayList<>();
+        for(var game : games){
+            gamePreviewDTOs.add(mapToPreview(game));
+        }
+        return gamePreviewDTOs;
+    }
+
+    public GamePreviewDTO mapToPreview(Game game){
+        return new GamePreviewDTO(
+                game.getId(),
+                game.getTitle(),
+                game.getDescription(),
+                game.getImageFileTitle()
+        );
     }
 }

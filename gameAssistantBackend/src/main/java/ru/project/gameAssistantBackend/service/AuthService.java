@@ -9,9 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.project.gameAssistantBackend.dto.JwtRequest;
-import ru.project.gameAssistantBackend.dto.JwtResponse;
-import ru.project.gameAssistantBackend.dto.UserRequestDTO;
+import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
+import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
+import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.enums.Role;
 import ru.project.gameAssistantBackend.models.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.Token;
@@ -65,7 +65,6 @@ public class AuthService {
             throw new AuthException("Неправильный пароль");
         }
     }
-
 
     @Transactional
     public User register(UserRequestDTO userRequestDTO) {
@@ -137,8 +136,11 @@ public class AuthService {
         userRepository.save(user);
     }
 
-
     public JwtAuthentication getAuthInfo() {
         return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    public String getAuthenticatedUserEmail(){
+        return getAuthInfo().getPrincipal().toString();
     }
 }

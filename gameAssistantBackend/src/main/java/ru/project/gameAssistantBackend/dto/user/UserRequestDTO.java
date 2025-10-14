@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.dto;
+package ru.project.gameAssistantBackend.dto.user;
 
 import org.springframework.web.multipart.MultipartFile;
 

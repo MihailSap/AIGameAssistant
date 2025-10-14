@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.dto;
+package ru.project.gameAssistantBackend.dto.user;
 
 public record UserResponseDTO(
         Long id,

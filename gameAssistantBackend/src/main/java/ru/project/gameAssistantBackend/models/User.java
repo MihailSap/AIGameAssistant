@@ -3,6 +3,9 @@ package ru.project.gameAssistantBackend.models;
 import jakarta.persistence.*;
 import ru.project.gameAssistantBackend.enums.Role;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "uzer")
 public class User {
@@ -23,6 +26,14 @@ public class User {
     private Token refreshToken;
 
     private String imageFileTitle;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "uzer_favourites",
+            joinColumns = @JoinColumn(name = "uzer_id"),
+            inverseJoinColumns = @JoinColumn(name = "game_id")
+    )
+    private Set<Game> games = new HashSet<>();
 
     public User(String email, String login, String password, Role role, String imageFileTitle) {
         this.email = email;
@@ -80,6 +91,24 @@ public class User {
 
     public void setImageFileTitle(String imageFileTitle) {
         this.imageFileTitle = imageFileTitle;
+    }
+
+    public Set<Game> getGames() {
+        return games;
+    }
+
+    public void setGames(Set<Game> games) {
+        this.games = games;
+    }
+
+    public void addGame(Game game) {
+        games.add(game);
+        game.getUsers().add(this);
+    }
+
+    public void removeGame(Game game) {
+        games.remove(game);
+        game.getUsers().remove(this);
     }
 
     public void setRefreshToken(Token token) {

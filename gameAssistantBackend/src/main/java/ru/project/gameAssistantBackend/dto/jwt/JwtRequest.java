@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.dto;
+package ru.project.gameAssistantBackend.dto.jwt;
 
 public class JwtRequest {
     private String email;

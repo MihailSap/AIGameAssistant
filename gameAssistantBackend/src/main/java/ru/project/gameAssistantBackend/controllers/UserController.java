@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.ResponseDTO;
-import ru.project.gameAssistantBackend.dto.UpdatePasswordDTO;
-import ru.project.gameAssistantBackend.dto.UserRequestDTO;
-import ru.project.gameAssistantBackend.dto.UserResponseDTO;
+import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
+import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
+import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
 import ru.project.gameAssistantBackend.models.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.AuthService;
@@ -63,7 +63,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/{id}/make-admin")
     public ResponseDTO makeAdmin(@PathVariable("id") Long id){
-        userService.makeUserAdmin(id);
+        userService.changeRole(id);
         String message = String.format("Пользователь с id = %d теперь имеет роль ADMIN", id);
         return new ResponseDTO(message);
     }
@@ -71,7 +71,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/{id}/make-not-admin")
     public ResponseDTO makeNotAdmin(@PathVariable("id") Long id){
-        userService.makeAdminUser(id);
+        userService.changeRole(id);
         String message = String.format("Пользователь с id = %d теперь имеет роль USER", id);
         return new ResponseDTO(message);
     }

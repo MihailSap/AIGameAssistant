@@ -1,9 +1,10 @@
-package ru.project.gameAssistantBackend.dto;
+package ru.project.gameAssistantBackend.dto.game;
 
 public record GameResponseDTO(
         Long id,
         String title,
         String description,
         String imageFileTitle,
-        String rulesFileTitle) {
+        String rulesFileTitle
+) {
 }

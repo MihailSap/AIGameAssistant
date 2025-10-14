@@ -6,8 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.project.gameAssistantBackend.dto.UpdatePasswordDTO;
-import ru.project.gameAssistantBackend.dto.UserResponseDTO;
+import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
+import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
 import ru.project.gameAssistantBackend.enums.Role;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.UserRepository;
@@ -23,12 +23,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
+    private final GameService gameService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileService, GameService gameService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileService = fileService;
+        this.gameService = gameService;
     }
 
     public Optional<User> getByEmail(String email) {
@@ -97,15 +99,13 @@ public class UserService {
     }
 
     @Transactional
-    public void makeUserAdmin(Long id){
+    public void changeRole(Long id){
         var user = getById(id);
-        user.setRole(Role.ADMIN);
-        userRepository.save(user);
-    }
-
-    public void makeAdminUser(Long id){
-        var user = getById(id);
-        user.setRole(Role.USER);
+        if(user.getRole().equals(Role.ADMIN)){
+            user.setRole(Role.USER);
+        } else {
+            user.setRole(Role.ADMIN);
+        }
         userRepository.save(user);
     }
 }

@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.project.gameAssistantBackend.dto.GameRequestDTO;
-import ru.project.gameAssistantBackend.dto.GameResponseDTO;
-import ru.project.gameAssistantBackend.service.FileService;
+import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
+import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
+import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
 import ru.project.gameAssistantBackend.service.GameService;
 
 import java.util.List;
@@ -42,8 +42,8 @@ public class GameController {
     }
 
     @GetMapping("/all")
-    public List<GameResponseDTO> readAll(){
+    public List<GamePreviewDTO> readAll(){
         var games = gameService.getAll();
-        return gameService.mapToDTOs(games);
+        return gameService.mapToPreviews(games);
     }
 }
