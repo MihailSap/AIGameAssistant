@@ -66,7 +66,7 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
 
       <div className="admin-modal-actions">
         <button type="button" className="btn btn-ghost" onClick={onCancel} disabled={submitting}>Отмена</button>
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
+        <button type="submit" className="btn" disabled={submitting}>
           {submitting ? "Сохранение..." : mode === "create" ? "Создать" : "Сохранить"}
         </button>
       </div>

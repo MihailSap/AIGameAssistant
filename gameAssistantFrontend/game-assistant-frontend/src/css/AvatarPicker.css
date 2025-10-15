@@ -41,6 +41,10 @@
     flex: 1 1 auto;
 }
 
+.avatar-actions .btn {
+    padding: 10px 30px;
+}
+
 .visually-hidden {
     position: absolute !important;
     height: 1px;

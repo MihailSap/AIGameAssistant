@@ -51,7 +51,7 @@ export default function UsersTable({ users = [], currentUser = null, onDelete, o
                     <input
                       type="checkbox"
                       checked={!!u.isAdmin}
-                      onChange={() => onToggleAdmin(u)}
+                      onChange={(e) => onToggleAdmin(u, e.target.checked)}
                       aria-label={`isAdmin-${u.id}`}
                     />
                   </td>

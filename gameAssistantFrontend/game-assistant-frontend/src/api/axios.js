@@ -5,7 +5,7 @@ const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 100000,
 });
 
 const refreshClient = axios.create({
@@ -63,7 +63,9 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+    const accessToken = getAccessToken();
+
+    if (error.response && (error.response.status === 401 || (accessToken && error.response.status === 403))) {
       if (originalRequest._retry) {
         return Promise.reject(error);
       }

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "../css/ProfilePage.css";
 import "../css/AvatarPicker.css";
 
-export default function AvatarPicker({ initialUrl = null, onSelectFile }) {
+export default function AvatarPicker({ initialUrl = null, onSelectFile, loading, loadingText }) {
   const [preview, setPreview] = useState(initialUrl);
   const inputRef = useRef(null);
   const lastBlobRef = useRef(null);
@@ -57,9 +57,15 @@ export default function AvatarPicker({ initialUrl = null, onSelectFile }) {
           className="visually-hidden"
           onChange={onFileChange}
         />
-        <button type="button" className="btn btn-ghost" onClick={trigger}>
-          Изменить фотографию
-        </button>
+        {loading ? (
+          <div className="profile-message">
+            {loadingText}
+          </div>
+        ) : (
+          <button type="button" className="btn btn-ghost" onClick={trigger}>
+            Изменить фотографию
+          </button>
+        )}
       </div>
     </div>
   );

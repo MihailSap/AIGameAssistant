@@ -1,8 +1,8 @@
-// src/pages/ProfilePage.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { userApi } from "../api/users";
+import { fileApi } from "../api/file";
 import AvatarPicker from "../components/AvatarPicker";
 
 import "../css/ProfilePage.css";
@@ -20,53 +20,131 @@ export default function ProfilePage() {
   const [pwError, setPwError] = useState("");
   const [successChangePw, setSuccessChangePw] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const mountedRef = useRef(true);
 
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarUrl, setAvatarUrl] = useState(authUser?.avatarUrl || null);
+  const attemptedRef = useRef(false);
+  const blobRef = useRef(null);
+  const mountedRef = useRef(true);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  const revokeBlobRef = () => {
+    if (blobRef.current && typeof blobRef.current === "string" && blobRef.current.startsWith("blob:")) {
+      try {
+        URL.revokeObjectURL(blobRef.current);
+      } catch (revErr) {
+        // eslint-disable-next-line no-console
+        console.warn("Ошибка revokeObjectURL:", revErr);
+      }
+      blobRef.current = null;
+    }
+  };
+
+  const makeBlobUrl = (blob) => {
+    const url = URL.createObjectURL(blob);
+    blobRef.current = url;
+    return url;
+  };
 
   useEffect(() => {
     mountedRef.current = true;
-    const fetch = async () => {
+
+    const load = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const resp = await userApi.getAuthenticated();
+        const auth = await userApi.getAuthenticated();
         if (!mountedRef.current) return;
-        setUser(resp || null);
-        if (resp && resp.avatarUrl) setAvatarUrl(resp.avatarUrl);
-        setError(null);
+        setUser(auth || null);
       } catch (err) {
-        console.warn(err);
+        // eslint-disable-next-line no-console
+        console.error("Ошибка получения профиля:", err);
         setError(err?.response?.data?.message || err?.message || "Не удалось загрузить данные пользователя");
       } finally {
         if (mountedRef.current) setLoading(false);
       }
     };
 
-    fetch();
+    load();
+
     return () => {
       mountedRef.current = false;
-      if (avatarUrl && avatarUrl.startsWith("blob:")) URL.revokeObjectURL(avatarUrl);
+      revokeBlobRef();
     };
-  }, [avatarUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    attemptedRef.current = false;
+    revokeBlobRef();
+    setAvatarUrl(null);
+
+    const imageFileTitle = user?.imageFileTitle;
+    setAvatarLoading(!!imageFileTitle);
+
+    if (!imageFileTitle) {
+      setAvatarLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      if (attemptedRef.current) return;
+      attemptedRef.current = true;
+      setAvatarLoading(true);
+
+      try {
+        const blob = await fileApi.getImageBlob(imageFileTitle);
+        if (cancelled) {
+          if (blob) {
+            try {
+              const tmp = URL.createObjectURL(blob);
+              URL.revokeObjectURL(tmp);
+            } catch (_) {
+            }
+          }
+          return;
+        }
+        const url = makeBlobUrl(blob);
+        if (mountedRef.current) {
+          setAvatarUrl(url);
+          setAvatarLoading(false);
+          setError(null);
+        } else {
+          revokeBlobRef();
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn("Не удалось загрузить изображение через blob:", imageFileTitle, err);
+        if (mountedRef.current) {
+          setAvatarUrl(null);
+          setAvatarLoading(false);
+          setError(err?.response?.data?.message || err?.message || "Не удалось загрузить изображение профиля");
+        }
+      } finally {
+        attemptedRef.current = false;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.imageFileTitle]);
 
   useEffect(() => {
     setPwError("");
     setShortPwError("");
     setDiffPwError("");
-    if (!newPassword && !repeatPassword) {
-      setPwError("");
-      setShortPwError("");
-      setDiffPwError("");
-      return;
-    }
+
+    if (!newPassword && !repeatPassword) return;
+
     if (newPassword.length > 0 && (newPassword.length < 4 || newPassword.length > 30)) {
       setShortPwError("Пароль должен быть не менее 4-х символов");
       return;
     }
     if (repeatPassword.length > 0 && newPassword !== repeatPassword) {
       setDiffPwError("Пароли не совпадают");
-      return;
     }
   }, [newPassword, repeatPassword]);
 
@@ -79,30 +157,88 @@ export default function ProfilePage() {
       setPwError("Неизвестный пользователь — повторите вход.");
       return;
     }
+
     setIsSubmitting(true);
+    setPwError("");
+    setSuccessChangePw("");
+
     try {
-      await userApi.updatePassword(user.id, { newPassword: newPassword });
+      await userApi.updatePassword(user.id, { newPassword });
       setNewPassword("");
       setRepeatPassword("");
       setSuccessChangePw("Пароль успешно изменён");
     } catch (err) {
-      console.error(err);
-      setPwError("Не удалось сменить пароль");
+      // eslint-disable-next-line no-console
+      console.error("Ошибка смены пароля:", err);
+      setPwError(err?.response?.data?.message || err?.message || "Не удалось сменить пароль");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleAvatarSelect = (file) => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    if (avatarUrl && avatarUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(avatarUrl);
+  const handleAvatarSelect = async (file) => {
+    if (!file) {
+      setError("Файл не выбран");
+      return;
     }
-    setAvatarUrl(url);
-    setAvatarFile(file);
+    if (!user || !user.id) {
+      setError("Неизвестный пользователь — обновление невозможно.");
+      return;
+    }
 
-    // TODO: upload to server if endpoint exists, then set server-provided URL
+    const localPreview = URL.createObjectURL(file);
+    revokeBlobRef();
+    blobRef.current = localPreview;
+    setAvatarUrl(localPreview);
+    setError(null);
+
+    setAvatarUploading(true);
+
+    try {
+      const refreshed = await userApi.updateImage(user.id, {
+        email: user.email ?? "",
+        login: user.login ?? "",
+        password: "",
+        isAdmin: user.isAdmin ?? false,
+        imageFile: file,
+      });
+
+      if (!mountedRef.current) {
+        if (localPreview && localPreview.startsWith("blob:")) {
+          try {
+            URL.revokeObjectURL(localPreview);
+          } catch (revErr) {
+            // eslint-disable-next-line no-console
+            console.warn("Ошибка revoke local preview после размонтирования:", revErr);
+          }
+        }
+        return;
+      }
+
+      setUser(refreshed || null);
+
+      if (!refreshed?.imageFileTitle) {
+        setError("Аватар загружен, но сервер не вернул ссылку на изображение.");
+      } else {
+        setError(null);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Ошибка загрузки аватара на сервер:", err);
+      if (localPreview && localPreview.startsWith("blob:")) {
+        try {
+          URL.revokeObjectURL(localPreview);
+        } catch (revErr) {
+          // eslint-disable-next-line no-console
+          console.warn("Ошибка освобождения локального preview после ошибки:", revErr);
+        }
+      }
+      blobRef.current = null;
+      setAvatarUrl(null);
+      setError(err?.response?.data?.message || err?.message || "Не удалось загрузить аватар на сервер");
+    } finally {
+      if (mountedRef.current) setAvatarUploading(false);
+    }
   };
 
   return (
@@ -113,7 +249,7 @@ export default function ProfilePage() {
       </div>
 
       {loading && <div className="profile-message">Загрузка...</div>}
-      {error && <div className="profile-error">{error}</div>}
+      {error && <div className="profile-error" role="alert">{error}</div>}
 
       {!loading && user && (
         <>
@@ -121,7 +257,14 @@ export default function ProfilePage() {
             <section className="profile-panel profile-panel-left">
               <div className="profile-panel-inner">
                 <h2 className="profile-section-title small">Профиль</h2>
-                <AvatarPicker initialUrl={avatarUrl} onSelectFile={handleAvatarSelect} />
+
+                <AvatarPicker
+                  initialUrl={avatarUrl}
+                  onSelectFile={handleAvatarSelect}
+                  disabled={avatarUploading}
+                  loading={avatarLoading || avatarUploading}
+                  loadingText={avatarUploading ? "Отправка на сервер..." : "Загрузка изображения..."}
+                />
 
                 <div className="user-info">
                   <div className="user-field">
@@ -177,12 +320,12 @@ export default function ProfilePage() {
                   </label>
 
                   {pwError && <div className="user-field-error" role="alert">{pwError}</div>}
-                  {successChangePw && <div className="profile-success-note" role="alert">{successChangePw}</div>}
+                  {successChangePw && <div className="profile-success-note" role="status">{successChangePw}</div>}
 
                   <div className="profile-password-actions">
                     <button
                       type="submit"
-                      className="btn btn-primary"
+                      className="btn"
                       disabled={!canSubmitPassword}
                     >
                       {isSubmitting ? "Сменяем..." : "Сменить"}

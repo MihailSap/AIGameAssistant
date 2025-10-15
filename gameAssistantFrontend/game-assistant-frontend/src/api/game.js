@@ -2,10 +2,18 @@ import { apiClient } from "./axios";
 
 function buildFormData(gameDTO) {
   const fd = new FormData();
-  if (gameDTO.title !== undefined && gameDTO.title !== null) fd.append("title", gameDTO.title);
-  if (gameDTO.description !== undefined && gameDTO.description !== null) fd.append("description", gameDTO.description);
-  if (gameDTO.imageFile) fd.append("imageFile", gameDTO.imageFile);
-  if (gameDTO.rulesFile) fd.append("rulesFile", gameDTO.rulesFile);
+  fd.append("title", gameDTO.title);
+  fd.append("description", gameDTO.description);
+  if (gameDTO.imageFile) {
+    fd.append("imageFile", gameDTO.imageFile)
+  } else {
+    fd.append("imageFile", new Blob());
+  }
+  if (gameDTO.rulesFile) {
+    fd.append("rulesFile", gameDTO.rulesFile);
+  } else {
+    fd.append("rulesFile", new Blob())
+  }
   return fd;
 }
 
