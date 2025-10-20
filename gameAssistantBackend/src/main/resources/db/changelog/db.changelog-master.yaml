@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/006-add-image-to-user.yaml
   - include:
       file: db/changelog/007-add-user-game.yaml
+  - include:
+      file: db/changelog/008-create-prompt.yaml
