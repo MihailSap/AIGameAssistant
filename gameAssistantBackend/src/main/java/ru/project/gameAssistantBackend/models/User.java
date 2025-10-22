@@ -35,6 +35,9 @@ public class User {
     )
     private Set<Game> games = new HashSet<>();
 
+    @OneToMany(mappedBy = "uzer")
+    private Set<Chat> chats;
+
     public User(String email, String login, String password, Role role, String imageFileTitle) {
         this.email = email;
         this.login = login;

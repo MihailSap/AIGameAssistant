@@ -2,11 +2,13 @@ package ru.project.gameAssistantBackend.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.project.gameAssistantBackend.models.Message;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 @Service
 public class YandexGPTService {
@@ -52,5 +54,10 @@ public class YandexGPTService {
         }
 
         return "Не получилось обработать запрос";
+    }
+
+    public String getAnswerByMessages(List<Message> messages) {
+        //TODO: Реализовать
+        return "ANSWER";
     }
 }

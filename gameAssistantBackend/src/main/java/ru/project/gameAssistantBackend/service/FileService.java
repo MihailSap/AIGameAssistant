@@ -1,5 +1,7 @@
 package ru.project.gameAssistantBackend.service;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 
 @Service
 public class FileService {
@@ -52,8 +55,17 @@ public class FileService {
         }
     }
 
-    public Resource getFile(String fileTitle) throws MalformedURLException {
+    public Resource getFileResource(String fileTitle) throws MalformedURLException {
         var path = Paths.get(String.format("uploads/%s", fileTitle));
         return new UrlResource(path.toUri());
+    }
+
+    public String extractTextFromPDF(String fileTitle) throws IOException {
+        File file = getFileResource(fileTitle).getFile();
+        PDDocument document = PDDocument.load(file);
+        PDFTextStripper stripper = new PDFTextStripper();
+        String text = stripper.getText(document);
+        document.close();
+        return text;
     }
 }

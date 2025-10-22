@@ -33,6 +33,10 @@ public class PromptService {
                 .orElseThrow(() -> new RuntimeException("Промпт не найден"));
     }
 
+    public String getPromptText(){
+        return get().getText();
+    }
+
     @Transactional
     public Prompt update(PromptDTO promptDTO){
         if(!isPromptExists()){

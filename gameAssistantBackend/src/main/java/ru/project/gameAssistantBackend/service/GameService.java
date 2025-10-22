@@ -10,6 +10,7 @@ import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
 import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.repository.GameRepository;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -125,5 +126,11 @@ public class GameService {
                 game.getDescription(),
                 game.getImageFileTitle()
         );
+    }
+
+    public String getRulesText(Long id) throws IOException {
+        Game game = getById(id);
+        String rulesFileTitle = game.getRulesFileTitle();
+        return fileService.extractTextFromPDF(rulesFileTitle);
     }
 }

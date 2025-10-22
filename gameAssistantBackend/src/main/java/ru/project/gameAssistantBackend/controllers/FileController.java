@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.project.gameAssistantBackend.service.FileService;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/file")
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class FileController {
 
     @GetMapping("/image/{imageFileTitle}")
     public ResponseEntity<Resource> getImageFile(@PathVariable("imageFileTitle") String imageFileTitle) throws Exception {
-        var resource = fileService.getFile(imageFileTitle);
+        var resource = fileService.getFileResource(imageFileTitle);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(resource);
@@ -27,9 +29,14 @@ public class FileController {
 
     @GetMapping("/rules/{rulesFileTitle}")
     public ResponseEntity<Resource> getRulesFile(@PathVariable("rulesFileTitle") String rulesFileTitle) throws Exception {
-        var resource = fileService.getFile(rulesFileTitle);
+        var resource = fileService.getFileResource(rulesFileTitle);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
+    }
+
+    @GetMapping("/rules/text/{rulesFileTitle}")
+    public String getTextFromFile(@PathVariable("rulesFileTitle") String rulesFileTitle) throws IOException {
+        return fileService.extractTextFromPDF(rulesFileTitle);
     }
 }

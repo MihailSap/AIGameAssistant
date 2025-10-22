@@ -15,3 +15,7 @@ databaseChangeLog:
       file: db/changelog/007-add-user-game.yaml
   - include:
       file: db/changelog/008-create-prompt.yaml
+  - include:
+      file: db/changelog/010-create-chat.yaml
+  - include:
+      file: db/changelog/009-create-message.yaml
