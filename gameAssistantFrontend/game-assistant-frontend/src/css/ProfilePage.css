@@ -3,7 +3,7 @@
     --muted-text: #9aa4b2;
     --danger: #e25555;
     --success: #4BB543;
-    --max-content-width: 1200px;
+    --max-content-width: 1250px;
 }
 
 .profile-root {
@@ -151,6 +151,10 @@
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+.profile-password-actions .btn {
+    padding: 10px 30px;
 }
 
 .divider {

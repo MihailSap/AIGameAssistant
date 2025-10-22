@@ -3,7 +3,7 @@
     --muted-text: #9aa4b2;
     --accent: #3a7bfd;
     --transition: 220ms cubic-bezier(.2, .9, .2, 1);
-    --max-content-width: 1200px;
+    --max-content-width: 1250px;
 }
 
 .site-header {
@@ -12,7 +12,7 @@
     z-index: 60;
     display: flex;
     justify-content: center;
-    padding: 8px 12px;
+    padding: 0 12px 12px;
     background: transparent;
 }
 
@@ -22,8 +22,9 @@
     margin: 0 auto;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
-    padding: 12px 18px;
+    padding: 0 18px;
     box-sizing: border-box;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.03) 28%, rgba(255, 255, 255, 0.01) 55%, transparent 100%);
     border-radius: 14px;
@@ -34,12 +35,8 @@
 }
 
 .header-left .logo {
-    font-weight: 700;
-    color: var(--text);
-    text-decoration: none;
-    font-size: 18px;
     padding: 6px 8px;
-    display: inline-block;
+    display: block;
     border-radius: 8px;
     transition: transform var(--transition), background var(--transition);
 }
@@ -49,12 +46,31 @@
     background: rgba(255, 255, 255, 0.01);
 }
 
+.header-left .logo img {
+    display: block;
+}
+
 .header-center {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-width: 0;
+    justify-content: space-between;
+    max-width: 550px;
+}
+
+.header-link {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    min-width: fit-content;
+    margin: 0;
+    transition: background var(--transition), transform var(--transition), color var(--transition);
+}
+
+.header-active {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 .search-input {
@@ -84,19 +100,17 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    min-width: 0;
 }
 
 .admin-link {
     color: var(--text);
     text-decoration: none;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 14px;
+    margin: 0 10px;
+    font-size: 16px;
     transition: background var(--transition), transform var(--transition), color var(--transition);
 }
 
-.admin-link:hover {
+.admin-link:hover, .header-link:hover {
     color: var(--text);
     background: rgba(255, 255, 255, 0.02);
     transform: translateY(-2px);

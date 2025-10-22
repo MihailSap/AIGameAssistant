@@ -1,24 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { gameApi } from "../api/game";
 import Header from "../components/Header";
 import GameGrid from "../components/GameGrid";
 import GameModal from "../components/GameModal";
-import useDebounce from "../hooks/useDebounce";
 import { userApi } from "../api/users";
 import useAuth from "../hooks/useAuth";
 import "../css/MainPage.css";
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
 
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 280);
-
-  const [visibleCount, setVisibleCount] = useState(12); // загружаем пачками по 12
+  const visibleCount = 5;
 
   const [selectedGame, setSelectedGame] = useState(null);
 
@@ -46,48 +44,28 @@ export default function MainPage() {
     return () => (mounted = false);
   }, [isAuthenticated]);
 
-  const filtered = useMemo(() => {
-    const q = (debouncedSearch || "").trim();
-    if (q.length < 3) return games;
-    const qq = q.toLowerCase();
-    return games.filter(g => (g.title || "").toLowerCase().includes(qq) || (g.description || "").toLowerCase().includes(qq));
-  }, [games, debouncedSearch]);
-
-  useEffect(() => {
-    setVisibleCount(12);
-  }, [debouncedSearch]);
-
-  const visibleGames = filtered.slice(0, visibleCount);
-  const canLoadMore = visibleCount < filtered.length;
-
-  const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(filtered.length, prev + 12));
-  };
+  const visibleGames = games.slice(0, visibleCount);
 
   return (
     <div className="main-root">
-      <Header
-        search={search}
-        onSearchChange={setSearch}
-        currentUser={userInfo}
-      />
+      <Header currentUser={userInfo} main={true} admin={true} />
 
       <main className="main-content">
-        {loading && <div className="main-info">Загрузка игр...</div>}
+        {loading && <div className="main-info">Загрузка...</div>}
         {error && <div className="main-error">{error}</div>}
 
         {!loading && !error && (
           <>
+            <h1 className="page-title">Каталог игр</h1>
+
             <GameGrid
               games={visibleGames}
               onOpenGame={(g) => setSelectedGame(g)}
             />
 
-            {canLoadMore && (
-              <div className="load-more-wrap">
-                <button className="btn btn-primary load-more" onClick={handleLoadMore}>Загрузить ещё</button>
-              </div>
-            )}
+            <div className="load-more-wrap">
+              <button className="btn catalog-btn" onClick={() => navigate('/games')}>Смотреть всё</button>
+            </div>
           </>
         )}
       </main>

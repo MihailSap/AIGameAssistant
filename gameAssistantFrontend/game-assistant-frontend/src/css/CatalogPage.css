@@ -6,31 +6,62 @@
     --max-content-width: 1250px;
 }
 
-.main-root {
+.catalog-root {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-.main-content {
+.catalog-content {
     max-width: var(--max-content-width);
     margin: 20px auto;
     padding: 0 18px 60px;
     box-sizing: border-box;
 }
 
-.main-info,
-.main-error {
+.catalog-info,
+.catalog-error {
     padding: 36px;
     font-size: 24px;
     text-align: center;
     color: var(--muted-text);
 }
 
-.btn.catalog-btn {
+.favourite-games-section {
+    margin: 20px 0;
+    padding: 20px 0;
+    border-bottom: #9aa4b2 1px solid;
+    border-top: #9aa4b2 1px solid;
+}
+
+.favourite-games-section .grid-wrap {
+    padding: 0;
+}
+
+.favourite-games-section h2 {
+    margin: 0;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.load-more-wrap {
+    text-align: center;
+    margin: 18px 0 36px;
+}
+
+.btn.load-more {
     padding: 10px 30px;
     font-size: 20px;
     text-transform: uppercase;
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    margin: 10px 0;
 }
 
 @media (max-width: 900px) {

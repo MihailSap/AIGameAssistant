@@ -94,7 +94,9 @@
   margin-top: 12px;
 }
 
-.pagination-btn {
+.admin-root .pagination-btn {
+  background: var(--muted);
+  color: var(--muted-text);
   min-width: 44px;
   width: 44px;
   height: 36px;

@@ -1,6 +1,6 @@
 import React from "react";
 import GameCard from "./GameCard";
-import "../css/MainPage.css";
+import "../css/CatalogPage.css";
 import "../css/GameGrid.css";
 
 export default function GameGrid({ games = [], onOpenGame }) {

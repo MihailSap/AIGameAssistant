@@ -2,11 +2,12 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import MainPage from "./pages/MainPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import PrivateRoute from "./components/PrivateRoute";
+import GameAIChat from "./pages/GameAIChat";
+import CatalogPage from "./pages/CatalogPage";
 
 export default function App() {
   return (
@@ -14,8 +15,9 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/games" element={<CatalogPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<AuthPage />} />
           <Route path="/admin" element={
             <PrivateRoute>
               <AdminPage />
@@ -24,6 +26,11 @@ export default function App() {
           <Route path="/profile" element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          } />
+          <Route path="/games/ai" element={
+            <PrivateRoute>
+              <GameAIChat />
             </PrivateRoute>
           } />
         </Routes>

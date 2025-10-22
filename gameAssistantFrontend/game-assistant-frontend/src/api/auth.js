@@ -2,6 +2,16 @@ import { apiClient } from "./axios";
 import { setTokens, clearTokens, getRefreshToken } from "../utils/storage";
 import { markUserLoggedOut } from "./axios";
 
+function buildFormData(userRequestDTO) {
+  console.log(userRequestDTO);
+  const fd = new FormData();
+  if (userRequestDTO.email !== undefined && userRequestDTO.email !== null) fd.append("email", userRequestDTO.email);
+  if (userRequestDTO.login !== undefined && userRequestDTO.login !== null) fd.append("login", userRequestDTO.login);
+  if (userRequestDTO.password !== undefined && userRequestDTO.password !== null) fd.append("password", userRequestDTO.password);
+  fd.append("isAdmin", false);
+  return fd;
+}
+
 export const authApi = {
   async login({ email, password }) {
     const resp = await apiClient.post("/api/auth/login", { email, password });
@@ -9,8 +19,9 @@ export const authApi = {
     return resp.data;
   },
 
-  async register(userDTO) {
-    const resp = await apiClient.post("/api/auth/register", userDTO);
+  async register(userRequestDTO) {
+    const fd = buildFormData(userRequestDTO);
+    const resp = await apiClient.post("/api/auth/register", fd);
     return resp.data;
   },
 

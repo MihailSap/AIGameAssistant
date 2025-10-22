@@ -1,5 +1,5 @@
 :root {
-    --muted-text: #9aa4b2;
+  --muted-text: #9aa4b2;
 }
 
 .modal-image-wrap {
@@ -15,42 +15,61 @@
 }
 
 .game-modal-content {
-    display: flex;
-    gap: 18px;
-    align-items: center;
+  display: flex;
+  gap: 18px;
+  align-items: center;
 }
 
 .game-modal-left {
-    flex: 0 0 auto;
-    max-width: 360px;
+  flex: 0 0 auto;
+  max-width: 360px;
+}
+
+.game-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.game-modal-header-left {
+  flex: 1;
+}
+
+.game-modal-header-right {
+  margin-left: 12px;
 }
 
 .modal-image {
-    width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    object-fit: cover;
-    display: block;
-    border: 1px solid rgba(255, 255, 255, 0.03);
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .modal-title {
-    margin: 0 0 10px 0;
-    font-size: 24px;
-    font-weight: 700;
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .modal-description {
-    color: var(--muted-text);
-    line-height: 1.6;
-    white-space: pre-wrap;
-    margin: 0;
+  color: var(--muted-text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin: 0;
 }
 
 .game-modal-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.game-modal-actions .btn {
+  padding: 10px 20px;
 }
 
 .modal-image.placeholder {
@@ -70,15 +89,62 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.18));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.18));
   z-index: 5;
 }
 
 .loading-text {
   color: var(--muted-text);
   font-size: 16px;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.fav-btn {
+  --size: 44px;
+  width: var(--size);
+  height: var(--size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  padding: 6px;
+  color: var(--accent, #ff6b81);
+  /* fallback accent color */
+  transition: transform 160ms cubic-bezier(.2, .9, .2, 1), box-shadow 160ms;
+}
+
+.fav-btn:hover {
+  transform: translateY(-2px);
+}
+
+.fav-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.fav-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.fav-btn.fav {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.06));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+  color: #ff6b81;
+}
+
+.fav-btn:not(.fav) svg path {
+  stroke: rgba(255, 255, 255, 0.85);
+}
+
+.fav-btn.fav svg path {
+  stroke: rgba(255, 255, 255, 0.96);
+  fill: currentColor;
 }

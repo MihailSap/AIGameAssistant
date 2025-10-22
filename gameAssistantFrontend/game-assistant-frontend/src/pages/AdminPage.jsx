@@ -47,11 +47,19 @@ export default function AdminPage() {
         const [allUsers, allGames] = await Promise.all([userApi.getAll(), gameApi.getAll()]);
         if (!mounted) return;
 
+        if (allGames && allGames.length > 0) {
+          const gamesResults = await Promise.all(
+            allGames.map(item => gameApi.read(item.id))
+          );
+          setGames(gamesResults);
+        } else {
+          setGames(allGames || []);
+        }
+
         const others = (allUsers || []).filter(u => u.id !== authUser.id);
         const admins = others.filter(u => u.isAdmin);
         const regulars = others.filter(u => !u.isAdmin);
         setUsers([authUser, ...admins, ...regulars]);
-        setGames(allGames || []);
         setError(null);
       } catch (err) {
         console.error(err);
@@ -70,12 +78,21 @@ export default function AdminPage() {
   const refreshData = async () => {
     try {
       const [allUsers, allGames] = await Promise.all([userApi.getAll(), gameApi.getAll()]);
+
+      if (allGames && allGames.length > 0) {
+        const gamesResults = await Promise.all(
+          allGames.map(item => gameApi.read(item.id))
+        );
+        setGames(gamesResults);
+      } else {
+        setGames(allGames || []);
+      }
+
       const authUser = await userApi.getAuthenticated();
       const others = (allUsers || []).filter(u => u.id !== authUser.id);
       const admins = others.filter(u => u.isAdmin);
       const regulars = others.filter(u => !u.isAdmin);
       setUsers([authUser, ...admins, ...regulars]);
-      setGames(allGames || []);
       setCurrentUser(authUser);
     } catch (err) {
       console.error("refresh error", err);
@@ -106,8 +123,25 @@ export default function AdminPage() {
     });
   };
 
-  const handleToggleAdmin = (user) => {
-    alert(`Требуется реализация: сменить роль для ${user.login}`);
+  const handleToggleAdmin = async (user, checked) => {
+    if (!user || user.id == null) return;
+    const current = Boolean(user.isAdmin);
+    if (checked === current) return;
+
+    try {
+      if (checked) {
+        await userApi.makeAdmin(user.id);
+      } else {
+        await userApi.makeNotAdmin(user.id);
+      }
+      if (currentUser && user.id === currentUser.id) {
+        navigate("/");
+        return;
+      }
+      await refreshData();
+    } catch (err) {
+      console.error("Ошибка при смене роли:", err);
+    }
   };
 
   const handleOpenCreateGame = () => {
@@ -207,7 +241,7 @@ export default function AdminPage() {
           <Link to="/" className="main-link">На главную</Link>
         </div>
         <div>
-          <button className="btn btn-logout" onClick={logout}>Выйти</button>
+          <button className="btn admin-btn-logout" onClick={logout}>Выйти</button>
         </div>
       </header>
 
@@ -243,7 +277,7 @@ export default function AdminPage() {
                 value={gamesSearch}
                 onChange={(e) => setGamesSearch(e.target.value)}
               />
-              <button className="btn btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
+              <button className="btn admin-btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
             </div>
           </div>
 

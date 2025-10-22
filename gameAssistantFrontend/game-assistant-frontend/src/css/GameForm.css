@@ -52,6 +52,11 @@ input[type="file" i].form-input:focus{
   min-width: 285px;
 }
 
+.admin-modal-actions .btn {
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
 @media (max-width: 820px) {
   .game-form .form-row {
     flex-direction: column;
