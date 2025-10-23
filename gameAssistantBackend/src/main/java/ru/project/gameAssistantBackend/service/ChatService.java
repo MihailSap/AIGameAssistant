@@ -12,6 +12,7 @@ import ru.project.gameAssistantBackend.models.Chat;
 import ru.project.gameAssistantBackend.models.Message;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.ChatRepository;
+import ru.project.gameAssistantBackend.utils.PdfToMarkdown;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,24 +26,28 @@ public class ChatService {
     private final UserService userService;
     private final ChatRepository chatRepository;
     private final YandexGPTService yandexGPTService;
+    private final PdfToMarkdown pdfToMarkdown;
 
     @Autowired
     public ChatService(GameService gameService,
                        PromptService promptService,
                        UserService userService,
                        ChatRepository chatRepository,
-                       YandexGPTService yandexGPTService) {
+                       YandexGPTService yandexGPTService,
+                       PdfToMarkdown pdfToMarkdown) {
         this.gameService = gameService;
         this.promptService = promptService;
         this.userService = userService;
         this.chatRepository = chatRepository;
         this.yandexGPTService = yandexGPTService;
+        this.pdfToMarkdown = pdfToMarkdown;
     }
 
     @Transactional
     public Chat startChat(StartChatDTO startChatDTO) throws IOException {
         Chat chat = create(startChatDTO.userId());
-        String systemMessageText = getSystemMessageText(startChatDTO.gameId());
+//        String systemMessageText = getSystemMessageText(startChatDTO.gameId());
+        String systemMessageText = getSystemMessageTextMd(startChatDTO.gameId());
         chat.addMessage(systemMessageText, ChatRole.system);
         chat.addMessage(startChatDTO.request(), ChatRole.user);
 //        String assistantAnswerText = yandexGPTService.getAnswerByMessages(chat.getMessages());
@@ -95,5 +100,12 @@ public class ChatService {
         String rulesText = gameService.getRulesText(gameId);
         rulesText = rulesText.replace("\r", "").replace("\n", "");
         return String.format("%s %s", promptText, rulesText);
+    }
+
+    public String getSystemMessageTextMd(Long gameId) throws IOException {
+        String promptText = promptService.getPromptText();
+        String rulesText = gameService.getRulesText(gameId);
+        String rulesMdText = pdfToMarkdown.convertTextToMarkdown(rulesText);
+        return String.format("%s %s", promptText, rulesMdText);
     }
 }

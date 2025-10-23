@@ -43,4 +43,9 @@ public class ChatController {
     public String delete(@PathVariable("id") Long id) {
         return chatService.delete(id);
     }
+
+    @GetMapping("/md/{id}")
+    public String getMarkdownParsed(@PathVariable("id") Long id) throws IOException {
+        return chatService.getSystemMessageTextMd(id);
+    }
 }
