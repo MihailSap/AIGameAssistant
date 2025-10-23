@@ -1,5 +1,5 @@
 :root {
-    --panel: #0f1113;
+    --panel: rgba(15, 17, 20, 0.9);
     --muted: #16171a;
     --text: #e9eef8;
     --muted-text: #9aa4b2;
@@ -16,30 +16,33 @@
     min-width: 40px;
 }
 
+.auth-links {
+    display: flex;
+    gap: 10px;
+}
+
 .user-icon {
     background: transparent;
     border: none;
     padding: 0;
     height: 100%;
     width: 100%;
-    border-radius: 10px;
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: box-shadow var(--transition), transform var(--transition), background var(--transition);
+    transition: outline var(--transition);
 }
 
 .user-icon:focus {
-    outline: 2px solid rgba(58, 123, 253, 0.2);
-    box-shadow: 0 6px 18px rgba(58, 123, 253, 0.08);
-    transform: translateY(-2px);
+    outline: 1px solid rgba(244, 196, 48, 0.5);
 }
 
 .user-avatar {
-    width: 100%;
     height: 100%;
+    aspect-ratio: 1/1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--radius);
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     color: white;
     font-weight: 700;
@@ -50,7 +53,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 50%;
+    border-radius: var(--radius);
 }
 
 .user-popup {
@@ -58,8 +61,8 @@
     right: 0;
     top: calc(100% + 20px);
     background: linear-gradient(180deg, var(--panel), var(--muted));
-    padding: 12px;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: var(--radius);
     min-width: 220px;
     border: 1px solid rgba(255, 255, 255, 0.04);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
@@ -109,34 +112,28 @@
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.04);
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-size: 16px;
     text-decoration: none;
     color: var(--text);
     text-align: left;
     cursor: pointer;
-    transition: background var(--transition), transform var(--transition);
+    transition: background-color var(--transition);
 }
 
 .user-popup-btn:hover {
-    background: rgba(255, 255, 255, 0.02);
-    transform: translateY(-2px);
+    background-color: rgba(244, 196, 48, 0.5);
 }
 
-@media (max-width: 520px) {
-    .user-popup {
-        min-width: 160px;
-    }
-
+@media (max-width: 549px) {
     .user-popup-btn {
-        font-size: 14px;
-        padding: 6px 8px;
+        font-size: 18px;
+        padding: 10px 12px;
     }
     .user-popup-name {
-        font-size: 13px;
+        font-size: 16px;
     }
     .user-popup-email {
-        font-size: 12px;
+        font-size: 16px;
     }
-    
 }

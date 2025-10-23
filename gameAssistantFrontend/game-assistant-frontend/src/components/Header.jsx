@@ -1,48 +1,52 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import UserMenu from "./UserMenu";
 import logo from "../img/LOGO.svg";
-
-import "../css/MainPage.css";
-import "../css/CatalogPage.css";
+import searchIcon from "../img/search-icon.svg";
 import "../css/Header.css";
 
-export default function Header({ search, onSearchChange, currentUser, main = false, admin = false }) {
-    const location = useLocation();
+export default function Header({ search = null, onSearchChange, currentUser, title }) {
     const isAdmin = currentUser?.isAdmin;
-
     return (
-        <header className="site-header">
-            <div className="header-inner">
-                <div className="header-left">
-                    <Link to="/" className="logo"><img src={logo} alt="AIGameAssistant"/></Link>
+        <header className={"site-header"}>
+            <div className={`header-inner ${isAdmin ? "admin" : ""}`}>
+                <div className={`header-left`}>
+                    <Link to="/" className="logo"><img src={logo} alt="AIGameAssistant" /></Link>
                 </div>
 
-                <div className="header-center">
-                    {main ? (
-                        <>
-                            <Link to="/" className={`header-link ${location.pathname === '/' ? 'header-active' : ''}`}>Главная</Link>
-                            <Link to="/games" className={`header-link ${location.pathname === '/games' ? 'header-active' : ''}`}>Каталог игр</Link>
-                            <Link to="/games/ai" className={`header-link ${location.pathname === '/games/ai' ? 'header-active' : ''}`}>Чат</Link>
-                        </>
-                    ) : (
-                        <input
-                            className="search-input"
-                            placeholder="Поиск игр..."
-                            value={search}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                        />
-                    )}
+                <div className={"header-center"}>
+                    {search !== null &&
+                        <div className="search-wrap">
+                            <input
+                                className="search-input"
+                                value={search}
+                                onChange={(e) => onSearchChange(e.target.value)}
+                            />
+                            <span className="search-icon" aria-hidden="true"><img src={searchIcon} alt="Поиск" /></span>
+                        </div>
+                    }
+                    {title &&
+                        <h1 className="header-page-title">{title}</h1>
+                    }
                 </div>
 
                 <div className="header-right">
-                    {(isAdmin && admin) && (
-                        <Link to="/admin" className="admin-link">Админка</Link>
-                    )}
+                    {isAdmin && <Link to="/admin" className="link">Админка</Link>}
                     <UserMenu currentUser={currentUser} />
                 </div>
-
             </div>
+            {search !== null &&
+                <div className={"header-center header-mobile-search"}>
+                    <div className="search-wrap">
+                        <input
+                            className="search-input"
+                            value={search}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                        />
+                        <span className="search-icon" aria-hidden="true"><img src={searchIcon} alt="Поиск" /></span>
+                    </div>
+                </div>
+            }
         </header>
     );
 }

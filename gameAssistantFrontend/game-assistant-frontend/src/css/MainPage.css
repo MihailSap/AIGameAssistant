@@ -1,91 +1,53 @@
 :root {
-    --muted-text: #9aa4b2;
-    --accent: #3a7bfd;
-    --accent-2: #3267db;
-    --transition: 220ms cubic-bezier(.2, .9, .2, 1);
-    --max-content-width: 1250px;
+    --bg: #0b0b0d;
+    --surface: rgba(255, 255, 255, 0.06);
+    --rounded: 14px;
+    --yellow: #ffcf2e;
 }
 
-.main-root {
+.catalog-root {
     min-height: 100vh;
+    background: var(--bg);
+    color: #fff;
+    font-family: Inter, system-ui, Arial, Helvetica, sans-serif;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.catalog-content {
+    padding: 0 0 30px;
+}
+
+.grid-container {
+    margin: 0 auto;
+}
+
+.grid-top-controls {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(rgb(0, 0, 0, 1), rgba(11, 11, 11, 1));
 }
 
-.main-content {
-    max-width: var(--max-content-width);
-    margin: 20px auto;
-    padding: 0 18px 60px;
-    box-sizing: border-box;
+.games-area {
+    margin-top: 30px;
 }
 
-.main-info,
-.main-error {
-    padding: 36px;
-    font-size: 24px;
-    text-align: center;
-    color: var(--muted-text);
+.load-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0 0;
 }
 
-.btn.catalog-btn {
-    padding: 10px 30px;
+.btn.load-more {
+    padding: 5px 15px;
     font-size: 20px;
-    text-transform: uppercase;
+    font-weight: 700;
 }
 
-@media (max-width: 900px) {
-    .game-modal-content {
-        flex-direction: column;
-    }
-
-    .game-modal-left {
-        width: 100%;
-        max-width: 100%;
-        flex: 0 0 auto;
-        order: 0;
-    }
-
-    .modal-image {
-        border-radius: 8px;
-    }
-
-    .header-inner {
-        padding: 10px 12px;
-    }
-
-    .search-input {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 520px) {
-    .header-inner {
-        gap: 8px;
-        padding: 10px;
-    }
-
-    .user-avatar {
-        width: 26px;
-        height: 26px;
-        font-size: 12px;
-    }
-
-    .game-overlay {
-        padding: 8px;
-    }
-
-    .game-title {
-        font-size: 14px;
-    }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-
-    .game-card,
-    .game-image,
-    .game-overlay,
-    .game-hover,
-    .user-popup {
-        transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition);
-    }
+.hero-anchor {
+    overflow: hidden;
 }

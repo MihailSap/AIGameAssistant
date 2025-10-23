@@ -1,5 +1,5 @@
 :root {
-  --card-bg: rgba(15, 17, 20, 0.72);
+  --card-bg: rgba(15, 17, 20, 0.9);
   --card-border: rgba(255, 255, 255, 0.04);
   --muted-text: #9aa4b2;
 }
@@ -74,7 +74,7 @@
   max-width: 100%;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 30px 20px;
   box-shadow: 0 6px 30px rgba(2, 4, 10, 0.6);
   box-sizing: border-box;
@@ -85,7 +85,7 @@
   display: flex;
   width: 80%;
   background: rgba(255, 255, 255, 0.02);
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 5px;
   margin: 0 auto;
   margin-bottom: 25px;
@@ -100,7 +100,7 @@
   background: transparent;
   width: 50%;
   padding: 7px 20px;
-  border-radius: 20px;
+  border-radius: var(--radius);
   color: var(--muted-text);
   font-weight: 500;
   font-size: 20px;
@@ -123,7 +123,7 @@
   bottom: 6px;
   width: calc(50% - 6px);
   background: linear-gradient(90deg, rgba(244, 196, 48, 0.2), rgba(254, 216, 58, 0.15));
-  border-radius: 20px;
+  border-radius: var(--radius);
   transition: transform 220ms cubic-bezier(.2, .9, .2, 1);
   z-index: 1;
   left: 6px;
@@ -174,7 +174,7 @@
 
 .auth-form-input {
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.03);
   color: white;
@@ -182,6 +182,7 @@
   font-size: 16px;
   font-weight: 300;
   box-sizing: border-box;
+  transition: box-shadow var(--transition), border-color var(--transition);
 }
 
 .auth-form-input:focus {
@@ -210,7 +211,7 @@
   width: calc(32.5% - 20px);
   color: #ffb4b4;
   padding: 10px;
-  border-radius: 20px;
+  border-radius: var(--radius);
   background: rgba(255, 0, 0, 0.04);
   border: 1px solid rgba(255, 0, 0, 0.06);
   font-size: 14px;
@@ -245,18 +246,10 @@
   justify-content: center;
 }
 
-.auth-footer .auth-link {
-  color: var(--main-button-color);
-  text-decoration: none;
+.auth-footer .link {
+  color: var(--muted-text);
   font-weight: 700;
-  background: transparent;
-  padding: 0;
-}
-
-.auth-footer .auth-link:hover {
-  color: rgba(244, 196, 48, 0.5);
-  transform: none;
-  box-shadow: none;
+  font-size: 16px;
 }
 
 @media (max-width: 1399px) {

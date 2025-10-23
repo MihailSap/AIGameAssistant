@@ -1,5 +1,5 @@
 :root {
-  --panel: #111111;
+  --modal-bg: rgba(15, 17, 20, 0.9);
   --muted-2: #232323;
   --muted-text: #a9a9a9;
 }
@@ -18,12 +18,12 @@
 }
 
 .modal {
-  width: 720px;
+  min-width: 40%;
   max-width: calc(100% - 40px);
   max-height: 86vh;
-  background: linear-gradient(180deg, var(--panel), var(--muted-2));
-  border-radius: 12px;
-  padding: 18px;
+  background: var(--modal-bg);
+  border-radius: var(--radius);
+  padding: 25px;
   margin: 18px;
   border: 1px solid rgba(255,255,255,0.04);
   box-shadow: 0 20px 60px rgba(0,0,0,0.7);
@@ -50,4 +50,28 @@
   margin-top: 12px;
   overflow: auto;
   max-height: calc(86vh - 120px);
+}
+
+@media (max-width: 1399px) {
+  .modal {
+    min-width: 50%;
+  }
+}
+
+@media (max-width: 1149px) {
+  .modal {
+    min-width: 60%;
+  }
+}
+
+@media (max-width: 820px) {
+  .modal {
+    min-width: 70%;
+  }
+}
+
+@media (max-width: 599px) {
+  .modal {
+    min-width: 80%;
+  }
 }

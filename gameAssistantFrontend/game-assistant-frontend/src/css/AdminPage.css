@@ -1,8 +1,8 @@
 :root {
-  --panel: #111111;
+  --panel: rgba(15, 17, 20, 0.9);
   --text: #e8e8e8;
   --muted-text: #a9a9a9;
-  --radius: 8px;
+  --radius: 30px;
   --transition: 160ms ease;
 }
 
@@ -11,7 +11,12 @@
   padding: 24px;
 }
 
-.admin-root h1, .admin-root h2, .admin-root h3, .admin-root h4, .admin-root h5, .admin-root h6 {
+.admin-root h1,
+.admin-root h2,
+.admin-root h3,
+.admin-root h4,
+.admin-root h5,
+.admin-root h6 {
   color: var(--text);
   margin: 0;
 }
@@ -20,39 +25,22 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  background: var(--panel);
   padding: 18px 22px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 20px;
 }
 
 .admin-title {
   display: flex;
   gap: 12px;
-  align-items: center;
 }
 
 .admin-header h1 {
   margin: 0;
   font-size: 20px;
   letter-spacing: 0.2px;
-}
-
-.main-link {
-  color: var(--muted-text);
-  text-decoration: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: transparent;
-  transition: all var(--transition);
-  font-size: 16px;
-}
-
-.main-link:hover {
-  color: var(--text);
-  background: rgba(255,255,255,0.02);
-  transform: translateY(-2px);
 }
 
 .admin-main {
@@ -65,10 +53,11 @@
   background: var(--panel);
   padding: 16px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.admin-loading, .admin-error {
+.admin-loading,
+.admin-error {
   padding: 40px;
   text-align: center;
   color: var(--muted-text);
@@ -79,11 +68,6 @@
   justify-content: flex-end;
   gap: 12px;
   margin-top: 16px;
-}
-
-.admin-root .btn {
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .admin-btn-logout {
@@ -97,11 +81,7 @@
   font-size: 20px;
 }
 
-@media (max-width: 680px) {
-  
-}
-
-@media (max-width: 480px) {
+@media (max-width: 530px) {
   .admin-header {
     gap: 8px;
     padding: 12px;
@@ -111,6 +91,10 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+  }
+
+  .admin-title .link {
+    font-size: 18px;
   }
 
   .admin-title h1 {
@@ -124,7 +108,7 @@
     padding: 0;
   }
 
-  .admin-header > div:last-child {
+  .admin-header>div:last-child {
     display: flex;
     justify-content: flex-end;
   }

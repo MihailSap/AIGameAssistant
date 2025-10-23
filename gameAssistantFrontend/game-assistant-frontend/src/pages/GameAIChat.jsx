@@ -16,7 +16,7 @@ export default function GameAIChat() {
     const location = useLocation();
     const passedGame = location.state?.game;
 
-    const [game, setGame] = useState(passedGame);
+    const [game, setGame] = useState(passedGame || null);
     const [currentUser, setCurrentUser] = useState(null);
 
     const [sessions, setSessions] = useState([]);
@@ -67,11 +67,11 @@ export default function GameAIChat() {
 
     const refreshAllSessions = async () => {
         try {
-            if (typeof aiApi.getAllSessions === "function") {
-                const all = await aiApi.getAllSessions();
-                all.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                setSessions(all);
-                return all;
+            if (typeof aiApi.getSessions === "function" && game) {
+                const allGameSessions = await aiApi.getSessions(game.id);
+                allGameSessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setSessions(allGameSessions);
+                return allGameSessions;
             } else {
                 const all = loadAllSessionsFromStorage();
                 setSessions(all);
@@ -99,44 +99,8 @@ export default function GameAIChat() {
     }, []);
 
     useEffect(() => {
-        let cancelled = false;
-        (async () => {
-            const all = await refreshAllSessions();
-            // Для каждой игры может быть много сессий или только одна?
-            if (game) {
-                const gidStr = String(game.id);
-                const existing = all.find(s => String(s.gameId) === gidStr);
-                if (existing) {
-                    setActiveSession(existing);
-                    return;
-                } else {
-                    try {
-                        const created = await aiApi.createSession(gidStr, `Сессия — ${new Date().toLocaleString()}`);
-                        created.gameId = gidStr;
-                        created.gameTitle = game.title;
-                        await refreshAllSessions();
-                        if (!cancelled) setActiveSession(created);
-                        return;
-                    } catch (err) {
-                        console.error("chat: failed to create session for passedGame", err);
-                    }
-                }
-            }
-
-            if (all && all.length > 0) {
-                try {
-                    const sGame = await gameApi.read(all[0].gameId);
-                    setGame(sGame || null);
-                    setActiveSession(all[0]);
-                } catch (err) {
-                    console.error("chat: failed to open last session", err);
-                }
-            } else {
-                setActiveSession(null);
-            }
-        })();
-
-        return () => { cancelled = true; };
+        (async () => await refreshAllSessions())();
+        return;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [game]);
 
@@ -187,10 +151,33 @@ export default function GameAIChat() {
     };
 
     const handleSend = async () => {
-        if (!activeSession) {
-            alert("Выберите сессию или создайте новую.");
+        if (!game && !activeSession) {
+            alert("Выберите сессию или игру.");
             return;
         }
+
+        let sessionToUse = activeSession;
+
+        if (!sessionToUse) {
+            if (!game || !game.id) {
+                alert("Необходимо выбрать игру для создания сессии.");
+                return;
+            }
+            try {
+                const gidStr = String(game.id);
+                const created = await aiApi.createSession(gidStr, `Сессия — ${new Date().toLocaleString()}`);
+                created.gameId = gidStr;
+                created.gameTitle = game.title;
+                await refreshAllSessions();
+                setActiveSession(created);
+                sessionToUse = created;
+            } catch (err) {
+                console.error("chat: failed to create session on send", err);
+                alert("Не удалось создать сессию. Попробуйте снова.");
+                return;
+            }
+        }
+
         if (!input.trim()) return;
 
         const text = input.slice(0, 10000);
@@ -216,8 +203,8 @@ export default function GameAIChat() {
         setTimeout(() => messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight, behavior: "smooth" }), 50);
 
         try {
-            await aiApi.sendMessage(activeSession.gameId, activeSession.id, text);
-            const fresh = await aiApi.getMessages(activeSession.gameId, activeSession.id);
+            await aiApi.sendMessage(sessionToUse.gameId, sessionToUse.id, text);
+            const fresh = await aiApi.getMessages(sessionToUse.gameId, sessionToUse.id);
             setMessages(fresh || []);
             await refreshAllSessions();
         } catch (err) {
@@ -272,7 +259,7 @@ export default function GameAIChat() {
 
     return (
         <div className="chat-root">
-            <Header currentUser={currentUser} main={true}/>
+            <Header currentUser={currentUser} />
 
             <div className="chat-container">
                 <button className="hamburger hide-on-desktop" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle sessions">
@@ -281,14 +268,14 @@ export default function GameAIChat() {
 
                 <aside className={`chat-sidebar ${sidebarOpen ? "open" : ""}`}>
                     <div className="chat-sidebar-header">
-                        <div>Сессии</div>
+                        <div>{`Чаты${game ? ` по игре "${game.title}"` : ""}`}</div>
                         <div className="chat-sidebar-actions">
                             <button className="btn btn-ghost hide-on-desktop" onClick={() => setSidebarOpen(false)}>✕</button>
                         </div>
                     </div>
 
                     <div className="chat-sessions-list">
-                        {sessions.length === 0 && <div className="muted">Нет сессий</div>}
+                        {sessions.length === 0 && <div className="muted-empty">Нет сессий</div>}
                         {sessions.map(s => (
                             <ChatSidebarItem
                                 key={s.id}
@@ -305,7 +292,7 @@ export default function GameAIChat() {
                     {activeSession ? (
                         <div className="chat-main-inner">
                             <div className="chat-title-area">
-                                <h2>Диалог по игре: {game?.title || "—"}</h2>
+                                <h2>Id: {activeSession.id}</h2>
                                 <div className="chat-session-current">{activeSession.title}</div>
                             </div>
 
@@ -340,9 +327,37 @@ export default function GameAIChat() {
                         <div className="chat-main-inner">
                             <div className="muted">
                                 <div className="muted-empty">
-                                    У вас еще нет ни одного чата
-                                    <button className="btn chat-catalog-btn" onClick={() => navigate('/games')}>Каталог игр</button>
+                                    {sessions.length === 0
+                                        ? (game ? "Отправьте сообщение, чтобы создать новую сессию для выбранной игры" : "У вас еще нет ни одного чата")
+                                        : (game ? "Выберите существующую сессию или отправьте сообщение, чтобы создать новую сессию для выбранной игры" : "Выберите существующую сессию или создайте новую, выбрав игру из каталога")}
+                                    {!game &&
+                                        <button className="btn chat-catalog-btn" onClick={() => navigate('/')}>Каталог игр</button>
+                                    }
                                 </div>
+                                {game &&
+                                    <div className="chat-input-area">
+                                        <textarea
+                                            className="chat-input"
+                                            placeholder="Напишите подробно ваш вопрос..."
+                                            value={input}
+                                            maxLength={10000}
+                                            onChange={(e) => setInput(e.target.value)}
+                                            onKeyDown={handleKeyDown}
+                                            rows={3}
+                                            disabled={!game}
+                                        />
+                                        <div className="chat-input-actions">
+                                            <button className="btn btn-ghost" onClick={() => setInput("")}>Очистить</button>
+                                            <button
+                                                className="btn"
+                                                onClick={handleSend}
+                                                disabled={sending || !input.trim() || !game}
+                                            >
+                                                {sending ? "Отправка..." : "Отправить"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     )}

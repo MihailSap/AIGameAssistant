@@ -142,7 +142,7 @@ function LoginForm({ onSuccess }) {
         </button>
         <div className="auth-footer">
           <span>Нет аккаунта?</span>
-          <Link to="/register" className="auth-link">Зарегистрироваться</Link>
+          <Link to="/register" className="link">Зарегистрироваться</Link>
         </div>
       </div>
     </form>
@@ -311,7 +311,7 @@ function RegisterForm({ onSuccess }) {
         </button>
         <div className="auth-footer">
           <span>Есть аккаунт?</span>
-          <Link to="/login" className="auth-link">Войти</Link>
+          <Link to="/login" className="link">Войти</Link>
         </div>
       </div>
     </form>

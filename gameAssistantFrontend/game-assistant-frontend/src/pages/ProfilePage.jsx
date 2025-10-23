@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import Header from "../components/Header";
 import { userApi } from "../api/users";
 import { fileApi } from "../api/file";
 import AvatarPicker from "../components/AvatarPicker";
@@ -9,7 +9,7 @@ import "../css/ProfilePage.css";
 
 export default function ProfilePage() {
   const { userInfo: authUser } = useAuth() || {};
-  const [user, setUser] = useState(authUser || null);
+  const [currentUser, setCurrentUser] = useState(authUser || null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -55,7 +55,7 @@ export default function ProfilePage() {
       try {
         const auth = await userApi.getAuthenticated();
         if (!mountedRef.current) return;
-        setUser(auth || null);
+        setCurrentUser(auth || null);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error("Ошибка получения профиля:", err);
@@ -79,7 +79,7 @@ export default function ProfilePage() {
     revokeBlobRef();
     setAvatarUrl(null);
 
-    const imageFileTitle = user?.imageFileTitle;
+    const imageFileTitle = currentUser?.imageFileTitle;
     setAvatarLoading(!!imageFileTitle);
 
     if (!imageFileTitle) {
@@ -130,7 +130,7 @@ export default function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [user?.imageFileTitle]);
+  }, [currentUser?.imageFileTitle]);
 
   useEffect(() => {
     setPwError("");
@@ -153,7 +153,7 @@ export default function ProfilePage() {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (!canSubmitPassword) return;
-    if (!user || !user.id) {
+    if (!currentUser || !currentUser.id) {
       setPwError("Неизвестный пользователь — повторите вход.");
       return;
     }
@@ -163,7 +163,7 @@ export default function ProfilePage() {
     setSuccessChangePw("");
 
     try {
-      await userApi.updatePassword(user.id, { newPassword });
+      await userApi.updatePassword(currentUser.id, { newPassword });
       setNewPassword("");
       setRepeatPassword("");
       setSuccessChangePw("Пароль успешно изменён");
@@ -181,7 +181,7 @@ export default function ProfilePage() {
       setError("Файл не выбран");
       return;
     }
-    if (!user || !user.id) {
+    if (!currentUser || !currentUser.id) {
       setError("Неизвестный пользователь — обновление невозможно.");
       return;
     }
@@ -195,11 +195,11 @@ export default function ProfilePage() {
     setAvatarUploading(true);
 
     try {
-      const refreshed = await userApi.updateImage(user.id, {
-        email: user.email ?? "",
-        login: user.login ?? "",
+      const refreshed = await userApi.updateImage(currentUser.id, {
+        email: currentUser.email ?? "",
+        login: currentUser.login ?? "",
         password: "",
-        isAdmin: user.isAdmin ?? false,
+        isAdmin: currentUser.isAdmin ?? false,
         imageFile: file,
       });
 
@@ -215,7 +215,7 @@ export default function ProfilePage() {
         return;
       }
 
-      setUser(refreshed || null);
+      setCurrentUser(refreshed || null);
 
       if (!refreshed?.imageFileTitle) {
         setError("Аватар загружен, но сервер не вернул ссылку на изображение.");
@@ -243,15 +243,12 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-root">
-      <div className="profile-top">
-        <Link to="/" className="link-like">← На главную</Link>
-        <h1 className="profile-title">Личный кабинет</h1>
-      </div>
+      <Header currentUser={currentUser} title={"Профиль"}/>
 
       {loading && <div className="profile-message">Загрузка...</div>}
       {error && <div className="profile-error" role="alert">{error}</div>}
 
-      {!loading && user && (
+      {!loading && currentUser && (
         <>
           <div className="profile-grid">
             <section className="profile-panel profile-panel-left">
@@ -269,12 +266,12 @@ export default function ProfilePage() {
                 <div className="user-info">
                   <div className="user-field">
                     <div className="user-field-label">Логин</div>
-                    <div className="user-field-value">{user.login || "—"}</div>
+                    <div className="user-field-value">{currentUser.login || "—"}</div>
                   </div>
 
                   <div className="user-field">
                     <div className="user-field-label">Электронная почта</div>
-                    <div className="user-field-value">{user.email || "—"}</div>
+                    <div className="user-field-value">{currentUser.email || "—"}</div>
                   </div>
                 </div>
               </div>

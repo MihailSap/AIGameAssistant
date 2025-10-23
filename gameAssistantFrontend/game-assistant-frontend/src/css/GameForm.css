@@ -1,7 +1,7 @@
 :root {
   --text: #e8e8e8;
   --muted-text: #a9a9a9;
-  --glass: rgba(255,255,255,0.03);
+  --glass: rgba(15, 17, 20, 0.9);
   --transition: 160ms ease;
 }
 
@@ -21,17 +21,17 @@
 .game-form .form-input {
   flex: 1;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--glass);
   border: 1px solid rgba(255,255,255,0.03);
   color: var(--text);
   outline: none;
-  transition: box-shadow var(--transition), transform var(--transition);
+  transition: box-shadow var(--transition), border-color var(--transition);
 }
 
 .game-form .form-input:focus {
-  box-shadow: 0 8px 30px rgba(58,123,253,0.12);
-  transform: translateY(-2px);
+  border-color: rgba(244, 196, 48, 0.5);
+  box-shadow: 0 6px 20px rgba(58, 123, 253, 0.06);
 }
 
 textarea.form-input {
@@ -53,7 +53,6 @@ input[type="file" i].form-input:focus{
 }
 
 .admin-modal-actions .btn {
-  border-radius: 10px;
   padding: 8px 12px;
 }
 
