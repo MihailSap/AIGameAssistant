@@ -1,14 +1,18 @@
 package ru.project.gameAssistantBackend.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import ru.project.gameAssistantBackend.enums.ChatRole;
 import ru.project.gameAssistantBackend.models.Message;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class YandexGPTService {
@@ -16,48 +20,78 @@ public class YandexGPTService {
     @Value("${yandex-cloud.gpt.api-key}")
     private String apiKey;
 
+    @Value("${yandex-cloud.gpt.api-url}")
+    private String apiUrl;
+
     @Value("${yandex-cloud.gpt.catalog-id}")
     private String catalogId;
 
-    public String getAnswer(String prompt) {
-        var json = """
-        {
-            "modelUri": "gpt://%s/yandexgpt-lite",
-            "completionOptions": {
-                "stream": false,
-                "temperature": 0.6,
-                "maxTokens": "2000"
-            },
-            "messages": [
-                {
-                    "role": "user",
-                    "text": "%s"
-                }
-            ]
-        }
-        """.formatted(catalogId, prompt);
+    private final RestTemplate restTemplate;
 
-        try {
-            var client = HttpClient.newHttpClient();
-            var request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://llm.api.cloud.yandex.net/foundationModels/v1/completion"))
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", "Api-Key " + apiKey)
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+    private final ObjectMapper objectMapper;
 
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return "Не получилось обработать запрос";
+    @Autowired
+    public YandexGPTService(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
-    public String getAnswerByMessages(List<Message> messages) {
-        //TODO: Реализовать
-        return "ANSWER";
+    public String getAssistantAnswer(List<Message> messages) {
+        String jsonBody = buildRequestBody(messages);
+        String rawResponse = sendRequest(jsonBody);
+        return extractText(rawResponse);
+    }
+
+    private String buildRequestBody(List<Message> messages) {
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("modelUri", String.format("gpt://%s/yandexgpt-lite", catalogId));
+            Map<String, Object> options = new HashMap<>();
+            options.put("stream", false);
+            options.put("temperature", 0.6);
+            options.put("maxTokens", 2000);
+            body.put("completionOptions", options);
+            body.put("messages", messages);
+            return objectMapper.writeValueAsString(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при формировании JSON-запроса", e);
+        }
+    }
+
+    private String sendRequest(String jsonBody) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey.startsWith("Api-Key ") ? apiKey.substring(8) : apiKey);
+        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiUrl,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        return response.getBody();
+    }
+
+    public String extractText(String assistantAnswer){
+        try {
+            JsonNode root = objectMapper.readTree(assistantAnswer);
+            return root
+                    .path("result")
+                    .path("alternatives")
+                    .get(0)
+                    .path("message")
+                    .path("text")
+                    .asText();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при парсинге ответа: ", e);
+        }
+    }
+
+    public String getAnswer(String prompt) {
+        Message userMessage = new Message();
+        userMessage.setRole(ChatRole.user);
+        userMessage.setText(prompt);
+        return getAssistantAnswer(List.of(userMessage));
     }
 }

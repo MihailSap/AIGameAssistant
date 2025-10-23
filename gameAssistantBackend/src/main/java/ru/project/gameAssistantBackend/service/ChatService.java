@@ -45,7 +45,8 @@ public class ChatService {
         String systemMessageText = getSystemMessageText(startChatDTO.gameId());
         chat.addMessage(systemMessageText, ChatRole.system);
         chat.addMessage(startChatDTO.request(), ChatRole.user);
-        String assistantAnswerText = yandexGPTService.getAnswerByMessages(chat.getMessages());
+//        String assistantAnswerText = yandexGPTService.getAnswerByMessages(chat.getMessages());
+        String assistantAnswerText = yandexGPTService.getAssistantAnswer(chat.getMessages());
         chat.addMessage(assistantAnswerText, ChatRole.assistant);
         return chatRepository.save(chat);
     }
@@ -54,7 +55,8 @@ public class ChatService {
     public Chat continueChat(Long id, PromptDTO promptDTO){
         Chat chat = getChatById(id);
         chat.addMessage(promptDTO.text(), ChatRole.user);
-        String assistantAnswerText = yandexGPTService.getAnswerByMessages(chat.getMessages());
+//        String assistantAnswerText = yandexGPTService.getAnswerByMessages(chat.getMessages());
+        String assistantAnswerText = yandexGPTService.getAssistantAnswer(chat.getMessages());
         chat.addMessage(assistantAnswerText, ChatRole.assistant);
         return chatRepository.save(chat);
     }
@@ -91,7 +93,7 @@ public class ChatService {
     public String getSystemMessageText(Long gameId) throws IOException {
         String promptText = promptService.getPromptText();
         String rulesText = gameService.getRulesText(gameId);
-        System.out.println("RULES: " + rulesText);
+        rulesText = rulesText.replace("\r", "").replace("\n", "");
         return String.format("%s %s", promptText, rulesText);
     }
 }

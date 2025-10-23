@@ -1,5 +1,6 @@
 package ru.project.gameAssistantBackend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import ru.project.gameAssistantBackend.enums.ChatRole;
 
@@ -22,6 +23,7 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
+    @JsonIgnore
     private Chat chat;
 
     public Message(Long id, ChatRole role, String text, Chat chat, Instant timestamp) {
@@ -85,5 +87,14 @@ public class Message {
     @Override
     public int hashCode() {
         return Objects.hash(id, role, text, chat);
+    }
+
+    @Override
+    public String toString() {
+        return """
+                {
+                    "role":\"%s\",
+                    "text":\"%s\"
+                }""".formatted(role, text);
     }
 }

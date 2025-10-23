@@ -34,4 +34,5 @@ jwt:
 yandex-cloud:
   gpt:
     api-key: ${YANDEX_API_KEY}
+    api-url: https://llm.api.cloud.yandex.net/foundationModels/v1/completion
     catalog-id: ${CATALOG_ID}
