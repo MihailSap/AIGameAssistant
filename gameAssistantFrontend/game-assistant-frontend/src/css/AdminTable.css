@@ -8,7 +8,7 @@
 
 .table-wrap {
   overflow: auto;
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 
 .admin-table-header {
@@ -33,12 +33,12 @@
   min-width: 220px;
   max-width: 420px;
   padding: 8px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.03);
   color: var(--text);
   outline: none;
-  transition: box-shadow var(--transition), transform var(--transition);
+  transition: box-shadow var(--transition), border-color var(--transition);
   font-size: 14px;
 }
 
@@ -47,8 +47,8 @@
 }
 
 .admin-table-search:focus {
-  box-shadow: 0 8px 30px rgba(58,123,253,0.12);
-  transform: translateY(-2px);
+  border-color: rgba(244, 196, 48, 0.5);
+  box-shadow: 0 6px 20px rgba(58, 123, 253, 0.06);
 }
 
 .admin-table {
@@ -97,21 +97,30 @@
 .admin-root .pagination-btn {
   background: var(--muted);
   color: var(--muted-text);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   min-width: 44px;
   width: 44px;
   height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
   padding: 0;
+}
+
+.admin-root .pagination-btn:hover {
+  color: var(--muted-text);
 }
 
 .pagination-btn:disabled {
   opacity: 0.45;
-  cursor: default;
+  cursor: no-drop;
   transform: none;
   box-shadow: none;
+  background: var(--muted);
+}
+
+.pagination-btn:disabled:hover {
+  background: var(--muted);
 }
 
 .pagination-indicator {
@@ -128,7 +137,7 @@
   cursor: pointer;
   font-size: 16px;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   transition: background var(--transition), transform var(--transition);
 }
 
@@ -184,8 +193,11 @@
   }
 
   .admin-table-search {
-    width: 100%;
+    width: calc(100% - 69px);
     max-width: none;
   }
-}
 
+  .users-search {
+    width: 100%;
+  }
+}

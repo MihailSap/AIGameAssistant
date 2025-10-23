@@ -216,7 +216,11 @@ export default function AdminPage() {
         <div className="admin-header">
           <h1>Админская панель</h1>
         </div>
-        <div className="admin-loading">Загрузка...</div>
+        {loading && (
+          <div className="full-loader">
+            <div className="spinner" />
+          </div>
+        )}
       </div>
     );
   }
@@ -238,7 +242,7 @@ export default function AdminPage() {
       <header className="admin-header">
         <div className="admin-title">
           <h1>Админская панель</h1>
-          <Link to="/" className="main-link">На главную</Link>
+          <Link to="/" className="link">На главную</Link>
         </div>
         <div>
           <button className="btn admin-btn-logout" onClick={logout}>Выйти</button>
@@ -251,7 +255,7 @@ export default function AdminPage() {
             <h2 className="admin-table-title">Пользователи</h2>
             <div className="admin-table-controls">
               <input
-                className="admin-table-search"
+                className="admin-table-search users-search"
                 placeholder="Поиск пользователей..."
                 value={usersSearch}
                 onChange={(e) => setUsersSearch(e.target.value)}
@@ -272,7 +276,7 @@ export default function AdminPage() {
             <h2 className="admin-table-title">Игры</h2>
             <div className="admin-table-controls">
               <input
-                className="admin-table-search"
+                className="admin-table-search games-search"
                 placeholder="Поиск игр..."
                 value={gamesSearch}
                 onChange={(e) => setGamesSearch(e.target.value)}

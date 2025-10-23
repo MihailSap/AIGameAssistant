@@ -8,7 +8,8 @@
 }
 
 .chat-root {
-    min-height: calc(100vh - 100px);
+    margin-top: 50px;
+    min-height: calc(100vh - 50px);
     box-sizing: border-box;
     background: transparent;
 }
@@ -40,7 +41,6 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
-    color: var(--muted-text);
 }
 
 .chat-sessions-list {
@@ -93,20 +93,26 @@
 }
 
 .muted {
-    margin: auto;
+    display: flex;
+    flex-direction: column;
     color: var(--muted-text);
     padding: 12px;
     text-align: center;
+    justify-content:flex-end;
+    height: 100%;
 }
 
 .muted-empty {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    margin: auto 0;
+    color: var(--muted-text);
 }
 
 .chat-catalog-btn {
     padding: 10px 20px;
-    font-size: 14px;
+    max-width: fit-content;
     text-transform: uppercase;
     margin: 10px;
 }
@@ -117,7 +123,6 @@
     gap: 12px;
     align-items: flex-end;
     padding: 8px 12px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.02);
 }
 
 .chat-input {
@@ -169,7 +174,7 @@
     .chat-sidebar {
         position: fixed;
         left: 25px;
-        top: 98px;
+        top: 90px;
         bottom: 16px;
         z-index: 120;
         transform: translateX(-120%);
@@ -199,7 +204,7 @@
     .hamburger {
         display: inline-flex;
         position: absolute;
-        top: 110px;
+        top: 85px;
         left: 30px;
     }
 

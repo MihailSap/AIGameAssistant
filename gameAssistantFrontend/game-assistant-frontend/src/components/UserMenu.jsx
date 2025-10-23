@@ -120,8 +120,8 @@ export default function UserMenu({ currentUser }) {
         </button>
       ) : (
         <div className="auth-links">
-          <Link to="/login" className="auth-link">Войти</Link>
-          <Link to="/register" className="auth-link">Регистрация</Link>
+          <Link to="/login" className="link">Вход</Link>
+          <Link to="/register" className="link">Регистрация</Link>
         </div>
       )}
 

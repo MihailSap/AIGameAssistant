@@ -6,7 +6,7 @@ import { gameApi } from "../api/game";
 import { favouriteApi } from "../api/favourite";
 import useAuth from "../hooks/useAuth";
 
-import "../css/CatalogPage.css";
+import "../css/MainPage.css";
 import "../css/GameModal.css";
 
 export default function GameModal({ game, onClose, onFavouriteChange }) {

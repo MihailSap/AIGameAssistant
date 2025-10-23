@@ -7,7 +7,6 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import PrivateRoute from "./components/PrivateRoute";
 import GameAIChat from "./pages/GameAIChat";
-import CatalogPage from "./pages/CatalogPage";
 
 export default function App() {
   return (
@@ -15,7 +14,6 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/games" element={<CatalogPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/register" element={<AuthPage />} />
           <Route path="/admin" element={

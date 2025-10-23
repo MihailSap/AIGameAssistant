@@ -3,13 +3,10 @@
     --muted-text: #9aa4b2;
     --danger: #e25555;
     --success: #4BB543;
-    --max-content-width: 1250px;
 }
 
 .profile-root {
-    max-width: var(--max-content-width);
-    margin: 20px auto;
-    padding: 18px;
+    margin: 50px 0 20px 0;
     box-sizing: border-box;
     color: var(--text);
     min-height: calc(100vh - 80px);
@@ -43,6 +40,7 @@
         "sessions sessions";
     gap: 18px;
     align-items: start;
+    padding: 30px;
 }
 
 .profile-panel-left {

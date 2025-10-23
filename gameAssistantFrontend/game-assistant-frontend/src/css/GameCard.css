@@ -1,142 +1,110 @@
-:root {
-    --shadow-1: 0 8px 30px rgba(0, 0, 0, 0.6);
-    --transition: 220ms cubic-bezier(.2, .9, .2, 1);
-}
-
-.game-card {
-    cursor: pointer;
+.tile-card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius);
     overflow: hidden;
-    border-radius: 12px;
     position: relative;
-    width: 220px;
-    height: 214px;
-    transition: transform var(--transition), box-shadow var(--transition);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+    cursor: pointer;
+    transition: transform 260ms cubic-bezier(.2, .9, .2, 1), box-shadow 260ms cubic-bezier(.2, .9, .2, 1);
+    background: linear-gradient(90deg, #0d0d0d, #131316);
     border: 1px solid rgba(255, 255, 255, 0.03);
     display: flex;
-    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
 }
 
-.game-card:focus {
+.tile-card:focus {
     outline: 2px solid rgba(58, 123, 253, 0.16);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
 }
 
-.game-card:hover {
-    transform: scale(1.03);
-    box-shadow: var(--shadow-1);
-}
-
-.game-card:hover .game-image {
-    filter: blur(3px) saturate(1.05);
-    transform: scale(1.06);
-}
-
-.game-card:hover .game-overlay {
-    opacity: 0;
-}
-
-.game-card:hover .game-hover {
-    opacity: 1;
-}
-
-.game-card:focus .game-image {
-    filter: blur(2px);
-    transform: scale(1.03);
-}
-
-.game-card:focus .game-overlay {
-    opacity: 0;
-}
-
-.game-card:focus .game-hover {
-    opacity: 1;
-}
-
-.game-image-wrap {
+.tile-media {
     position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    background: #0d0d0d;
     display: block;
 }
 
-.game-image {
-    position: absolute;
-    inset: 0;
+.tile-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform-origin: center;
-    transition: filter var(--transition), transform var(--transition), opacity var(--transition);
-    backface-visibility: hidden;
     display: block;
-    opacity: 1;
 }
 
-.game-image.placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-  background: linear-gradient(90deg, #111, #131316);
-  border-radius: 8px;
-}
-
-.loading-text {
-  color: var(--muted-text);
-  font-size: 16px;
-  opacity: 0.95;
-}
-
-.game-overlay {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 12px;
-    display: flex;
-    align-items: flex-end;
-    pointer-events: none;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.40) 40%, rgba(0, 0, 0, 0.0) 100%);
-    transition: opacity var(--transition), transform var(--transition);
-}
-
-.game-title {
-    font-weight: 700;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 20px;
-}
-
-.game-title,
-.game-desc {
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-.game-hover {
-    position: absolute;
-    inset: 0;
+.tile-empty {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 14px;
-    opacity: 0;
-    transition: opacity var(--transition), transform var(--transition);
-    pointer-events: none;
+    color: #9aa4b2;
+    height: 100%;
 }
 
-.game-desc {
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
-    padding: 10px 12px;
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 18px;
-    line-height: 1.4;
-    max-width: 80%;
-    text-align: left;
+.tile-title-strip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 22%;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+    transition: opacity 260ms ease;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 15px;
+}
+
+.tile-title {
+    width: 100%;
+    font-style: italic;
+    color: #fff;
+    font-weight: 400;
+    font-size: 20px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tile-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: background 260ms ease, opacity 260ms ease, transform 260ms ease;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.tile-desc {
+    color: #fff;
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 400;
+    max-width: 100%;
+    max-height: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tile-card:hover {
+    transform: scale(1.03);
+}
+
+.tile-card:hover .tile-title-strip {
+    opacity: 0;
+}
+
+.tile-card:hover .tile-overlay {
+    opacity: 1;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+    transform: translateY(0);
 }
