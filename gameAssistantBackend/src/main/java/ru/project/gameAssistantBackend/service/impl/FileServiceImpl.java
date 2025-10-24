@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service;
+package ru.project.gameAssistantBackend.service.impl;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -6,20 +6,20 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.project.gameAssistantBackend.service.FileServiceI;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
 
 @Service
-public class FileService {
+public class FileServiceImpl implements FileServiceI {
 
     private final String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
 
-    public FileService() {
+    public FileServiceImpl() {
         try {
             Files.createDirectories(Paths.get(uploadDir));
         } catch (IOException e) {
@@ -27,6 +27,7 @@ public class FileService {
         }
     }
 
+    @Override
     public String save(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;
@@ -43,6 +44,7 @@ public class FileService {
         }
     }
 
+    @Override
     public void delete(String fileName) {
         if (fileName == null || fileName.isEmpty()) {
             return;
@@ -55,11 +57,13 @@ public class FileService {
         }
     }
 
+    @Override
     public Resource getFileResource(String fileTitle) throws MalformedURLException {
         var path = Paths.get(String.format("uploads/%s", fileTitle));
         return new UrlResource(path.toUri());
     }
 
+    @Override
     public String extractTextFromPDF(String fileTitle) throws IOException {
         File file = getFileResource(fileTitle).getFile();
         PDDocument document = PDDocument.load(file);

@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-@ToString
+//@ToString
 @Entity
 @Table(name = "game")
 public class Game {
@@ -82,5 +83,30 @@ public class Game {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Game game = (Game) o;
+        return Objects.equals(id, game.id) && Objects.equals(title, game.title) && Objects.equals(description, game.description) && Objects.equals(imageFileTitle, game.imageFileTitle) && Objects.equals(rulesFileTitle, game.rulesFileTitle) && Objects.equals(users, game.users);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, description, imageFileTitle, rulesFileTitle, users);
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", imageFileTitle='" + imageFileTitle + '\'' +
+                ", rulesFileTitle='" + rulesFileTitle + '\'' +
+                ", users=" + users +
+                '}';
     }
 }

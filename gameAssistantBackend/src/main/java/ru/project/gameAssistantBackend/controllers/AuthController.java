@@ -1,7 +1,7 @@
 package ru.project.gameAssistantBackend.controllers;
 
 import jakarta.security.auth.message.AuthException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
@@ -10,44 +10,49 @@ import ru.project.gameAssistantBackend.dto.jwt.RefreshJwtRequest;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
 import ru.project.gameAssistantBackend.models.User;
-import ru.project.gameAssistantBackend.service.AuthService;
-import ru.project.gameAssistantBackend.service.UserService;
+import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.UserServiceImpl;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
-    private final UserService userService;
+    private final AuthServiceImpl authServiceImpl;
+    private final UserServiceImpl userServiceImpl;
+
+    @Autowired
+    public AuthController(AuthServiceImpl authServiceImpl, UserServiceImpl userServiceImpl) {
+        this.authServiceImpl = authServiceImpl;
+        this.userServiceImpl = userServiceImpl;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
-        final JwtResponse token = authService.login(authRequest);
+        final JwtResponse token = authServiceImpl.login(authRequest);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/register")
     public UserResponseDTO registration(@ModelAttribute UserRequestDTO userRequestDTO){
-        User user = authService.register(userRequestDTO);
-        return userService.mapToResponseDTO(user);
+        User user = authServiceImpl.register(userRequestDTO);
+        return userServiceImpl.mapToResponseDTO(user);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody RefreshJwtRequest request) throws AuthException {
-        authService.logout(request.getRefreshToken());
+        authServiceImpl.logout(request.getRefreshToken());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/token")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody RefreshJwtRequest request) throws AuthException {
-        final JwtResponse token = authService.getAccessToken(request.getRefreshToken());
+        final JwtResponse token = authServiceImpl.getAccessToken(request.getRefreshToken());
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody RefreshJwtRequest request) throws AuthException {
-        final JwtResponse token = authService.refresh(request.getRefreshToken());
+        final JwtResponse token = authServiceImpl.refresh(request.getRefreshToken());
         return ResponseEntity.ok(token);
     }
 }

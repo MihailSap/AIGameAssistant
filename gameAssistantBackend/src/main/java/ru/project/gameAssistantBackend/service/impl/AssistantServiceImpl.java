@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service;
+package ru.project.gameAssistantBackend.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.project.gameAssistantBackend.enums.ChatRole;
 import ru.project.gameAssistantBackend.models.Message;
+import ru.project.gameAssistantBackend.service.AssistantServiceI;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class YandexGPTService {
+public class AssistantServiceImpl implements AssistantServiceI {
 
     @Value("${yandex-cloud.gpt.api-key}")
     private String apiKey;
@@ -31,18 +32,20 @@ public class YandexGPTService {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public YandexGPTService(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public AssistantServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
 
+    @Override
     public String getAssistantAnswer(List<Message> messages) {
         String jsonBody = buildRequestBody(messages);
         String rawResponse = sendRequest(jsonBody);
         return extractText(rawResponse);
     }
 
-    private String buildRequestBody(List<Message> messages) {
+    @Override
+    public String buildRequestBody(List<Message> messages) {
         try {
             Map<String, Object> body = new HashMap<>();
             body.put("modelUri", String.format("gpt://%s/yandexgpt-lite", catalogId));
@@ -58,7 +61,8 @@ public class YandexGPTService {
         }
     }
 
-    private String sendRequest(String jsonBody) {
+    @Override
+    public String sendRequest(String jsonBody) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey.startsWith("Api-Key ") ? apiKey.substring(8) : apiKey);
@@ -73,6 +77,7 @@ public class YandexGPTService {
         return response.getBody();
     }
 
+    @Override
     public String extractText(String assistantAnswer){
         try {
             JsonNode root = objectMapper.readTree(assistantAnswer);
@@ -88,6 +93,7 @@ public class YandexGPTService {
         }
     }
 
+    @Override
     public String getAnswer(String prompt) {
         Message userMessage = new Message();
         userMessage.setRole(ChatRole.user);

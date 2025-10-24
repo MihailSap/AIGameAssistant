@@ -5,44 +5,44 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.chat.PromptDTO;
 import ru.project.gameAssistantBackend.models.Prompt;
-import ru.project.gameAssistantBackend.service.PromptService;
+import ru.project.gameAssistantBackend.service.impl.PromptServiceImpl;
 
 @RestController
 @RequestMapping("/api/prompt")
 public class PromptController {
 
-    private final PromptService promptService;
+    private final PromptServiceImpl promptServiceImpl;
 
     @Autowired
-    public PromptController(PromptService promptService) {
-        this.promptService = promptService;
+    public PromptController(PromptServiceImpl promptServiceImpl) {
+        this.promptServiceImpl = promptServiceImpl;
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public PromptDTO createPrompt(@RequestBody PromptDTO promptDTO) {
-        Prompt prompt = promptService.create(promptDTO);
-        return promptService.mapToDTO(prompt);
+        Prompt prompt = promptServiceImpl.create(promptDTO);
+        return promptServiceImpl.mapToDTO(prompt);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public PromptDTO getPrompt(){
-        Prompt prompt = promptService.get();
-        return promptService.mapToDTO(prompt);
+        Prompt prompt = promptServiceImpl.get();
+        return promptServiceImpl.mapToDTO(prompt);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping
     public PromptDTO updatePrompt(@RequestBody PromptDTO promptDTO){
-        Prompt prompt = promptService.update(promptDTO);
-        return promptService.mapToDTO(prompt);
+        Prompt prompt = promptServiceImpl.update(promptDTO);
+        return promptServiceImpl.mapToDTO(prompt);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping
     public String deletePrompt(){
-        promptService.delete();
+        promptServiceImpl.delete();
         return "Промпт был успешно удален";
     }
 }

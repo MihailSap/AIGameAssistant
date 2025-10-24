@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service;
+package ru.project.gameAssistantBackend.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -6,18 +6,20 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.project.gameAssistantBackend.dto.chat.PromptDTO;
 import ru.project.gameAssistantBackend.models.Prompt;
 import ru.project.gameAssistantBackend.repository.PromptRepository;
+import ru.project.gameAssistantBackend.service.PromptServiceI;
 
 @Service
-public class PromptService {
+public class PromptServiceImpl implements PromptServiceI {
 
     private final PromptRepository promptRepository;
 
     @Autowired
-    public PromptService(PromptRepository promptRepository) {
+    public PromptServiceImpl(PromptRepository promptRepository) {
         this.promptRepository = promptRepository;
     }
 
     @Transactional
+    @Override
     public Prompt create(PromptDTO promptDTO){
         if(isPromptExists()){
             throw new RuntimeException("Промпт уже создан");
@@ -28,16 +30,19 @@ public class PromptService {
         return promptRepository.save(prompt);
     }
 
+    @Override
     public Prompt get(){
         return promptRepository.findAll().stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("Промпт не найден"));
     }
 
+    @Override
     public String getPromptText(){
         return get().getText();
     }
 
     @Transactional
+    @Override
     public Prompt update(PromptDTO promptDTO){
         if(!isPromptExists()){
             throw new RuntimeException("Промпт ещё не создан");
@@ -49,6 +54,7 @@ public class PromptService {
     }
 
     @Transactional
+    @Override
     public void delete(){
         if(!isPromptExists()){
             throw new RuntimeException("Промпт ещё не создан");
@@ -58,10 +64,12 @@ public class PromptService {
         promptRepository.delete(prompt);
     }
 
+    @Override
     public PromptDTO mapToDTO(Prompt prompt){
         return new PromptDTO(prompt.getText());
     }
 
+    @Override
     public boolean isPromptExists(){
         return !promptRepository.findAll().isEmpty();
     }

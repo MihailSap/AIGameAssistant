@@ -1,6 +1,6 @@
 package ru.project.gameAssistantBackend.controllers;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -8,20 +8,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.project.gameAssistantBackend.service.FileService;
+import ru.project.gameAssistantBackend.service.impl.FileServiceImpl;
 
 import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/file")
-@RequiredArgsConstructor
 public class FileController {
 
-    private final FileService fileService;
+    private final FileServiceImpl fileServiceImpl;
+
+    @Autowired
+    public FileController(FileServiceImpl fileServiceImpl) {
+        this.fileServiceImpl = fileServiceImpl;
+    }
 
     @GetMapping("/image/{imageFileTitle}")
     public ResponseEntity<Resource> getImageFile(@PathVariable("imageFileTitle") String imageFileTitle) throws Exception {
-        var resource = fileService.getFileResource(imageFileTitle);
+        var resource = fileServiceImpl.getFileResource(imageFileTitle);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(resource);
@@ -29,7 +33,7 @@ public class FileController {
 
     @GetMapping("/rules/{rulesFileTitle}")
     public ResponseEntity<Resource> getRulesFile(@PathVariable("rulesFileTitle") String rulesFileTitle) throws Exception {
-        var resource = fileService.getFileResource(rulesFileTitle);
+        var resource = fileServiceImpl.getFileResource(rulesFileTitle);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
@@ -37,6 +41,6 @@ public class FileController {
 
     @GetMapping("/rules/text/{rulesFileTitle}")
     public String getTextFromFile(@PathVariable("rulesFileTitle") String rulesFileTitle) throws IOException {
-        return fileService.extractTextFromPDF(rulesFileTitle);
+        return fileServiceImpl.extractTextFromPDF(rulesFileTitle);
     }
 }

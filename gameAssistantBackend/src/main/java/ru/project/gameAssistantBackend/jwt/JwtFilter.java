@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.filter;
+package ru.project.gameAssistantBackend.jwt;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -12,9 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
-import ru.project.gameAssistantBackend.service.JwtUtils;
-import ru.project.gameAssistantBackend.models.JwtAuthentication;
-import ru.project.gameAssistantBackend.service.JwtProvider;
 
 import java.io.IOException;
 

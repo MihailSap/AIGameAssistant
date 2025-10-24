@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.models;
+package ru.project.gameAssistantBackend.jwt;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

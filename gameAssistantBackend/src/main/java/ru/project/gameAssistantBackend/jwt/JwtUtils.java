@@ -1,9 +1,8 @@
-package ru.project.gameAssistantBackend.service;
+package ru.project.gameAssistantBackend.jwt;
 
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.project.gameAssistantBackend.models.JwtAuthentication;
 import ru.project.gameAssistantBackend.enums.Role;
 
 import java.util.Set;

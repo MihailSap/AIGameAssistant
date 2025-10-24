@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service;
+package ru.project.gameAssistantBackend.service.impl;
 
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
@@ -13,39 +13,42 @@ import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
 import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.enums.Role;
-import ru.project.gameAssistantBackend.models.JwtAuthentication;
+import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.Token;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.TokenRepository;
 import ru.project.gameAssistantBackend.repository.UserRepository;
+import ru.project.gameAssistantBackend.service.AuthServiceI;
+import ru.project.gameAssistantBackend.jwt.JwtProvider;
 
 @Service
-public class AuthService {
+public class AuthServiceImpl implements AuthServiceI {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final FileService fileService;
+    private final FileServiceImpl fileServiceImpl;
 
     @Autowired
-    public AuthService(UserService userService,
-                       JwtProvider jwtProvider,
-                       UserRepository userRepository,
-                       TokenRepository tokenRepository,
-                       PasswordEncoder passwordEncoder, FileService fileService) {
-        this.userService = userService;
+    public AuthServiceImpl(UserServiceImpl userServiceImpl,
+                           JwtProvider jwtProvider,
+                           UserRepository userRepository,
+                           TokenRepository tokenRepository,
+                           PasswordEncoder passwordEncoder, FileServiceImpl fileServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
         this.jwtProvider = jwtProvider;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
-        this.fileService = fileService;
+        this.fileServiceImpl = fileServiceImpl;
     }
 
     @Transactional
+    @Override
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
-        final User user = userService.getByEmail(authRequest.getEmail())
+        final User user = userServiceImpl.getByEmail(authRequest.getEmail())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
 
         if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
@@ -67,6 +70,7 @@ public class AuthService {
     }
 
     @Transactional
+    @Override
     public User register(UserRequestDTO userRequestDTO) {
         var email = userRequestDTO.email();
         if(userRepository.findByEmail(email).isPresent()) {
@@ -80,7 +84,7 @@ public class AuthService {
         newUser.setRole(Role.USER);
 
         MultipartFile imageFile = userRequestDTO.imageFile();
-        String imageFileTitle = fileService.save(imageFile);
+        String imageFileTitle = fileServiceImpl.save(imageFile);
         newUser.setImageFileTitle(imageFileTitle);
 
         if(userRequestDTO.isAdmin()){
@@ -90,11 +94,12 @@ public class AuthService {
         return userRepository.save(newUser);
     }
 
+    @Override
     public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
-            var user = userService.getByEmail(email)
+            var user = userServiceImpl.getByEmail(email)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
             var saveRefreshToken = tokenRepository.findByUser(user).get().getBody();
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
@@ -106,11 +111,12 @@ public class AuthService {
     }
 
     @Transactional
+    @Override
     public JwtResponse refresh(@NonNull String refreshToken) throws AuthException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
-            final User user = userService.getByEmail(email)
+            final User user = userServiceImpl.getByEmail(email)
                     .orElseThrow(() -> new AuthException("Пользователь не найден"));
             var saveRefreshToken = tokenRepository.findByUser(user);
             if (saveRefreshToken.isPresent() && saveRefreshToken.get().getBody().equals(refreshToken)) {
@@ -127,6 +133,7 @@ public class AuthService {
     }
 
     @Transactional
+    @Override
     public void logout(String refreshToken) throws AuthException {
         var token = tokenRepository.findByBody(refreshToken)
                 .orElseThrow(() -> new AuthException("Токен не найден"));
@@ -136,10 +143,12 @@ public class AuthService {
         userRepository.save(user);
     }
 
+    @Override
     public JwtAuthentication getAuthInfo() {
         return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
     }
 
+    @Override
     public String getAuthenticatedUserEmail(){
         return getAuthInfo().getPrincipal().toString();
     }

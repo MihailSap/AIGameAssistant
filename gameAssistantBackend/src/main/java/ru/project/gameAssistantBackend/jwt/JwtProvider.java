@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service;
+package ru.project.gameAssistantBackend.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
