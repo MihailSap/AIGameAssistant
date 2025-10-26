@@ -19,3 +19,5 @@ databaseChangeLog:
       file: db/changelog/010-create-chat.yaml
   - include:
       file: db/changelog/009-create-message.yaml
+  - include:
+      file: db/changelog/011-update-chat.yaml

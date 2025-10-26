@@ -3,12 +3,10 @@ package ru.project.gameAssistantBackend.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.project.gameAssistantBackend.dto.chat.ChatDTO;
-import ru.project.gameAssistantBackend.dto.chat.MessageDTO;
-import ru.project.gameAssistantBackend.dto.chat.PromptDTO;
-import ru.project.gameAssistantBackend.dto.chat.StartChatDTO;
+import ru.project.gameAssistantBackend.dto.chat.*;
 import ru.project.gameAssistantBackend.enums.ChatRole;
 import ru.project.gameAssistantBackend.models.Chat;
+import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.models.Message;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.ChatRepository;
@@ -16,6 +14,7 @@ import ru.project.gameAssistantBackend.service.ChatServiceI;
 import ru.project.gameAssistantBackend.utils.PdfToMarkdown;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,35 +23,41 @@ public class ChatServiceImpl implements ChatServiceI {
 
     private final GameServiceImpl gameServiceImpl;
     private final PromptServiceImpl promptServiceImpl;
-    private final UserServiceImpl userServiceImpl;
-    private final ChatRepository chatRepository;
     private final AssistantServiceImpl assistantServiceImpl;
     private final PdfToMarkdown pdfToMarkdown;
+    private final AuthServiceImpl authServiceImpl;
+    private final ChatRepository chatRepository;
 
     @Autowired
     public ChatServiceImpl(GameServiceImpl gameServiceImpl,
                            PromptServiceImpl promptServiceImpl,
-                           UserServiceImpl userServiceImpl,
                            ChatRepository chatRepository,
                            AssistantServiceImpl assistantServiceImpl,
-                           PdfToMarkdown pdfToMarkdown) {
+                           PdfToMarkdown pdfToMarkdown,
+                           AuthServiceImpl authServiceImpl) {
         this.gameServiceImpl = gameServiceImpl;
         this.promptServiceImpl = promptServiceImpl;
-        this.userServiceImpl = userServiceImpl;
         this.chatRepository = chatRepository;
         this.assistantServiceImpl = assistantServiceImpl;
         this.pdfToMarkdown = pdfToMarkdown;
+        this.authServiceImpl = authServiceImpl;
     }
 
     @Transactional
     @Override
     public Chat startChat(StartChatDTO startChatDTO) throws IOException {
-        Chat chat = create(startChatDTO.userId());
+        Chat chat = create(startChatDTO.gameId());
         String systemMessageText = getSystemMessageTextMd(startChatDTO.gameId());
         chat.addMessage(systemMessageText, ChatRole.system);
         chat.addMessage(startChatDTO.request(), ChatRole.user);
+
         String assistantAnswerText = assistantServiceImpl.getAssistantAnswer(chat.getMessages());
         chat.addMessage(assistantAnswerText, ChatRole.assistant);
+        chat.setLastUseTime(Instant.now());
+
+        String titlePrompt = getPromptForTitle(chat.getMessages());
+        String title = assistantServiceImpl.getAnswer(titlePrompt);
+        chat.setTitle(title);
         return chatRepository.save(chat);
     }
 
@@ -63,15 +68,18 @@ public class ChatServiceImpl implements ChatServiceI {
         chat.addMessage(promptDTO.text(), ChatRole.user);
         String assistantAnswerText = assistantServiceImpl.getAssistantAnswer(chat.getMessages());
         chat.addMessage(assistantAnswerText, ChatRole.assistant);
+        chat.setLastUseTime(Instant.now());
         return chatRepository.save(chat);
     }
 
     @Transactional
     @Override
-    public Chat create(Long userId){
+    public Chat create(Long gameId){
         Chat chat = new Chat();
-        User user = userServiceImpl.getById(userId);
+        User user = authServiceImpl.getAuthenticatedUser();
+        Game game = gameServiceImpl.getById(gameId);
         chat.setUzer(user);
+        chat.setGame(game);
         return chatRepository.save(chat);
     }
 
@@ -96,14 +104,7 @@ public class ChatServiceImpl implements ChatServiceI {
         for (Message message : messages) {
             messageDTOs.add(new MessageDTO(message.getRole(), message.getText(), message.getTimestamp()));
         }
-        return new ChatDTO(chat.getId(), messageDTOs);
-    }
-
-    public String getSystemMessageText(Long gameId) throws IOException {
-        String promptText = promptServiceImpl.getPromptText();
-        String rulesText = gameServiceImpl.getRulesText(gameId);
-        rulesText = rulesText.replace("\r", "").replace("\n", "");
-        return String.format("%s %s", promptText, rulesText);
+        return new ChatDTO(chat.getId(), chat.getTitle(), chat.getLastUseTime(), messageDTOs);
     }
 
     @Override
@@ -112,5 +113,37 @@ public class ChatServiceImpl implements ChatServiceI {
         String rulesText = gameServiceImpl.getRulesText(gameId);
         String rulesMdText = pdfToMarkdown.convertTextToMarkdown(rulesText);
         return String.format("%s %s", promptText, rulesMdText);
+    }
+
+    @Override
+    public String getPromptForTitle(List<Message> messages){
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("На основании этих сообщений сформулируй название для диалога: ");
+        for (Message message : messages) {
+            prompt.append(message.getRole())
+                    .append(": ")
+                    .append(message.getText())
+                    .append("; ");
+        }
+        return prompt.toString();
+    }
+
+    @Override
+    public List<Chat> getChatsByGameAndUser(Long gameId){
+        User user = authServiceImpl.getAuthenticatedUser();
+        return chatRepository.findByUzerIdAndGameId(user.getId(), gameId);
+    }
+
+    @Override
+    public List<ChatPreviewDTO> mapToPreviews(List<Chat> chats){
+        List<ChatPreviewDTO> previewDTOs = new ArrayList<>();
+        for (Chat chat : chats) {
+            previewDTOs.add(mapToChatPreviewDTO(chat));
+        }
+        return previewDTOs;
+    }
+
+    public ChatPreviewDTO mapToChatPreviewDTO(Chat chat){
+        return new ChatPreviewDTO(chat.getId(), chat.getTitle(), chat.getLastUseTime());
     }
 }

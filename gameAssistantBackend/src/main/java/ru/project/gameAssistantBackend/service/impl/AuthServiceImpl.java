@@ -152,4 +152,10 @@ public class AuthServiceImpl implements AuthServiceI {
     public String getAuthenticatedUserEmail(){
         return getAuthInfo().getPrincipal().toString();
     }
+
+    public User getAuthenticatedUser(){
+        String email = getAuthenticatedUserEmail();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Авторизованный пользователь не найден"));
+    }
 }

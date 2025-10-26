@@ -20,11 +20,21 @@ public class Chat {
     @JoinColumn(name = "uzer_id", nullable = false)
     private User uzer;
 
+    @ManyToOne
+    @JoinColumn(name = "game_id", nullable = false)
+    private Game game;
+
+    private String title;
+
+    private Instant lastUseTime;
+
     @OneToMany(mappedBy="chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
 
-    public Chat(Long id, User uzer, List<Message> messages) {
+    public Chat(Long id, String title, Instant lastUsedTime, User uzer, List<Message> messages) {
         this.id = id;
+        this.title = title;
+        this.lastUseTime = lastUsedTime;
         this.uzer = uzer;
         this.messages = messages;
     }
@@ -54,6 +64,30 @@ public class Chat {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Instant getLastUseTime() {
+        return lastUseTime;
+    }
+
+    public void setLastUseTime(Instant lastUseTime) {
+        this.lastUseTime = lastUseTime;
     }
 
     public void addMessage(Message message){

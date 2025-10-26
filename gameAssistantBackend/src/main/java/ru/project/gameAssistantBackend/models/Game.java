@@ -1,13 +1,11 @@
 package ru.project.gameAssistantBackend.models;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-//@ToString
 @Entity
 @Table(name = "game")
 public class Game {
@@ -26,6 +24,9 @@ public class Game {
 
     @ManyToMany(mappedBy = "games")
     private Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "game")
+    private Set<Chat> chats;
 
     public Game(Long id, String title, String description, String imageFileTitle, String rulesFileTitle) {
         this.id = id;
@@ -83,6 +84,14 @@ public class Game {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    public Set<Chat> getChats() {
+        return chats;
+    }
+
+    public void setChats(Set<Chat> chats) {
+        this.chats = chats;
     }
 
     @Override
