@@ -122,18 +122,18 @@ public class User {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id && Objects.equals(email, user.email) && Objects.equals(login, user.login)
-                && Objects.equals(password, user.password) && role == user.role && Objects.equals(refreshToken, user.refreshToken)
-                && Objects.equals(imageFileTitle, user.imageFileTitle) && Objects.equals(games, user.games) && Objects.equals(chats, user.chats);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, email, login, password, role, refreshToken, imageFileTitle, games, chats);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        User user = (User) o;
+//        return id == user.id && Objects.equals(email, user.email) && Objects.equals(login, user.login)
+//                && Objects.equals(password, user.password) && role == user.role && Objects.equals(refreshToken, user.refreshToken)
+//                && Objects.equals(imageFileTitle, user.imageFileTitle) && Objects.equals(games, user.games) && Objects.equals(chats, user.chats);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, email, login, password, role, refreshToken, imageFileTitle, games, chats);
+//    }
 }

@@ -53,4 +53,10 @@ public class ChatController {
         List<Chat> chats = chatServiceImpl.getChatsByGameAndUser(gameId);
         return chatServiceImpl.mapToPreviews(chats);
     }
+
+    @GetMapping("/by-user")
+    public List<ChatPreviewDTO> getChatPreviews() {
+        List<Chat> chats = chatServiceImpl.getChatsByAuthUser();
+        return chatServiceImpl.mapToPreviews(chats);
+    }
 }

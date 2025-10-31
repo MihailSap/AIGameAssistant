@@ -102,6 +102,7 @@ public class ChatServiceImpl implements ChatServiceI {
         List<Message> messages = chat.getMessages();
         List<MessageDTO> messageDTOs = new ArrayList<>();
         for (Message message : messages) {
+            if(message.getRole().equals(ChatRole.system)) continue;
             messageDTOs.add(new MessageDTO(message.getRole(), message.getText(), message.getTimestamp()));
         }
         return new ChatDTO(chat.getId(), chat.getTitle(), chat.getLastUseTime(), messageDTOs);
@@ -117,8 +118,13 @@ public class ChatServiceImpl implements ChatServiceI {
 
     @Override
     public String getPromptForTitle(List<Message> messages){
+        String promptStr = """
+                Сформулируй название для чата. Название не должно состоять более чем из 5 слов.
+                Название чата должно затрагивать саму игру и мой вопрос.
+                Верни только название чата и ничего более. Сообщения чата: 
+                """;
         StringBuilder prompt = new StringBuilder();
-        prompt.append("На основании этих сообщений сформулируй название для диалога: ");
+        prompt.append(promptStr);
         for (Message message : messages) {
             prompt.append(message.getRole())
                     .append(": ")
@@ -144,6 +150,16 @@ public class ChatServiceImpl implements ChatServiceI {
     }
 
     public ChatPreviewDTO mapToChatPreviewDTO(Chat chat){
-        return new ChatPreviewDTO(chat.getId(), chat.getTitle(), chat.getLastUseTime());
+        Long gameId = -1L;
+        if(chat.getGame() != null){
+            gameId = chat.getGame().getId();
+        }
+
+        return new ChatPreviewDTO(chat.getId(), gameId, chat.getTitle(), chat.getLastUseTime());
+    }
+
+    public List<Chat> getChatsByAuthUser(){
+        User user = authServiceImpl.getAuthenticatedUser();
+        return chatRepository.findByUzerId(user.getId());
     }
 }
