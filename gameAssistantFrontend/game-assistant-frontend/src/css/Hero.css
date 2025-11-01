@@ -9,7 +9,7 @@
 .hero-bg {
     position: absolute;
     inset: 0;
-    background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 1)), url('../img/hero-bg.png');
+    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.7), black), url('../img/hero-bg.png');
     background-size: cover;
     background-position: center;
     filter: grayscale(.02) brightness(.6);
@@ -32,7 +32,6 @@
 
 .hero-title {
     margin: 60px 50px 60px 0;
-    color: #fff;
     font-size: 40px;
     text-align: center;
     font-weight: 700;
@@ -44,7 +43,6 @@
 }
 
 .top-label {
-    color: #fff;
     margin-bottom: 10px;
     font-weight: 800;
     font-size: 24px;

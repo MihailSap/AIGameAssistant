@@ -1,14 +1,6 @@
-:root {
-  --text: #e8e8e8;
-  --muted-text: #a9a9a9;
-  --accent: #3a7bfd;
-  --danger: #e25555;
-  --transition: 160ms ease;
-}
-
 .table-wrap {
   overflow: auto;
-  border-radius: var(--radius);
+  border-radius: var(--radius) var(--radius) 0 0;
 }
 
 .admin-table-header {
@@ -16,10 +8,10 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  width: 100%;
 }
 
 .admin-table-title {
-  margin: 0 0 12px 0;
   font-size: 16px;
 }
 
@@ -33,12 +25,9 @@
   min-width: 220px;
   max-width: 420px;
   padding: 8px 12px;
-  border-radius: var(--radius);
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.03);
+  background: var(--text-input);
+  border: 1px solid var(--text-input-border);
   color: var(--text);
-  outline: none;
-  transition: box-shadow var(--transition), border-color var(--transition);
   font-size: 14px;
 }
 
@@ -47,8 +36,7 @@
 }
 
 .admin-table-search:focus {
-  border-color: rgba(244, 196, 48, 0.5);
-  box-shadow: 0 6px 20px rgba(58, 123, 253, 0.06);
+  border-color: var(--muted-yellow);
 }
 
 .admin-table {
@@ -60,24 +48,22 @@
 .admin-table thead th {
   text-align: center;
   padding: 12px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted-text);
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  position: sticky;
-  top: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-bottom: 1px solid var(--text-input-border);
+  background: var(--text-input);
 }
 
 .admin-table tbody td {
   padding: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--text-input-border);
   vertical-align: middle;
   text-align: center;
   font-size: 14px;
 }
 
 .admin-table tbody tr.row-current {
-  background: linear-gradient(90deg, rgba(58,123,253,0.06), rgba(255,255,255,0.01));
+  background: linear-gradient(90deg, rgba(58,123,253,0.06), transparent);
   box-shadow: inset 4px 0 0 0 rgba(58,123,253,0.18);
 }
 
@@ -95,32 +81,27 @@
 }
 
 .admin-root .pagination-btn {
-  background: var(--muted);
+  background: var(--muted-button-bg);
   color: var(--muted-text);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  min-width: 44px;
-  width: 44px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  border: 1px solid var(--text-input-border);
+  width: 40px;
+  height: 40px;
+  transition: background var(--transition), color var(--transition), opacity var(--transition);
 }
 
 .admin-root .pagination-btn:hover {
   color: var(--muted-text);
 }
 
-.pagination-btn:disabled {
+.admin-root .pagination-btn:disabled {
   opacity: 0.45;
   cursor: no-drop;
-  transform: none;
-  box-shadow: none;
-  background: var(--muted);
+  background: var(--muted-button-bg);
 }
 
-.pagination-btn:disabled:hover {
-  background: var(--muted);
+.admin-root .pagination-btn:disabled:hover {
+  background: var(--muted-button-bg);
+  color: var(--muted-text);
 }
 
 .pagination-indicator {
@@ -133,31 +114,40 @@
 .icon-btn, .link-btn {
   background: transparent;
   border: none;
-  color: var(--accent);
+  color: var(--yellow);
   cursor: pointer;
   font-size: 16px;
   padding: 6px;
   border-radius: var(--radius);
-  transition: background var(--transition), transform var(--transition);
+  transition: background var(--transition), transform var(--transition), text-decoration-color var(--transition);
 }
 
-.icon-btn:hover, .link-btn:hover {
+.link-btn {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+}
+
+.icon-btn:hover{
   background: rgba(255,255,255,0.02);
   transform: translateY(-2px);
+}
+
+.link-btn:hover {
+  text-decoration-color: var(--yellow);
 }
 
 .icon-btn.danger {
   color: var(--danger);
 }
 
-@media (max-width: 680px) {
+@media (max-width: 740px) {
   .admin-section {
     min-width: 0;
   }
 
   .table-wrap {
     width: 100%;
-    max-width: 100%;
     display: block;
     overflow-x: auto;
     overflow-y: visible;
@@ -166,18 +156,12 @@
   }
 
   .admin-table {
-    width: max-content;
     min-width: 580px;
     table-layout: auto;
     white-space: nowrap;
   }
 
   .admin-table thead th {
-    padding: 12px 4px;
-    position: sticky;
-    top: 0;
-    z-index: 3;
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
     white-space: nowrap;
   }
 
@@ -194,7 +178,8 @@
 
   .admin-table-search {
     width: calc(100% - 69px);
-    max-width: none;
+    min-width: unset;
+    max-width: unset;
   }
 
   .users-search {

@@ -5,8 +5,9 @@
 
 .grid-surface,
 .catalog-info {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--game-grid-bg);
     padding: 35px;
+    border: 1px solid var(--section-border);
     border-radius: var(--radius);
 }
 

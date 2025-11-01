@@ -11,41 +11,80 @@ function buildFormData(userRequestDTO) {
 }
 
 export const userApi = {
-  async getById(id) {
-    const resp = await apiClient.get(`/api/users/${encodeURIComponent(id)}`);
-    return resp.data;
+  getById: async (id) => {
+    try {
+      const resp = await apiClient.get(`/api/users/${encodeURIComponent(id)}`);
+      return resp.data;
+    } catch (error) {
+      console.error("Error getting user by id:", error);
+      throw error;
+    }
   },
 
-  async updatePassword(id, updatePassword) {
-    await apiClient.patch(`/api/users/${encodeURIComponent(id)}/update/password`, updatePassword);
+  updatePassword: async (id, updatePassword) => {
+    try {
+      await apiClient.patch(`/api/users/${encodeURIComponent(id)}/update/password`, updatePassword);
+    } catch (error) {
+      console.error("Error updating user password:", error);
+      throw error;
+    }
   },
 
-  async getAuthenticated() {
-    const resp = await apiClient.get("/api/users/authenticated");
-    return resp.data;
+  getAuthenticated: async () => {
+    try {
+      const resp = await apiClient.get("/api/users/authenticated");
+      return resp.data;
+    } catch (error) {
+      console.error("Error getting authenticated user:", error);
+      throw error;
+    }
   },
 
-  async getAll() {
-    const resp = await apiClient.get("/api/users");
-    return resp.data;
+  getAll: async () => {
+    try {
+      const resp = await apiClient.get("/api/users");
+      return resp.data;
+    } catch (error) {
+      console.error("Error getting all users:", error);
+      throw error;
+    }
   },
 
-  async delete(id) {
-    await apiClient.delete(`/api/users/${encodeURIComponent(id)}`);
+  delete: async (id) => {
+    try {
+      await apiClient.delete(`/api/users/${encodeURIComponent(id)}`);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error;
+    }
   },
 
-  async makeAdmin(id) {
-    await apiClient.patch(`/api/users/${encodeURIComponent(id)}/make-admin`);
+  makeAdmin: async (id) => {
+    try {
+      await apiClient.patch(`/api/users/${encodeURIComponent(id)}/make-admin`);
+    } catch (error) {
+      console.error("Error making user admin:", error);
+      throw error;
+    }
   },
 
-  async makeNotAdmin(id) {
-    await apiClient.patch(`/api/users/${encodeURIComponent(id)}/make-not-admin`);
+  makeNotAdmin: async (id) => {
+    try {
+      await apiClient.patch(`/api/users/${encodeURIComponent(id)}/make-not-admin`);
+    } catch (error) {
+      console.error("Error removing user admin:", error);
+      throw error;
+    }
   },
 
-  async updateImage(id, userRequestDTO) {
-    console.log(userRequestDTO);
-    const fd = buildFormData(userRequestDTO);
-    const resp = await apiClient.patch(`/api/users/${encodeURIComponent(id)}/update/image`, fd);
-    return resp.data;
+  updateImage: async (id, userRequestDTO) => {
+    try {
+      const fd = buildFormData(userRequestDTO);
+      const resp = await apiClient.patch(`/api/users/${encodeURIComponent(id)}/update/image`, fd);
+      return resp.data;
+    } catch (error) {
+      console.error("Error updating user image:", error);
+      throw error;
+    }
   },
 };

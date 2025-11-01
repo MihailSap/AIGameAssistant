@@ -9,7 +9,7 @@ export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFil
 
     const filtered = useMemo(() => {
         const q = (search || "").trim();
-        if (q.length < 3) return games;
+        if (q.length < 2) return games;
         const qq = q.toLowerCase();
         return (games || []).filter(g =>
             (g.title || "").toLowerCase().includes(qq) ||

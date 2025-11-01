@@ -4,6 +4,7 @@ import "../css/TopCarousel.css";
 import leftArrow from "../img/left-arrow.svg";
 import rightArrow from "../img/right-arrow.svg";
 import { fileApi } from "../api/file";
+import { createObjectUrl, revokeObjectUrl } from "../utils/blobUtils";
 
 function useBlobCache(items, concurrency = 6) {
     const cacheRef = useRef(new Map());
@@ -23,7 +24,7 @@ function useBlobCache(items, concurrency = 6) {
                 try {
                     const blob = await fileApi.getImageBlob(k);
                     if (cancelled) break;
-                    const url = URL.createObjectURL(blob);
+                    const url = createObjectUrl(blob);
                     cacheRef.current.set(k, url);
                     createdRef.current.add(k);
                 } catch (e) {
@@ -40,14 +41,14 @@ function useBlobCache(items, concurrency = 6) {
             cancelled = true;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [items.map ? items.map(i => i && i.imageFileTitle).join("|") : items.length, concurrency]);
+    }, [items && items.length ? items.map(i => i && i.imageFileTitle).join("|") : "", concurrency]);
 
     useEffect(() => {
         return () => {
             cacheRef.current.forEach((v, k) => {
                 // eslint-disable-next-line react-hooks/exhaustive-deps
                 if (v && createdRef.current.has(k)) {
-                    try { URL.revokeObjectURL(v); } catch (e) { }
+                    try { revokeObjectUrl(v); } catch (e) { }
                 }
             });
             // eslint-disable-next-line react-hooks/exhaustive-deps

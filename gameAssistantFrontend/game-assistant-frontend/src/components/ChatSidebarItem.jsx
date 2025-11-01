@@ -4,6 +4,7 @@ import "../css/ChatPage.css";
 import "../css/ChatSidebarItem.css";
 
 export default function ChatSidebarItem({ session, active, onSelect, onDelete }) {
+    const time = session.lastUseTime || session.createdAt || new Date().toISOString();
     return (
         <div
             className={`chat-session-item ${active ? "active" : ""}`}
@@ -13,9 +14,11 @@ export default function ChatSidebarItem({ session, active, onSelect, onDelete })
             onKeyDown={(e) => e.key === "Enter" && onSelect(session)}
         >
             <div style={{ minWidth: 0, overflow: "hidden" }}>
-                <div className="session-title">{session.title}</div>
+                <div className="session-title">
+                    {session._loading ? <span className="shimmer-title">Загрузка…</span> : session.title}
+                </div>
                 <div className="session-meta">
-                    {session.gameTitle ? `${session.gameTitle} • ` : ""}{new Date(session.createdAt).toLocaleString()}
+                    {session.gameTitle ? `${session.gameTitle} • ` : ""}{new Date(time).toLocaleString()}
                 </div>
             </div>
             <button

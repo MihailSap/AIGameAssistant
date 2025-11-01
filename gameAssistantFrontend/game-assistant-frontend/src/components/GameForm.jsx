@@ -26,9 +26,11 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
 
   return (
     <form className="game-form" onSubmit={handleSubmit}>
+      <h3 className="form-title">{mode === "create" ? "Создать игру" : "Редактировать игру"}</h3>
+
       <label className="form-row">
         <span className="form-label">Название</span>
-        <input className="form-input" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={30} required />
+        <input type="text" className="form-input" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={30} required />
       </label>
 
       <label className="form-row">
@@ -65,7 +67,7 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
       </label>
 
       <div className="admin-modal-actions">
-        <button type="button" className="btn btn-ghost" onClick={onCancel} disabled={submitting}>Отмена</button>
+        <button type="button" className="btn btn-danger" onClick={onCancel} disabled={submitting}>Отмена</button>
         <button type="submit" className="btn" disabled={submitting}>
           {submitting ? "Сохранение..." : mode === "create" ? "Создать" : "Сохранить"}
         </button>

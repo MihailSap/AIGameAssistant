@@ -18,29 +18,54 @@ function buildFormData(gameDTO) {
 }
 
 export const gameApi = {
-  async create(gameDTO) {
-    const fd = buildFormData(gameDTO);
-    const resp = await apiClient.post("/api/game/create", fd);
-    return resp.data;
+  create: async (gameDTO) => {
+    try {
+      const fd = buildFormData(gameDTO);
+      const resp = await apiClient.post("/api/game/create", fd);
+      return resp.data;
+    } catch (error) {
+      console.error("Error creating game:", error);
+      throw error;
+    }
   },
 
-  async read(id) {
-    const resp = await apiClient.get(`/api/game/${encodeURIComponent(id)}`);
-    return resp.data;
+  read: async (id) => {
+    try {
+      const resp = await apiClient.get(`/api/game/${encodeURIComponent(id)}`);
+      return resp.data;
+    } catch (error) {
+      console.error("Error reading game:", error);
+      throw error;
+    }
   },
 
-  async update(id, gameDTO) {
-    const fd = buildFormData(gameDTO);
-    const resp = await apiClient.put(`/api/game/${encodeURIComponent(id)}/update`, fd);
-    return resp.data;
+  update: async (id, gameDTO) => {
+    try {
+      const fd = buildFormData(gameDTO);
+      const resp = await apiClient.put(`/api/game/${encodeURIComponent(id)}/update`, fd);
+      return resp.data;
+    } catch (error) {
+      console.error("Error updating game:", error);
+      throw error;
+    }
   },
 
-  async delete(id) {
-    await apiClient.delete(`/api/game/${encodeURIComponent(id)}/delete`);
+  delete: async (id) => {
+    try {
+      await apiClient.delete(`/api/game/${encodeURIComponent(id)}/delete`);
+    } catch (error) {
+      console.error("Error deleting game:", error);
+      throw error;
+    }
   },
 
-  async getAll() {
-    const resp = await apiClient.get("/api/game/all");
-    return resp.data;
+  getAll: async () => {
+    try {
+      const resp = await apiClient.get("/api/game/all");
+      return resp.data;
+    } catch (error) {
+      console.error("Error get all games:", error);
+      throw error;
+    }
   },
 };

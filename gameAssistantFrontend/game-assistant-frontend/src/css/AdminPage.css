@@ -1,34 +1,16 @@
-:root {
-  --panel: rgba(15, 17, 20, 0.9);
-  --text: #e8e8e8;
-  --muted-text: #a9a9a9;
-  --radius: 30px;
-  --transition: 160ms ease;
-}
-
 .admin-root {
   min-height: 100vh;
   padding: 24px;
-}
-
-.admin-root h1,
-.admin-root h2,
-.admin-root h3,
-.admin-root h4,
-.admin-root h5,
-.admin-root h6 {
-  color: var(--text);
-  margin: 0;
 }
 
 .admin-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--panel);
+  background: var(--section-bg);
   padding: 18px 22px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--section-border);
   margin-bottom: 20px;
 }
 
@@ -40,27 +22,25 @@
 .admin-header h1 {
   margin: 0;
   font-size: 20px;
-  letter-spacing: 0.2px;
 }
 
 .admin-main {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
 .admin-section {
-  background: var(--panel);
+  background: var(--section-bg);
   padding: 16px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--section-border);
 }
 
-.admin-loading,
 .admin-error {
   padding: 40px;
   text-align: center;
-  color: var(--muted-text);
+  color: var(--danger);
 }
 
 .admin-modal-actions {
@@ -71,8 +51,7 @@
 }
 
 .admin-btn-logout {
-  padding: 12px 16px;
-  font-size: 14px;
+  padding: 5px 15px;
 }
 
 .admin-btn-add {
@@ -99,17 +78,10 @@
 
   .admin-title h1 {
     font-size: 18px;
-    line-height: 1.15;
   }
 
   .admin-title .main-link {
-    order: 2;
     align-self: flex-start;
     padding: 0;
-  }
-
-  .admin-header>div:last-child {
-    display: flex;
-    justify-content: flex-end;
   }
 }

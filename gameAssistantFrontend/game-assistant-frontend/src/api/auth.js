@@ -13,19 +13,19 @@ function buildFormData(userRequestDTO) {
 }
 
 export const authApi = {
-  async login({ email, password }) {
+  login: async ({ email, password }) => {
     const resp = await apiClient.post("/api/auth/login", { email, password });
     setTokens({ accessToken: resp.data.accessToken, refreshToken: resp.data.refreshToken });
     return resp.data;
   },
 
-  async register(userRequestDTO) {
+  register: async (userRequestDTO) => {
     const fd = buildFormData(userRequestDTO);
     const resp = await apiClient.post("/api/auth/register", fd);
     return resp.data;
   },
 
-  async logout() {
+  logout: async () => {
     try {
       const refreshToken = getRefreshToken();
       if (refreshToken) {
@@ -38,7 +38,7 @@ export const authApi = {
     }
   },
 
-  async refreshAccessToken() {
+  refreshAccessToken: async () => {
     const refreshToken = getRefreshToken();
     const resp = await apiClient.post("/api/auth/token", { refreshToken });
     if (!resp?.data?.accessToken) throw new Error("refresh failed: no access token");
@@ -46,7 +46,7 @@ export const authApi = {
     return resp.data;
   },
 
-  async refreshRefreshToken() {
+  refreshRefreshToken: async () => {
     const refreshToken = getRefreshToken();
     const resp = await apiClient.post("/api/auth/refresh", { refreshToken });
     if (!resp?.data?.accessToken) throw new Error("refresh failed: no access token");

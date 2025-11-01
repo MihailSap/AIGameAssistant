@@ -5,7 +5,7 @@ import logo from "../img/LOGO.svg";
 import searchIcon from "../img/search-icon.svg";
 import "../css/Header.css";
 
-export default function Header({ search = null, onSearchChange, currentUser, title }) {
+export default function Header({ search = null, onSearchChange, currentUser }) {
     const isAdmin = currentUser?.isAdmin;
     return (
         <header className={"site-header"}>
@@ -18,15 +18,13 @@ export default function Header({ search = null, onSearchChange, currentUser, tit
                     {search !== null &&
                         <div className="search-wrap">
                             <input
+                                type="text"
                                 className="search-input"
                                 value={search}
                                 onChange={(e) => onSearchChange(e.target.value)}
                             />
                             <span className="search-icon" aria-hidden="true"><img src={searchIcon} alt="Поиск" /></span>
                         </div>
-                    }
-                    {title &&
-                        <h1 className="header-page-title">{title}</h1>
                     }
                 </div>
 
@@ -39,6 +37,7 @@ export default function Header({ search = null, onSearchChange, currentUser, tit
                 <div className={"header-center header-mobile-search"}>
                     <div className="search-wrap">
                         <input
+                            type="text"
                             className="search-input"
                             value={search}
                             onChange={(e) => onSearchChange(e.target.value)}

@@ -1,0 +1,54 @@
+.prompt-editor-root {
+    width: 100%;
+}
+
+.prompt-editor-textarea {
+    width: calc(100% - 24px);
+    min-height: 120px;
+    max-height: 220px;
+    padding: 12px;
+    border-radius: var(--radius);
+    background: var(--text-input);
+    border: 1px solid var(--text-input-border);
+    color: var(--text);
+    resize: vertical;
+    overflow-y: auto;
+    outline: none;
+    transition: box-shadow var(--transition), border-color var(--transition);
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.prompt-editor-textarea::placeholder {
+    color: var(--muted-text);
+}
+
+.prompt-editor-textarea.view {
+    opacity: 0.95;
+}
+
+.prompt-editor-textarea.editing {
+    border-color: var(--muted-yellow);
+}
+
+.prompt-editor-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.prompt-editor-actions .btn {
+    padding: 5px 15px;
+}
+
+.prompt-editor-loading,
+.prompt-editor-error {
+    color: var(--muted-text);
+    font-size: 16px;
+}
+
+@media (max-width: 600px) {
+    .prompt-editor-textarea {
+        max-height: 180px;
+    }
+}

@@ -2,17 +2,32 @@ import { apiClient } from "./axios";
 
 export const favouriteApi = {
   getAll: async () => {
-    const resp = await apiClient.get("/api/favourites");
-    return resp.data;
+    try {
+      const resp = await apiClient.get("/api/favourites");
+      return resp.data;
+    } catch (error) {
+      console.error("Error get favourites:", error);
+      throw error;
+    }
   },
 
   add: async (gameId) => {
-    const resp = await apiClient.post(`/api/favourites/${gameId}/add`);
-    return resp.data;
+    try {
+      const resp = await apiClient.post(`/api/favourites/${gameId}/add`);
+      return resp.data;
+    } catch (error) {
+      console.error("Error add favourite:", error);
+      throw error;
+    }
   },
 
   remove: async (gameId) => {
-    const resp = await apiClient.delete(`/api/favourites/${gameId}/remove`);
-    return resp.data;
+    try {
+      const resp = await apiClient.delete(`/api/favourites/${gameId}/remove`);
+      return resp.data;
+    } catch (error) {
+      console.error("Error remove favourite:", error);
+      throw error;
+    }
   },
 };

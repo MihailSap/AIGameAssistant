@@ -22,5 +22,21 @@ export const escapeText = (text) => {
     '`': '&#x60;'
   };
 
+  // eslint-disable-next-line no-useless-escape
   return text.replace(/[&<>"'\/\\`]/g, (char) => escapeMap[char]);
 };
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+export function formatDate(value) {
+  if (!value) return '-';
+  const d = typeof value === 'string' || typeof value === 'number' ? new Date(value) : value;
+  if (Number.isNaN(d.getTime())) return '-';
+  const day = pad(d.getDate());
+  const month = pad(d.getMonth() + 1);
+  const year = d.getFullYear() % 100;
+  const hours = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
+

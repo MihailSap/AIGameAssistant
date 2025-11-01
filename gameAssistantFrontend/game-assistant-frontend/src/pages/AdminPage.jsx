@@ -4,13 +4,13 @@ import useAuth from "../hooks/useAuth";
 import { userApi } from "../api/users";
 import { gameApi } from "../api/game";
 import { fileApi } from "../api/file";
-
 import UsersTable from "../components/UsersTable";
 import GamesTable from "../components/GamesTable";
 import Modal from "../components/Modal";
 import GameForm from "../components/GameForm";
-
+import PromptEditor from "../components/PromptEditor";
 import "../css/AdminPage.css";
+import { downloadBlob } from "../utils/blobUtils";
 
 export default function AdminPage() {
   const { logout } = useAuth();
@@ -62,7 +62,6 @@ export default function AdminPage() {
         setUsers([authUser, ...admins, ...regulars]);
         setError(null);
       } catch (err) {
-        console.error(err);
         setError(err?.response?.data?.message || err?.message || "Ошибка при загрузке данных");
         if (err?.response?.status === 401) navigate("/login", { replace: true });
       } finally {
@@ -115,7 +114,6 @@ export default function AdminPage() {
           }
           await refreshData();
         } catch (err) {
-          console.error(err);
           alert("Не удалось удалить пользователя.");
           setConfirmState({ open: false });
         }
@@ -163,7 +161,6 @@ export default function AdminPage() {
           setConfirmState({ open: false });
           await refreshData();
         } catch (err) {
-          console.error(err);
           alert("Не удалось удалить игру.");
           setConfirmState({ open: false });
         }
@@ -180,17 +177,8 @@ export default function AdminPage() {
       } else {
         blob = await fileApi.getRulesBlob(fileTitle);
       }
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileTitle;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      await downloadBlob(blob, fileTitle);
     } catch (err) {
-      console.error("download error", err);
       alert("Не удалось скачать файл.");
     }
   };
@@ -205,7 +193,6 @@ export default function AdminPage() {
       setGameFormState({ open: false, mode: "create", initial: null });
       await refreshData();
     } catch (err) {
-      console.error(err);
       alert("Ошибка при сохранении игры.");
     }
   };
@@ -252,9 +239,17 @@ export default function AdminPage() {
       <main className="admin-main">
         <section className="admin-section">
           <div className="admin-table-header">
+            <h2 className="admin-table-title">Промпт</h2>
+          </div>
+          <PromptEditor />
+        </section>
+
+        <section className="admin-section">
+          <div className="admin-table-header">
             <h2 className="admin-table-title">Пользователи</h2>
             <div className="admin-table-controls">
               <input
+                type="text"
                 className="admin-table-search users-search"
                 placeholder="Поиск пользователей..."
                 value={usersSearch}
@@ -276,6 +271,7 @@ export default function AdminPage() {
             <h2 className="admin-table-title">Игры</h2>
             <div className="admin-table-controls">
               <input
+                type="text"
                 className="admin-table-search games-search"
                 placeholder="Поиск игр..."
                 value={gamesSearch}
