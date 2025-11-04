@@ -3,20 +3,11 @@
     color: var(--text);
 }
 
-.profile-root .site-header {
-    background: transparent;
-}
-
-.profile-message,
-.profile-error {
+.profile-message {
     text-align: center;
     font-size: 32px;
     font-weight: 600;
     margin-top: 70px;
-    color: var(--danger);
-}
-
-.profile-message {
     color: var(--text);
 }
 
@@ -118,7 +109,7 @@
     border-color: var(--green);
 }
 
-.prifile-field-error {
+.profile-field-error {
     color: var(--danger);
     font-size: 14px;
     margin-left: 5px;
@@ -175,7 +166,7 @@
 }
 
 .profile-chat-item:hover {
-    background: var(--game-grid-bg);
+    background: rgb(255, 255, 255, 0.25);
 }
 
 .profile-chat-game {

@@ -26,7 +26,7 @@ export default function AdminPage() {
   const [usersSearch, setUsersSearch] = useState("");
   const [gamesSearch, setGamesSearch] = useState("");
 
-  const [confirmState, setConfirmState] = useState({ open: false, title: "", text: "", onConfirm: null });
+  const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null });
   const [gameFormState, setGameFormState] = useState({ open: false, mode: "create", initial: null });
 
   useEffect(() => {
@@ -101,7 +101,6 @@ export default function AdminPage() {
   const handleDeleteUser = (user) => {
     setConfirmState({
       open: true,
-      title: `Удалить пользователя ${user.login}?`,
       text: `Вы уверены, что хотите удалить пользователя "${user.login}" (${user.email})? Это действие нельзя отменить.`,
       onConfirm: async () => {
         try {
@@ -153,7 +152,6 @@ export default function AdminPage() {
   const handleDeleteGame = (game) => {
     setConfirmState({
       open: true,
-      title: `Удалить игру "${game.title}"?`,
       text: `Вы действительно хотите удалить игру "${game.title}"? Это действие нельзя отменить.`,
       onConfirm: async () => {
         try {
@@ -219,7 +217,7 @@ export default function AdminPage() {
           <h1>Админская панель</h1>
           <Link to="/" className="main-link">На главную</Link>
         </div>
-        <div className="admin-error">{error}</div>
+        <div className="loading-error">{error}</div>
       </div>
     );
   }
@@ -292,7 +290,7 @@ export default function AdminPage() {
       </main>
 
       {confirmState.open && (
-        <Modal title={confirmState.title} onClose={() => setConfirmState({ open: false })}>
+        <Modal onClose={() => setConfirmState({ open: false })}>
           <p>{confirmState.text}</p>
           <div className="admin-modal-actions">
             <button className="btn btn-ghost" onClick={() => setConfirmState({ open: false })}>Отмена</button>

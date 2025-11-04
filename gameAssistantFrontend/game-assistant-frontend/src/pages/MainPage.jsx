@@ -154,7 +154,7 @@ export default function MainPage() {
           </div>
         )}
 
-        {!loading && error && <div className="catalog-error">{error}</div>}
+        {!loading && error && <div className="loading-error">{error}</div>}
 
         {!loading && !error && (
           <>

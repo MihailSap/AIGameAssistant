@@ -68,7 +68,6 @@
 
 .avatar-control:hover .avatar-btn {
     opacity: 1;
-    pointer-events: auto;
 }
 
 .avatar-btn:hover {

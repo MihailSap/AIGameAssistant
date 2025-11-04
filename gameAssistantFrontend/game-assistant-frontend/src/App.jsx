@@ -26,8 +26,6 @@ export default function App() {
               <ProfilePage />
             </PrivateRoute>
           } />
-
-          {/* Chats: general /games/ai, specific game /games/ai/:gameId, specific chat /games/ai/:gameId/:chatId */}
           <Route path="/games/ai" element={
             <PrivateRoute>
               <ChatPage />

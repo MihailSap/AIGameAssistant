@@ -50,7 +50,7 @@
     position: absolute;
     right: 0;
     top: calc(100% + 20px);
-    background: var(--section-bg);
+    background: var(--chat-sidebar-bg);
     padding: 20px;
     border-radius: var(--radius);
     min-width: 220px;

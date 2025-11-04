@@ -224,7 +224,7 @@ export default function ProfilePage() {
           <div className="spinner" />
         </div>
       }
-      {globalError && <div className="profile-error" role="alert">{globalError}</div>}
+      {globalError && <div className="loading-error" role="alert">{globalError}</div>}
 
       {!loading && (
         <div className="profile-grid">
@@ -268,7 +268,7 @@ export default function ProfilePage() {
                         className="profile-input"
                         aria-invalid={!!pwErrors.short}
                       />
-                      {pwErrors.short && <div className="prifile-field-error">{pwErrors.short}</div>}
+                      {pwErrors.short && <div className="profile-field-error">{pwErrors.short}</div>}
                     </label>
 
                     <label className="password-row">
@@ -280,10 +280,10 @@ export default function ProfilePage() {
                         className="profile-input"
                         aria-invalid={!!pwErrors.diff}
                       />
-                      {pwErrors.diff && <div className="prifile-field-error">{pwErrors.diff}</div>}
+                      {pwErrors.diff && <div className="profile-field-error">{pwErrors.diff}</div>}
                     </label>
 
-                    {pwErrors.general && <div className="prifile-field-error">{pwErrors.general}</div>}
+                    {pwErrors.general && <div className="profile-field-error">{pwErrors.general}</div>}
 
                     <button type="submit" className="btn btn-green" disabled={!canSubmitPassword}>
                       {isSubmitting ? "Смена..." : "Сменить пароль"}

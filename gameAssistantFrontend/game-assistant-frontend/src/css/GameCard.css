@@ -30,6 +30,7 @@
     justify-content: center;
     color: var(--muted-text);
     height: 100%;
+    text-align: center;
 }
 
 .tile-title-strip {
