@@ -1,6 +1,7 @@
 package ru.project.gameAssistantBackend.models;
 
 import jakarta.persistence.*;
+import ru.project.gameAssistantBackend.enums.GameCategory;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -18,6 +19,9 @@ public class Game {
 
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private GameCategory category;
+
     private String imageFileTitle;
 
     private String rulesFileTitle;
@@ -28,10 +32,11 @@ public class Game {
     @OneToMany(mappedBy = "game")
     private Set<Chat> chats;
 
-    public Game(Long id, String title, String description, String imageFileTitle, String rulesFileTitle) {
+    public Game(Long id, String title, String description, GameCategory category, String imageFileTitle, String rulesFileTitle) {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.category = category;
         this.imageFileTitle = imageFileTitle;
         this.rulesFileTitle = rulesFileTitle;
     }
@@ -94,17 +99,31 @@ public class Game {
         this.chats = chats;
     }
 
+    public GameCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(GameCategory gameCategory) {
+        this.category = gameCategory;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(id, game.id) && Objects.equals(title, game.title) && Objects.equals(description, game.description) && Objects.equals(imageFileTitle, game.imageFileTitle) && Objects.equals(rulesFileTitle, game.rulesFileTitle) && Objects.equals(users, game.users);
+        return Objects.equals(id, game.id) && Objects.equals(title, game.title)
+                && Objects.equals(description, game.description)
+                && category == game.category
+                && Objects.equals(imageFileTitle, game.imageFileTitle)
+                && Objects.equals(rulesFileTitle, game.rulesFileTitle)
+                && Objects.equals(users, game.users)
+                && Objects.equals(chats, game.chats);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, description, imageFileTitle, rulesFileTitle, users);
+        return Objects.hash(id, title, description, category, imageFileTitle, rulesFileTitle, users, chats);
     }
 
     @Override
@@ -113,9 +132,11 @@ public class Game {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
+                ", gameCategory=" + category +
                 ", imageFileTitle='" + imageFileTitle + '\'' +
                 ", rulesFileTitle='" + rulesFileTitle + '\'' +
                 ", users=" + users +
+                ", chats=" + chats +
                 '}';
     }
 }

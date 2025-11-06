@@ -1,22 +1,22 @@
 package ru.project.gameAssistantBackend.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
 import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
+import ru.project.gameAssistantBackend.enums.GameCategory;
 import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.repository.GameRepository;
 import ru.project.gameAssistantBackend.service.GameServiceI;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GameServiceImpl implements GameServiceI {
@@ -30,6 +30,7 @@ public class GameServiceImpl implements GameServiceI {
         var game = new Game();
         game.setTitle(gameRequestDTO.title());
         game.setDescription(gameRequestDTO.description());
+        game.setCategory(gameRequestDTO.category());
 
         var imageFile = gameRequestDTO.imageFile();
         var imageFileTitle = fileServiceImpl.save(imageFile);
@@ -40,7 +41,6 @@ public class GameServiceImpl implements GameServiceI {
         game.setRulesFileTitle(rulesFileTitle);
 
         gameRepository.save(game);
-        log.info("Игра создана");
         return mapToDTO(game);
     }
 
@@ -56,6 +56,7 @@ public class GameServiceImpl implements GameServiceI {
         var game = getById(id);
         game.setTitle(gameDTO.title());
         game.setDescription(gameDTO.description());
+        game.setCategory(gameDTO.category());
 
         var newImageFile = gameDTO.imageFile();
         if(!newImageFile.isEmpty()){
@@ -74,7 +75,6 @@ public class GameServiceImpl implements GameServiceI {
         }
 
         gameRepository.save(game);
-        log.info("Игра с id {} была обновлена", id);
         return mapToDTO(game);
     }
 
@@ -87,7 +87,6 @@ public class GameServiceImpl implements GameServiceI {
         fileServiceImpl.delete(imageFileTitle);
         fileServiceImpl.delete(rulesFileTitle);
         gameRepository.delete(game);
-        log.info("Игра с id={} была удалена", id);
     }
 
     @Override
@@ -116,6 +115,7 @@ public class GameServiceImpl implements GameServiceI {
                 game.getId(),
                 game.getTitle(),
                 game.getDescription(),
+                game.getCategory(),
                 game.getImageFileTitle(),
                 game.getRulesFileTitle());
     }
@@ -135,6 +135,7 @@ public class GameServiceImpl implements GameServiceI {
                 game.getId(),
                 game.getTitle(),
                 game.getDescription(),
+                game.getCategory(),
                 game.getImageFileTitle()
         );
     }
@@ -144,5 +145,10 @@ public class GameServiceImpl implements GameServiceI {
         Game game = getById(id);
         String rulesFileTitle = game.getRulesFileTitle();
         return fileServiceImpl.extractTextFromPDF(rulesFileTitle);
+    }
+
+    @Override
+    public List<GameCategory> getCategories(){
+        return new ArrayList<>(Arrays.asList(GameCategory.values()));
     }
 }

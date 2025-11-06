@@ -21,3 +21,5 @@ databaseChangeLog:
       file: db/changelog/009-create-message.yaml
   - include:
       file: db/changelog/011-update-chat.yaml
+  - include:
+      file: db/changelog/012-update-game-category.yaml

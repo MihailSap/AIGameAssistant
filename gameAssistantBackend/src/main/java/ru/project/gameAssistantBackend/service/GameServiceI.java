@@ -3,6 +3,7 @@ package ru.project.gameAssistantBackend.service;
 import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
 import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
+import ru.project.gameAssistantBackend.enums.GameCategory;
 import ru.project.gameAssistantBackend.models.Game;
 
 import java.io.IOException;
@@ -32,4 +33,6 @@ public interface GameServiceI {
     GamePreviewDTO mapToPreview(Game game);
 
     String getRulesText(Long id) throws IOException;
+
+    List<GameCategory> getCategories();
 }
