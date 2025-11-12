@@ -6,6 +6,7 @@ import { gameApi } from "../api/game";
 import { fileApi } from "../api/file";
 import UsersTable from "../components/UsersTable";
 import GamesTable from "../components/GamesTable";
+import FileViewer from "../components/FileViewer";
 import Modal from "../components/Modal";
 import GameForm from "../components/GameForm";
 import PromptEditor from "../components/PromptEditor";
@@ -26,8 +27,11 @@ export default function AdminPage() {
   const [usersSearch, setUsersSearch] = useState("");
   const [gamesSearch, setGamesSearch] = useState("");
 
+  const [viewerState, setViewerState] = useState({ open: false, fileType: null, fileTitle: null });
   const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null });
   const [gameFormState, setGameFormState] = useState({ open: false, mode: "create", initial: null });
+
+  const [activeTab, setActiveTab] = useState("users");
 
   useEffect(() => {
     let mounted = true;
@@ -48,17 +52,21 @@ export default function AdminPage() {
         if (!mounted) return;
 
         if (allGames && allGames.length > 0) {
-          const gamesResults = await Promise.all(
+          const gamesResults = (await Promise.all(
             allGames.map(item => gameApi.read(item.id))
-          );
+          )).sort((a, b) => a?.id - b?.id);
           setGames(gamesResults);
         } else {
           setGames(allGames || []);
         }
 
         const others = (allUsers || []).filter(u => u.id !== authUser.id);
-        const admins = others.filter(u => u.isAdmin);
-        const regulars = others.filter(u => !u.isAdmin);
+        const admins = others
+          .filter(u => u.isAdmin)
+          .sort((a, b) => a?.id - b?.id);
+        const regulars = others
+          .filter(u => !u.isAdmin)
+          .sort((a, b) => a?.id - b?.id);
         setUsers([authUser, ...admins, ...regulars]);
         setError(null);
       } catch (err) {
@@ -79,9 +87,9 @@ export default function AdminPage() {
       const [allUsers, allGames] = await Promise.all([userApi.getAll(), gameApi.getAll()]);
 
       if (allGames && allGames.length > 0) {
-        const gamesResults = await Promise.all(
+        const gamesResults = (await Promise.all(
           allGames.map(item => gameApi.read(item.id))
-        );
+        )).sort((a, b) => a?.id - b?.id);
         setGames(gamesResults);
       } else {
         setGames(allGames || []);
@@ -89,8 +97,12 @@ export default function AdminPage() {
 
       const authUser = await userApi.getAuthenticated();
       const others = (allUsers || []).filter(u => u.id !== authUser.id);
-      const admins = others.filter(u => u.isAdmin);
-      const regulars = others.filter(u => !u.isAdmin);
+      const admins = others
+        .filter(u => u.isAdmin)
+        .sort((a, b) => a?.id - b?.id);
+      const regulars = others
+        .filter(u => !u.isAdmin)
+        .sort((a, b) => a?.id - b?.id);
       setUsers([authUser, ...admins, ...regulars]);
       setCurrentUser(authUser);
     } catch (err) {
@@ -139,6 +151,11 @@ export default function AdminPage() {
     } catch (err) {
       console.error("Ошибка при смене роли:", err);
     }
+  };
+
+  const handleOpenViewer = (fileType, fileTitle) => {
+    if (!fileTitle) return;
+    setViewerState({ open: true, fileType, fileTitle });
   };
 
   const handleOpenCreateGame = () => {
@@ -225,68 +242,105 @@ export default function AdminPage() {
   return (
     <div className="admin-root">
       <header className="admin-header">
-        <div className="admin-title">
+        <div className="admin-header-left">
           <h1>Админская панель</h1>
-          <Link to="/" className="link">На главную</Link>
+          <nav className="admin-tabs" role="tablist" aria-label="Админ вкладки">
+            <button
+              type="button"
+              className={`admin-tab ${activeTab === "users" ? "active" : ""}`}
+              onClick={() => setActiveTab("users")}
+              role="tab"
+              aria-selected={activeTab === "users"}
+            >
+              Пользователи
+            </button>
+            <button
+              type="button"
+              className={`admin-tab ${activeTab === "games" ? "active" : ""}`}
+              onClick={() => setActiveTab("games")}
+              role="tab"
+              aria-selected={activeTab === "games"}
+            >
+              Игры
+            </button>
+            <button
+              type="button"
+              className={`admin-tab ${activeTab === "settings" ? "active" : ""}`}
+              onClick={() => setActiveTab("settings")}
+              role="tab"
+              aria-selected={activeTab === "settings"}
+            >
+              Настройки
+            </button>
+          </nav>
         </div>
-        <div>
+
+        <div className="admin-header-right">
+          <Link to="/" className="link main-link">На главную</Link>
           <button className="btn admin-btn-logout" onClick={logout}>Выйти</button>
         </div>
       </header>
 
       <main className="admin-main">
-        <section className="admin-section">
-          <div className="admin-table-header">
-            <h2 className="admin-table-title">Промпт</h2>
-          </div>
-          <PromptEditor />
-        </section>
-
-        <section className="admin-section">
-          <div className="admin-table-header">
-            <h2 className="admin-table-title">Пользователи</h2>
-            <div className="admin-table-controls">
-              <input
-                type="text"
-                className="admin-table-search users-search"
-                placeholder="Поиск пользователей..."
-                value={usersSearch}
-                onChange={(e) => setUsersSearch(e.target.value)}
-              />
+        {activeTab === "settings" && (
+          <section className="admin-section">
+            <div className="admin-table-header">
+              <h2 className="admin-table-title">Промпт</h2>
             </div>
-          </div>
-          <UsersTable
-            users={users}
-            currentUser={currentUser}
-            onDelete={handleDeleteUser}
-            onToggleAdmin={handleToggleAdmin}
-            search={usersSearch}
-          />
-        </section>
+            <PromptEditor />
+          </section>
+        )}
 
-        <section className="admin-section">
-          <div className="admin-table-header">
-            <h2 className="admin-table-title">Игры</h2>
-            <div className="admin-table-controls">
-              <input
-                type="text"
-                className="admin-table-search games-search"
-                placeholder="Поиск игр..."
-                value={gamesSearch}
-                onChange={(e) => setGamesSearch(e.target.value)}
-              />
-              <button className="btn admin-btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
+        {activeTab === "users" && (
+          <section className="admin-section">
+            <div className="admin-table-header">
+              <h2 className="admin-table-title">Пользователи</h2>
+              <div className="admin-table-controls">
+                <input
+                  type="text"
+                  className="admin-table-search users-search"
+                  placeholder="Поиск пользователей..."
+                  value={usersSearch}
+                  onChange={(e) => setUsersSearch(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
+            <UsersTable
+              users={users}
+              currentUser={currentUser}
+              onDelete={handleDeleteUser}
+              onToggleAdmin={handleToggleAdmin}
+              search={usersSearch}
+            />
+          </section>
+        )}
 
-          <GamesTable
-            games={games}
-            onEdit={handleOpenEditGame}
-            onDelete={handleDeleteGame}
-            onDownloadFile={handleDownloadFile}
-            search={gamesSearch}
-          />
-        </section>
+        {activeTab === "games" && (
+          <section className="admin-section">
+            <div className="admin-table-header">
+              <h2 className="admin-table-title">Игры</h2>
+              <div className="admin-table-controls">
+                <input
+                  type="text"
+                  className="admin-table-search games-search"
+                  placeholder="Поиск игр..."
+                  value={gamesSearch}
+                  onChange={(e) => setGamesSearch(e.target.value)}
+                />
+                <button className="btn admin-btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
+              </div>
+            </div>
+
+            <GamesTable
+              games={games}
+              onEdit={handleOpenEditGame}
+              onDelete={handleDeleteGame}
+              onDownloadFile={handleDownloadFile}
+              onOpenFile={handleOpenViewer}
+              search={gamesSearch}
+            />
+          </section>
+        )}
       </main>
 
       {confirmState.open && (
@@ -300,12 +354,21 @@ export default function AdminPage() {
       )}
 
       {gameFormState.open && (
-        <Modal title={gameFormState.mode === "create" ? "Создать игру" : "Редактировать игру"} onClose={() => setGameFormState({ open: false })}>
+        <Modal onClose={() => setGameFormState({ open: false })}>
           <GameForm
             mode={gameFormState.mode}
             initial={gameFormState.initial}
             onCancel={() => setGameFormState({ open: false })}
             onSave={handleGameFormSave}
+          />
+        </Modal>
+      )}
+
+      {viewerState.open && (
+        <Modal onClose={() => setViewerState({ open: false, fileType: null, fileTitle: null })}>
+          <FileViewer
+            fileType={viewerState.fileType}
+            fileTitle={viewerState.fileTitle}
           />
         </Modal>
       )}

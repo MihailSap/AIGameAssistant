@@ -125,18 +125,8 @@
     border-color: var(--green);
 }
 
-.password-form .btn-green:hover {
-    color: rgba(0, 153, 0, 1);
-    background: transparent;
-}
-
 .password-form .btn-green:disabled {
     border-color: rgba(0, 153, 0, 0.5);
-    background: rgba(0, 153, 0, 0.5);
-    color: var(--text);
-}
-
-.password-form .btn-green:disabled:hover {
     background: rgba(0, 153, 0, 0.5);
     color: var(--text);
 }
@@ -163,10 +153,6 @@
     white-space: nowrap;
     cursor: pointer;
     transition: background var(--transition);
-}
-
-.profile-chat-item:hover {
-    background: rgb(255, 255, 255, 0.25);
 }
 
 .profile-chat-game {
@@ -293,5 +279,21 @@
 
     .profile-info-line {
         font-size: 14px;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .password-form .btn-green:hover {
+        color: rgba(0, 153, 0, 1);
+        background: transparent;
+    }
+
+    .password-form .btn-green:disabled:hover {
+        background: rgba(0, 153, 0, 0.5);
+        color: var(--text);
+    }
+
+    .profile-chat-item:hover {
+        background: rgb(255, 255, 255, 0.25);
     }
 }

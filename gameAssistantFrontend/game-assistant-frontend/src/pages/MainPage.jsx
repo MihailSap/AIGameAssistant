@@ -124,7 +124,13 @@ export default function MainPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filteredFavourites = useMemo(() => filterGames(favourites), [favourites, debouncedSearch]);
 
-  const sourceList = showFavourites ? filteredFavourites : filtered;
+  const sourceList = (showFavourites ? filteredFavourites : filtered)
+    .slice()
+    .sort((a, b) => {
+      const ta = (a?.title ?? '').trim();
+      const tb = (b?.title ?? '').trim();
+      return ta.localeCompare(tb, 'ru', { sensitivity: 'base', numeric: true });
+    });
   const visibleGames = sourceList.slice(0, visibleCount);
   const canLoadMore = visibleCount < sourceList.length;
 

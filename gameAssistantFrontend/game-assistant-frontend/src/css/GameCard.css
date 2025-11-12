@@ -65,34 +65,57 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 20px 10px;
     opacity: 0;
-    transition: background var(--transition), opacity var(--transition), transform var(--transition);
     text-align: center;
+    transition: background var(--transition), opacity var(--transition), transform var(--transition);
 }
 
 .tile-desc {
-    color: #fff;
+    color: white;
     font-size: 20px;
     font-weight: 400;
     max-width: 100%;
     max-height: 100%;
     text-align: center;
-    overflow: hidden;
     text-overflow: ellipsis;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 10px;
 }
 
-.tile-card:hover {
-    transform: scale(1.03);
+.tile-desc::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-.tile-card:hover .tile-title-strip {
-    opacity: 0;
+.tile-desc::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.tile-card:hover .tile-overlay {
-    opacity: 1;
-    backdrop-filter: blur(10px);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
-    transform: translateY(0);
+.tile-desc::-webkit-scrollbar-thumb {
+    background-color: var(--muted-text);
+    border-radius: var(--radius);
+    transition: background-color var(--transition);
+}
+
+.tile-desc::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .tile-card:hover {
+        transform: scale(1.03);
+    }
+
+    .tile-card:hover .tile-title-strip {
+        opacity: 0;
+    }
+
+    .tile-card:hover .tile-overlay {
+        opacity: 1;
+        backdrop-filter: blur(10px);
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+        transform: translateY(0);
+    }
 }

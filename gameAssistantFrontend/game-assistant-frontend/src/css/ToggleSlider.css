@@ -51,10 +51,6 @@
     color: var(--bg);
 }
 
-.ts-tab:hover {
-    transform: translateY(-2px);
-}
-
 .ts-tab-slider {
     position: absolute;
     top: 6px;
@@ -117,5 +113,11 @@
 @media (max-width: 379px) {
     .auth-root .ts-tab {
         font-size: 16px;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ts-tab:hover {
+        transform: translateY(-2px);
     }
 }

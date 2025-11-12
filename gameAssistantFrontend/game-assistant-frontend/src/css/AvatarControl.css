@@ -50,7 +50,6 @@
 
 .avatar-btn {
     position: absolute;
-    opacity: 0;
     width: 55px;
     height: 55px;
     background: transparent;
@@ -66,14 +65,6 @@
     height: 35px;
 }
 
-.avatar-control:hover .avatar-btn {
-    opacity: 1;
-}
-
-.avatar-btn:hover {
-    background: var(--main-search-input);
-}
-
 .avatar-btn-delete {
     left: 10px;
     top: 10px;
@@ -82,10 +73,6 @@
 .avatar-btn-edit {
     right: 10px;
     top: 10px;
-}
-
-.avatar-wrap.has-img:hover img.avatar-img {
-    filter: blur(2px) brightness(0.95);
 }
 
 .visually-hidden {
@@ -100,17 +87,6 @@
     border: 0;
 }
 
-@media (max-width: 950px) {
-    .avatar-btn {
-        opacity: 1;
-        background: rgba(0, 0, 0, 0.5);
-    }
-
-    .avatar-wrap.has-img:hover img.avatar-img {
-        filter: none;
-    }
-}
-
 @media (max-width: 620px) {
     .avatar-btn {
         width: 40px;
@@ -120,5 +96,23 @@
     .avatar-btn svg {
         width: 25px;
         height: 25px;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .avatar-btn {
+        opacity: 0;
+    }
+
+    .avatar-btn:hover {
+        background: var(--main-search-input);
+    }
+
+    .avatar-control:hover .avatar-btn {
+        opacity: 1;
+    }
+
+    .avatar-wrap.has-img:hover img.avatar-img {
+        filter: blur(2px) brightness(0.95);
     }
 }

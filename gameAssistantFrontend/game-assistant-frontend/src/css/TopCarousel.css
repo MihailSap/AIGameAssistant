@@ -11,10 +11,6 @@
     transition: transform var(--transition);
 }
 
-.carousel-arrow:hover {
-    transform: scale(1.15);
-}
-
 .carousel-arrow:active {
     transform: scale(0.9);
 }
@@ -32,10 +28,6 @@
 .carousel-item {
     display: flex;
     transition: transform var(--transition);
-}
-
-carousel-item:hover {
-    transform: scale(1.03);
 }
 
 .carousel-indicators {
@@ -61,4 +53,14 @@ carousel-item:hover {
     height: 30px;
     width: 5px;
     background: var(--yellow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .carousel-arrow:hover {
+        transform: scale(1.15);
+    }
+
+    carousel-item:hover {
+        transform: scale(1.03);
+    }
 }

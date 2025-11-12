@@ -66,19 +66,9 @@ h6 {
   color: var(--bg);
 }
 
-.btn:hover {
-  background-color: transparent;
-  color: var(--yellow);
-}
-
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.btn:disabled:hover {
-  background-color: var(--yellow);
-  color: var(--bg);
 }
 
 .btn-add {
@@ -93,10 +83,6 @@ h6 {
   border-color: var(--danger);
 }
 
-.btn-danger:hover {
-  color: var(--danger);
-}
-
 .link {
   color: var(--muted-text);
   border: none;
@@ -106,11 +92,6 @@ h6 {
   font-size: 20px;
   font-weight: 400;
   transition: color var(--transition), text-decoration-color var(--transition);
-}
-
-.link:hover {
-  color: var(--muted-yellow);
-  text-decoration-color: var(--muted-yellow);
 }
 
 input[type="checkbox"] {
@@ -184,5 +165,26 @@ input:not([type="checkbox"])[aria-invalid="true"]::placeholder {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background-color: transparent;
+    color: var(--yellow);
+  }
+
+  .btn:disabled:hover {
+    background-color: var(--yellow);
+    color: var(--bg);
+  }
+
+  .btn-danger:hover {
+    color: var(--danger);
+  }
+
+  .link:hover {
+    color: var(--muted-yellow);
+    text-decoration-color: var(--muted-yellow);
   }
 }

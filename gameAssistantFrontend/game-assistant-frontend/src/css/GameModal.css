@@ -83,14 +83,6 @@
   transition: color var(--transition);
 }
 
-.gm-btn-row .gm-circle-btn:hover svg {
-  color: var(--yellow);
-}
-
-.gm-btn-row .gm-circle-btn:disabled:hover svg {
-  color: black;
-}
-
 .gm-tooltip {
   position: absolute;
   bottom: calc(100% + 8px);
@@ -107,12 +99,6 @@
   z-index: 5;
 }
 
-.gm-circle-btn:hover .gm-tooltip,
-.gm-circle-btn:focus .gm-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
 .gm-right {
   flex: 1 1 65%;
   overflow: hidden;
@@ -127,6 +113,24 @@
   font-weight: 500;
   max-height: 350px;
   text-align: justify;
+}
+
+.gm-description::-webkit-scrollbar {
+  width: 8px;
+}
+
+.gm-description::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gm-description::-webkit-scrollbar-thumb {
+  background-color: var(--muted-text);
+  border-radius: var(--radius);
+  transition: background-color var(--transition);
+}
+
+.gm-description::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text);
 }
 
 @media (max-width: 820px) {
@@ -196,5 +200,21 @@
 
   .gm-description {
     max-height: 280px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gm-btn-row .gm-circle-btn:hover svg {
+    color: var(--yellow);
+  }
+
+  .gm-btn-row .gm-circle-btn:disabled:hover svg {
+    color: black;
+  }
+
+  .gm-circle-btn:hover .gm-tooltip,
+  .gm-circle-btn:focus .gm-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }

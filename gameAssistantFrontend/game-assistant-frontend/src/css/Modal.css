@@ -13,7 +13,7 @@
 
 .modal {
   max-width: 980px;
-  width: 95%;
+  width: calc(100% - 94px);
   max-height: 80vh;
   background: var(--modal-bg);
   border-radius: var(--radius);
@@ -21,8 +21,16 @@
   margin: 20px;
   border: 2px solid var(--yellow);
   box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  overflow: auto;
 }
 
 .modal-body {
   overflow: auto;
+}
+
+@media (max-width: 600px) {
+  .modal {
+    padding: 15px;
+    width: calc(100% - 74px);
+  }
 }

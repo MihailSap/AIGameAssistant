@@ -10,15 +10,18 @@ export function revokeObjectUrl(url) {
   } catch (e) {}
 }
 
-export async function downloadBlob(blob, filename = "") {
-  const url = createObjectUrl(blob);
+export async function downloadBlob(data, isBlobUrl = false, filename = "") {
+  let blobUrl = data;
+  if (!isBlobUrl) {
+    blobUrl = createObjectUrl(data);
+  }
   const a = document.createElement("a");
-  a.href = url;
+  a.href = blobUrl;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => {
-    revokeObjectUrl(url);
+    revokeObjectUrl(blobUrl);
   }, 1000);
 }
