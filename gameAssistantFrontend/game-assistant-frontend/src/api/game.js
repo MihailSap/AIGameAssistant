@@ -4,6 +4,7 @@ function buildFormData(gameDTO) {
   const fd = new FormData();
   fd.append("title", gameDTO.title);
   fd.append("description", gameDTO.description);
+  fd.append("category", gameDTO.category);
   if (gameDTO.imageFile) {
     fd.append("imageFile", gameDTO.imageFile)
   } else {
@@ -68,4 +69,14 @@ export const gameApi = {
       throw error;
     }
   },
+
+  getCategories: async () => {
+    try {
+      const resp = await apiClient.get("/api/game/categories");
+      return resp.data;
+    } catch (error) {
+      console.error("Error get games categories:", error);
+      throw error;
+    }
+  }
 };

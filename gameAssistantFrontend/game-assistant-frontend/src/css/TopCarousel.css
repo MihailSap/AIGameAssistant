@@ -11,10 +11,6 @@
     transition: transform var(--transition);
 }
 
-.carousel-arrow:active {
-    transform: scale(0.9);
-}
-
 .carousel-window {
     flex: 1;
     overflow: hidden;
@@ -63,4 +59,8 @@
     carousel-item:hover {
         transform: scale(1.03);
     }
+}
+
+.carousel-arrow:active {
+    transform: scale(0.9);
 }

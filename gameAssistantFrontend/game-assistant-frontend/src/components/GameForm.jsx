@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import "../css/AdminPage.css";
 import "../css/GameForm.css";
+import CategoryDropdown from "../components/CategoryDropdown";
 
 export default function GameForm({ mode = "create", initial = null, onCancel, onSave }) {
   const [title, setTitle] = useState(initial?.title || "");
   const [description, setDescription] = useState(initial?.description || "");
   const [imageFile, setImageFile] = useState(null);
   const [rulesFile, setRulesFile] = useState(null);
+  const [category, setCategory] = useState(initial?.category ?? null);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -14,7 +16,13 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
     e.preventDefault();
     setSubmitting(true);
     try {
-      const payload = { title, description };
+      if (!category) {
+        alert("Пожалуйста, выберите категорию.");
+        setSubmitting(false);
+        return;
+      }
+
+      const payload = { title, description, category };
       if (imageFile) payload.imageFile = imageFile;
       if (rulesFile) payload.rulesFile = rulesFile;
 
@@ -31,6 +39,13 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
       <label className="form-row">
         <span className="form-label">Название</span>
         <input type="text" className="form-input" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={30} required />
+      </label>
+
+      <label className="form-row">
+        <span className="form-label">Категория</span>
+        <div className="form-input">
+          <CategoryDropdown value={category} onChange={(v) => setCategory(v)} />
+        </div>
       </label>
 
       <label className="form-row">

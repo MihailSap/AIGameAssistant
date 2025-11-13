@@ -11,9 +11,17 @@
 }
 
 .grid-top-controls {
+    padding: 0 150px;
+    display: flex;
+    justify-content: space-between;
+    background: linear-gradient(black, var(--bg));
+}
+
+.slider-container {
     display: flex;
     justify-content: center;
-    background: linear-gradient(black, var(--bg));
+    width: 100%;
+    margin-right: 20vw;
 }
 
 .games-area {
@@ -34,4 +42,52 @@
 
 .hero-anchor {
     overflow: hidden;
+}
+
+@media(max-width:1399px) {
+    .grid-top-controls {
+        padding: 0 110px;
+    }
+
+    .slider-container {
+        margin-right: 0;
+        justify-content: flex-end;
+    }
+}
+
+@media(max-width:1099px) {
+    .grid-top-controls {
+        padding: 0 70px;
+    }
+}
+
+@media (max-width: 999px) {
+    .grid-top-controls {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .slider-container {
+        justify-content: center;
+        order: -1;
+    }
+}
+
+@media(max-width:799px) {
+    .grid-top-controls {
+        padding: 0 50px;
+    }
+}
+
+@media(max-width:549px) {
+    .grid-top-controls {
+        padding: 0 40px;
+    }
+}
+
+@media (max-width: 449px) {
+    .grid-top-controls {
+        padding: 0 10px;
+    }
 }

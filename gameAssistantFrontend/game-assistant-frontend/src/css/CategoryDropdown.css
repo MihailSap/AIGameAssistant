@@ -1,0 +1,193 @@
+.catdd-root {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 320px;
+    box-sizing: border-box;
+}
+
+.grid-top-controls .catdd-root {
+    max-width: 20vw;
+}
+
+.catdd-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 15px;
+    background-color: var(--yellow);
+    border: 1px solid var(--yellow);
+    border-radius: var(--radius);
+    color: var(--bg);
+    cursor: pointer;
+    text-align: center;
+    transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.catdd-button .catdd-arrow svg {
+    stroke: var(--bg);
+}
+
+.catdd-button.unset .catdd-arrow svg {
+    stroke: var(--text);
+}
+
+.catdd-button.unset {
+    background-color: var(--modal-bg);
+    border-color: var(--text-input-border);
+    color: var(--text);
+}
+
+.grid-top-controls .catdd-button.unset {
+    padding: 12px 15px;
+    background-color: var(--game-grid-bg);
+    border-color: var(--section-border);
+}
+
+.catdd-button.open {
+    outline: none;
+    box-shadow: 0 0 0 1px var(--yellow);
+}
+
+.catdd-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: calc(100% - 30px);
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.grid-top-controls .catdd-label {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.catdd-button.unset .catdd-label {
+    color: var(--muted-text);
+}
+
+.catdd-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-text);
+}
+
+.catdd-portal-list,
+.catdd-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 10px 0 0 0;
+    padding: 10px;
+    background: var(--chat-sidebar-bg);
+    border: 1px solid var(--section-border);
+    border-radius: var(--radius);
+    max-height: 360px;
+    overflow-y: auto;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    z-index: 99999;
+    box-sizing: border-box;
+}
+
+.catdd-list {
+    z-index: 2000;
+    top: 100%;
+    left: 0;
+    width: 100%
+}
+
+.catdd-item {
+    padding: 7px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+.catdd-item.selected {
+    background-color: var(--yellow);
+    color: var(--bg);
+}
+
+.catdd-portal-list::-webkit-scrollbar,
+.catdd-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.catdd-portal-list::-webkit-scrollbar-track,
+.catdd-list::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 25px;
+}
+
+.catdd-portal-list::-webkit-scrollbar-thumb,
+.catdd-list::-webkit-scrollbar-thumb {
+    background-color: var(--muted-text);
+    border-radius: var(--radius);
+    transition: background-color var(--transition);
+}
+
+.catdd-portal-list::-webkit-scrollbar-thumb:hover,
+.catdd-list::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .catdd-item:hover {
+        background-color: var(--muted-yellow);
+        color: white;
+    }
+
+    .catdd-item.selected:hover {
+        background-color: var(--yellow);
+        color: var(--bg);
+    }
+}
+
+@media (max-width: 1399px) {
+    .grid-top-controls .catdd-root {
+        max-width: 30vw;
+    }
+}
+
+@media (max-width: 999px) {
+    .grid-top-controls .catdd-root {
+        max-width: 45vw;
+    }
+}
+
+@media (max-width: 699px) {
+    .grid-top-controls .catdd-root {
+        max-width: 60vw;
+    }
+}
+
+@media (max-width: 499px) {
+    .grid-top-controls .catdd-root {
+        max-width: 85vw;
+    }
+
+    .grid-top-controls .catdd-button.unset {
+        padding: 11.25px 15px;
+    }
+
+    .catdd-label {
+        font-size: 18px;
+    }
+
+    catdd-item {
+        font-size: 16px;
+    }
+}

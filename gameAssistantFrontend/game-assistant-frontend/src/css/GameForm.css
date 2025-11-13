@@ -21,6 +21,7 @@
   padding: 10px 12px;
   background: var(--text-input);
   border: 1px solid var(--text-input-border);
+  border-radius: var(--radius);
   color: var(--text);
 }
 
