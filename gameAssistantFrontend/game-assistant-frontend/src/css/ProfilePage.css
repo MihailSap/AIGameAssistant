@@ -1,216 +1,299 @@
-:root {
-    --text: #e9eef8;
-    --muted-text: #9aa4b2;
-    --danger: #e25555;
-    --success: #4BB543;
-}
-
 .profile-root {
-    margin: 50px 0 20px 0;
-    box-sizing: border-box;
+    margin: 70px 0 20px;
     color: var(--text);
-    min-height: calc(100vh - 80px);
 }
 
-.profile-top {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
+.profile-message {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+    margin-top: 70px;
+    color: var(--text);
 }
 
-.profile-top .link-like {
-    color: var(--muted-text);
-    text-decoration: none;
-}
-
-.profile-title {
+.chats-panel .profile-message {
     margin: 0;
-    font-size: 22px;
-    font-weight: 700;
 }
 
 .profile-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-        "left right"
-        "sessions sessions";
-    gap: 18px;
+    grid-template-columns: 290px 1fr;
+    gap: 20px;
+    padding: 0 20px;
     align-items: start;
-    padding: 30px;
 }
 
-.profile-panel-left {
-    grid-area: left;
-}
-
-.profile-panel-right {
-    grid-area: right;
-}
-
-.sessions-panel {
-    grid-area: sessions;
+.profile-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .profile-panel {
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    background: linear-gradient(180deg,
-            rgba(255, 255, 255, 0.03) 0%,
-            rgba(255, 255, 255, 0.015) 40%,
-            transparent 100%);
-    backdrop-filter: blur(8px) saturate(1.05);
-    -webkit-backdrop-filter: blur(8px) saturate(1.05);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-    overflow: hidden;
-    height: 100%;
+    background: var(--game-grid-bg);
+    padding: 15px;
+    border: 1px solid var(--section-border);
+    border-radius: var(--radius);
 }
 
 .profile-panel-inner {
-    padding: 16px;
-    height: calc(100% - 32px);
-}
-
-.user-info {
-    margin-top: 12px;
     display: flex;
     flex-direction: column;
+    gap: 15px;
+}
+
+.profile-panel-title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.profile-info-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.profile-info-line {
+    display: flex;
     gap: 10px;
+    padding: 2px;
+    font-size: 16px;
 }
 
-.user-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.user-field-label {
-    color: var(--muted-text);
-    font-size: 13px;
-}
-
-.user-field-value {
-    color: var(--text);
+.profile-info-label {
     font-weight: 600;
 }
 
-.profile-section-title {
-    font-size: 16px;
-    margin: 0 0 12px 0;
-    font-weight: 700;
-    color: var(--text);
+.profile-info-value {
+    font-weight: 400;
+    word-break: break-all;
 }
 
-.profile-section-title.small {
-    margin-bottom: 12px;
-    font-size: 15px;
+.avatar-block {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+
+.security-panel .security-toggle {
+    color: var(--green);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    align-self: center;
 }
 
 .password-form {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 12px;
-    height: calc(100% - 34px);
-}
-
-.profile-form-row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    gap: 10px;
 }
 
 .profile-input {
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.005));
+    width: calc(100% - 16px);
+    padding: 7px;
+    border: 1px solid var(--muted-green);
+    background: var(--profile-text-input);
     color: var(--text);
     font-size: 14px;
-    outline: none;
+    font-weight: 300;
 }
 
 .profile-input:focus {
-    box-shadow: 0 8px 30px rgba(58, 123, 253, 0.08);
-    transform: translateY(-1px);
+    border-color: var(--green);
 }
 
-.user-field-error {
+.profile-field-error {
     color: var(--danger);
-    font-size: 13px;
-    margin-top: -6px;
+    font-size: 14px;
+    margin-left: 5px;
+    margin-top: 5px;
 }
 
-.profile-password-actions {
-    margin-top: 6px;
+.password-form .btn-green {
+    margin: 0 auto;
+    margin-top: 10px;
+    background: var(--green);
+    color: var(--text);
+    padding: 5px 10px;
+    border-color: var(--green);
+}
+
+.password-form .btn-green:disabled {
+    border-color: rgba(0, 153, 0, 0.5);
+    background: rgba(0, 153, 0, 0.5);
+    color: var(--text);
+}
+
+.profile-chats-list {
+    list-style: none;
+    margin: 0;
+    margin-top: 10px;
+    padding: 0;
     display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.profile-chat-item {
+    display: grid;
+    grid-template-columns: 10% auto 110px;
     gap: 10px;
-    align-items: center;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid var(--section-border);
+    border-radius: var(--radius);
+    background: var(--profile-chat-item);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition);
 }
 
-.profile-password-actions .btn {
-    padding: 10px 30px;
+.profile-chat-game {
+    color: var(--yellow);
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.divider {
-    margin: 18px 0;
-    border: none;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+.profile-chat-title {
+    color: var(--text);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
 }
 
-.sessions-block {
-    margin-top: 6px;
-}
-
-.profile-sessions-placeholder {
-    border-radius: 8px;
-    padding: 12px;
-    border: 1px dashed rgba(255, 255, 255, 0.03);
-    margin-top: 8px;
-    min-height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted-text);
+.profile-chat-time {
+    color: var(--text);
+    text-align: right;
+    font-weight: 400;
 }
 
 .profile-empty-note {
-    color: var(--muted-text);
-    font-size: 14px;
+    color: var(--text);
+    font-size: 20px;
+    text-align: center;
+    padding: 20px;
 }
 
-.profile-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    color: var(--muted-text);
-    padding: 12px 0;
-    font-size: 24px;
+@media (max-width: 1500px) {
+    .profile-chat-item {
+        grid-template-columns: 15% auto 110px;
+    }
 }
 
-.profile-error {
-    color: var(--danger);
-    padding: 12px 0;
+@media (max-width: 1050px) {
+    .profile-chat-item {
+        grid-template-columns: 20% auto 110px;
+    }
 }
 
-.profile-success-note {
-    color: var(--success);
-    padding: 12px 0;
-    font-size: 14px;
-}
-
-@media (max-width: 900px) {
+@media (max-width: 950px) {
     .profile-grid {
         grid-template-columns: 1fr;
-        grid-template-areas:
-            "left"
-            "right"
-            "sessions";
+        padding: 0 25px;
+    }
+
+    .profile-left-column {
+        flex-direction: row;
+    }
+
+    .info-panel {
+        width: calc(55% - 50px);
+    }
+
+    .info-panel .profile-panel-inner {
+        align-items: center;
+    }
+
+    .avatar-block {
+        width: 70%;
+    }
+
+    .security-panel {
+        width: calc(45% - 30px);
+        height: fit-content;
+    }
+}
+
+@media (max-width: 800px) {
+    .avatar-block {
+        width: 85%;
+    }
+}
+
+@media (max-width: 700px) {
+    .avatar-block {
+        width: 100%;
+    }
+}
+
+@media (max-width: 620px) {
+    .profile-root {
+        margin: 65px 0 25px;
+    }
+
+    .profile-grid {
+        padding: 0 15px;
+    }
+
+    .profile-left-column {
+        flex-direction: column;
+    }
+
+    .profile-panel-title {
+        font-size: 18px;
+    }
+
+    .info-panel,
+    .security-panel {
+        width: calc(100% - 30px);
+    }
+
+    .avatar-block {
+        width: 50%;
+    }
+
+    .profile-chats-list {
+        gap: 15px;
+        margin: 0;
+    }
+
+    .profile-chat-item {
+        font-size: 14px;
+        grid-template-columns: 20% auto 80px;
+        gap: 3px;
+        padding: 10px;
+    }
+
+    .profile-chat-time {
+        font-size: 12px;
+    }
+
+    .profile-info-line {
+        font-size: 14px;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .password-form .btn-green:hover {
+        color: rgba(0, 153, 0, 1);
+        background: transparent;
+    }
+
+    .password-form .btn-green:disabled:hover {
+        background: rgba(0, 153, 0, 0.5);
+        color: var(--text);
+    }
+
+    .profile-chat-item:hover {
+        background: rgb(255, 255, 255, 0.25);
     }
 }

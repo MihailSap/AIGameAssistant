@@ -6,7 +6,7 @@ import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import PrivateRoute from "./components/PrivateRoute";
-import GameAIChat from "./pages/GameAIChat";
+import ChatPage from "./pages/ChatPage";
 
 export default function App() {
   return (
@@ -28,9 +28,20 @@ export default function App() {
           } />
           <Route path="/games/ai" element={
             <PrivateRoute>
-              <GameAIChat />
+              <ChatPage />
             </PrivateRoute>
           } />
+          <Route path="/games/ai/:gameId" element={
+            <PrivateRoute>
+              <ChatPage />
+            </PrivateRoute>
+          } />
+          <Route path="/games/ai/:gameId/:chatId" element={
+            <PrivateRoute>
+              <ChatPage />
+            </PrivateRoute>
+          } />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

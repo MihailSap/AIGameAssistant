@@ -5,18 +5,9 @@
     overflow: hidden;
     position: relative;
     cursor: pointer;
-    transition: transform 260ms cubic-bezier(.2, .9, .2, 1), box-shadow 260ms cubic-bezier(.2, .9, .2, 1);
-    background: linear-gradient(90deg, #0d0d0d, #131316);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-}
-
-.tile-card:focus {
-    outline: 2px solid rgba(58, 123, 253, 0.16);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+    transition: transform var(--transition-cb), box-shadow var(--transition-cb);
+    background: var(--bg);
+    border: 1px solid var(--section-border);
 }
 
 .tile-media {
@@ -37,8 +28,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9aa4b2;
+    color: var(--muted-text);
     height: 100%;
+    text-align: center;
 }
 
 .tile-title-strip {
@@ -49,7 +41,7 @@
     height: 22%;
     backdrop-filter: blur(10px);
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
-    transition: opacity 260ms ease;
+    transition: opacity var(--transition);
     display: flex;
     align-items: center;
     box-sizing: border-box;
@@ -58,8 +50,6 @@
 
 .tile-title {
     width: 100%;
-    font-style: italic;
-    color: #fff;
     font-weight: 400;
     font-size: 20px;
     text-align: center;
@@ -71,40 +61,61 @@
 .tile-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0);
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 20px 10px;
     opacity: 0;
-    transition: background 260ms ease, opacity 260ms ease, transform 260ms ease;
     text-align: center;
-    box-sizing: border-box;
+    transition: background var(--transition), opacity var(--transition), transform var(--transition);
 }
 
 .tile-desc {
-    color: #fff;
-    font-style: italic;
+    color: white;
     font-size: 20px;
     font-weight: 400;
     max-width: 100%;
     max-height: 100%;
     text-align: center;
-    overflow: hidden;
     text-overflow: ellipsis;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 10px;
 }
 
-.tile-card:hover {
-    transform: scale(1.03);
+.tile-desc::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-.tile-card:hover .tile-title-strip {
-    opacity: 0;
+.tile-desc::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.tile-card:hover .tile-overlay {
-    opacity: 1;
-    backdrop-filter: blur(10px);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
-    transform: translateY(0);
+.tile-desc::-webkit-scrollbar-thumb {
+    background-color: var(--muted-text);
+    border-radius: var(--radius);
+    transition: background-color var(--transition);
+}
+
+.tile-desc::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .tile-card:hover {
+        transform: scale(1.03);
+    }
+
+    .tile-card:hover .tile-title-strip {
+        opacity: 0;
+    }
+
+    .tile-card:hover .tile-overlay {
+        opacity: 1;
+        backdrop-filter: blur(10px);
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+        transform: translateY(0);
+    }
 }

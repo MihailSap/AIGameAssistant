@@ -4,12 +4,12 @@ import "../css/AdminTable.css";
 
 const PAGE_SIZE = 10;
 
-export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFile, search = "" }) {
+export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFile, onOpenFile, search = "" }) {
     const [page, setPage] = useState(1);
 
     const filtered = useMemo(() => {
         const q = (search || "").trim();
-        if (q.length < 3) return games;
+        if (q.length < 2) return games;
         const qq = q.toLowerCase();
         return (games || []).filter(g =>
             (g.title || "").toLowerCase().includes(qq) ||
@@ -48,12 +48,22 @@ export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFil
                                 <td>{g.description ? (g.description.length > 30 ? g.description.slice(0, 30) + "…" : g.description) : "-"}</td>
                                 <td>
                                     {g.imageFileTitle ? (
-                                        <button className="link-btn" onClick={() => onDownloadFile("image", g.imageFileTitle)}>{g.imageFileTitle.slice(14).length > 30 ? g.imageFileTitle.slice(14).slice(0, 30) + "…" : g.imageFileTitle.slice(14)}</button>
+                                        <button
+                                            className="link-btn"
+                                            onClick={() => onOpenFile ? onOpenFile("image", g.imageFileTitle) : onDownloadFile("image", g.imageFileTitle)}
+                                        >
+                                            {g.imageFileTitle.slice(14).length > 30 ? g.imageFileTitle.slice(14).slice(0, 30) + "…" : g.imageFileTitle.slice(14)}
+                                        </button>
                                     ) : "-"}
                                 </td>
                                 <td>
                                     {g.rulesFileTitle ? (
-                                        <button className="link-btn" onClick={() => onDownloadFile("rules", g.rulesFileTitle)}>{g.rulesFileTitle.slice(14).length > 30 ? g.rulesFileTitle.slice(14).slice(0, 30) + "…" : g.rulesFileTitle.slice(14)}</button>
+                                        <button
+                                            className="link-btn"
+                                            onClick={() => onOpenFile ? onOpenFile("rules", g.rulesFileTitle) : onDownloadFile("rules", g.rulesFileTitle)}
+                                        >
+                                            {g.rulesFileTitle.slice(14).length > 30 ? g.rulesFileTitle.slice(14).slice(0, 30) + "…" : g.rulesFileTitle.slice(14)}
+                                        </button>
                                     ) : "-"}
                                 </td>
                                 <td>

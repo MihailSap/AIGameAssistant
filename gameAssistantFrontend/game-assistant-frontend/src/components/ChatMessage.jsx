@@ -1,15 +1,32 @@
 import React from "react";
-
 import "../css/ChatPage.css";
 import "../css/ChatMessage.css";
+import { escapeText } from "../utils/utils";
 
 export default function ChatMessage({ msg }) {
-    return (
-        <div className={`chat-message ${msg.role === "user" ? "user" : "bot"}`}>
-            <div className="chat-message-bubble">
-                <div className="chat-message-text" dangerouslySetInnerHTML={{ __html: String(msg.text).replace(/\n/g, "<br/>") }} />
-                <div className="chat-message-time">{new Date(msg.createdAt).toLocaleTimeString()}</div>
+    if (String(msg.role).toLowerCase() === "user") {
+        return (
+            <div className="chat-message user">
+                <div className="chat-message-bubble">
+                    <div className="chat-message-text" dangerouslySetInnerHTML={{ __html: String(escapeText(String(msg.text || ""))).replace(/\n/g, "<br/>") }} />
+                </div>
             </div>
-        </div>
-    );
+        );
+    } else if (String(msg.role).toLowerCase() === "assistant") {
+        return (
+            <div className="chat-message bot">
+                <div className="chat-message-plain">
+                    <div className="chat-message-text" dangerouslySetInnerHTML={{ __html: String(escapeText(String(msg.text || ""))).replace(/\n/g, "<br/>") }} />
+                </div>
+            </div>
+        );
+    } else {
+        return (
+            <div className="chat-message error">
+                <div className="chat-message-plain">
+                    <div className="chat-message-text" dangerouslySetInnerHTML={{ __html: String(escapeText(String(msg.text || ""))).replace(/\n/g, "<br/>") }} />
+                </div>
+            </div>
+        );
+    }
 }

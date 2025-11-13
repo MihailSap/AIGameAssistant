@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { fileApi } from "../api/file";
-
+import useBlobUrl from "../hooks/useBlobUrl";
 import "../css/MainPage.css";
 import "../css/UserMenu.css";
 
@@ -11,9 +11,7 @@ export default function UserMenu({ currentUser }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  const [avatarBlobUrl, setAvatarBlobUrl] = useState(null);
-  const mountedRef = useRef(true);
-  const blobRef = useRef(null);
+  const { url: avatarBlobUrl } = useBlobUrl(fileApi.getImageBlob, currentUser?.imageFileTitle, [currentUser?.imageFileTitle]);
 
   useEffect(() => {
     function onDoc(e) {
@@ -31,73 +29,6 @@ export default function UserMenu({ currentUser }) {
       document.removeEventListener("keydown", onKey);
     };
   }, []);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      if (blobRef.current && blobRef.current.startsWith("blob:")) {
-        try {
-          URL.revokeObjectURL(blobRef.current);
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.warn("Ошибка при revokeObjectURL:", err);
-        }
-        blobRef.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (blobRef.current && blobRef.current.startsWith("blob:")) {
-      try {
-        URL.revokeObjectURL(blobRef.current);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn("Ошибка при revokeObjectURL перед новой загрузкой:", err);
-      }
-      blobRef.current = null;
-    }
-    setAvatarBlobUrl(null);
-
-    const title = currentUser?.imageFileTitle;
-    if (!title) return;
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const blob = await fileApi.getImageBlob(title);
-        if (cancelled) {
-          const tmp = URL.createObjectURL(blob);
-          try {
-            URL.revokeObjectURL(tmp);
-          } catch (_) {}
-          return;
-        }
-        const url = URL.createObjectURL(blob);
-        blobRef.current = url;
-        if (mountedRef.current) {
-          setAvatarBlobUrl(url);
-        } else {
-          try {
-            URL.revokeObjectURL(url);
-          } catch (_) {}
-          blobRef.current = null;
-        }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn("Не удалось загрузить аватар через blob:", title, err);
-        if (mountedRef.current) {
-          setAvatarBlobUrl(null);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currentUser?.imageFileTitle]);
 
   const firstLetter = (currentUser?.login || "U")[0].toUpperCase();
 
@@ -125,8 +56,8 @@ export default function UserMenu({ currentUser }) {
         </div>
       )}
 
-      {open && isAuthenticated && (
-        <div className="user-popup">
+      {isAuthenticated && (
+        <div className={`user-popup ${open ? 'is-open' : 'is-closing'}`}>
           <div className="user-popup-header">
             <div className="user-popup-name">{currentUser?.login}</div>
             <div className="user-popup-email">{currentUser?.email}</div>

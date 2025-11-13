@@ -2,8 +2,8 @@ import React from "react";
 import "../css/ToggleSlider.css";
 
 export default function ToggleSlider({
-    leftLabel = "Избранное",
-    rightLabel = "Все игры",
+    leftLabel,
+    rightLabel,
     value = false,
     onChange = () => { }
 }) {

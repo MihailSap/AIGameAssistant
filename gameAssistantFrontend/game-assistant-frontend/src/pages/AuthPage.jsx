@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import ToggleSlider from "../components/ToggleSlider";
 import useAuth from "../hooks/useAuth";
 import { validateEmail } from "../utils/utils";
 import "../css/AuthPages.css";
@@ -24,10 +25,9 @@ export default function AuthPage() {
     setMode(initialMode);
   }, [initialMode]);
 
-  const switchMode = (m) => {
-    if (m === mode) return;
-    setMode(m);
-    const target = m === "register" ? "/register" : "/login";
+  const switchMode = (state) => {
+    setMode(state ? "login" : "register");
+    const target = state ? "/login" : "/register";
     navigate(target, { replace: false });
   };
 
@@ -45,26 +45,7 @@ export default function AuthPage() {
         <div className="auth-right-container" aria-hidden="true">
           <h1 className="auth-hello">Добро пожаловать!</h1>
           <div className="auth-card" role="region" aria-labelledby="auth-title">
-            <div className="auth-tabs" role="tablist" aria-label="Аутентификация">
-              <button
-                role="tab"
-                aria-selected={mode === "login"}
-                className={`auth-tab ${mode === "login" ? "active" : ""}`}
-                onClick={() => switchMode("login")}
-              >
-                Вход
-              </button>
-              <button
-                role="tab"
-                aria-selected={mode === "register"}
-                className={`auth-tab ${mode === "register" ? "active" : ""}`}
-                onClick={() => switchMode("register")}
-              >
-                Регистрация
-              </button>
-              <div className={`auth-tab-slider ${mode === "register" ? "right" : "left"}`} aria-hidden="true" />
-            </div>
-
+            <ToggleSlider leftLabel="Вход" rightLabel="Регистрация" value={mode === "login"} onChange={(s) => switchMode(s)} />
             <div className="auth-form-wrap">
               {mode === "login" ? (
                 <LoginForm onSuccess={() => navigate("/")} />
@@ -109,6 +90,7 @@ function LoginForm({ onSuccess }) {
         <input
           id="login-email"
           name="email"
+          type="text"
           className="auth-form-input"
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -235,6 +217,7 @@ function RegisterForm({ onSuccess }) {
           <input
             id="reg-login"
             name="login"
+            type="text"
             className="auth-form-input"
             value={userLogin}
             onChange={handleUserLoginChange}

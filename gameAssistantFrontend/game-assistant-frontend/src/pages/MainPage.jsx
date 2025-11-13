@@ -22,7 +22,6 @@ export default function MainPage() {
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 280);
-  //
   const [visibleCount, setVisibleCount] = useState(10);
   const [selectedGame, setSelectedGame] = useState(null);
 
@@ -115,7 +114,7 @@ export default function MainPage() {
 
   const filterGames = (list) => {
     const q = (debouncedSearch || "").trim();
-    if (q.length < 3) return list;
+    if (q.length < 2) return list;
     const qq = q.toLowerCase();
     return list.filter(g => (g.title || "").toLowerCase().includes(qq) || (g.description || "").toLowerCase().includes(qq));
   };
@@ -125,7 +124,13 @@ export default function MainPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filteredFavourites = useMemo(() => filterGames(favourites), [favourites, debouncedSearch]);
 
-  const sourceList = showFavourites ? filteredFavourites : filtered;
+  const sourceList = (showFavourites ? filteredFavourites : filtered)
+    .slice()
+    .sort((a, b) => {
+      const ta = (a?.title ?? '').trim();
+      const tb = (b?.title ?? '').trim();
+      return ta.localeCompare(tb, 'ru', { sensitivity: 'base', numeric: true });
+    });
   const visibleGames = sourceList.slice(0, visibleCount);
   const canLoadMore = visibleCount < sourceList.length;
 
@@ -155,7 +160,7 @@ export default function MainPage() {
           </div>
         )}
 
-        {!loading && error && <div className="catalog-error">{error}</div>}
+        {!loading && error && <div className="loading-error">{error}</div>}
 
         {!loading && !error && (
           <>

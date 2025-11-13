@@ -1,12 +1,31 @@
 :root {
-  --bg: #0b0b0b;
-  --text: #e8e8e8;
-  --muted: #1f1f1f;
-  --muted-text: #a9a9a9;
-  --main-button-color: #F4C430;
-  --accent: #3a7bfd;
-  --danger: #e25555;
-  --transition: 160ms ease;
+  --bg: rgb(11, 11, 11);
+  --text: rgb(232, 232, 232);
+  --muted-text: rgba(255, 255, 255, 0.6);
+  --muted-button-bg: rgb(31, 31, 31);
+  --section-bg: rgba(15, 17, 20, 0.9);
+  --section-border: rgba(255, 255, 255, 0.05);
+  --modal-bg: rgba(15, 17, 20, 0.95);
+  --modal-backdrop: rgba(2, 2, 2, 0.6);
+  --image-bg: rgb(26, 26, 26);
+  --game-grid-bg: rgba(255, 255, 255, 0.03);
+  --chat-sidebar-bg: rgba(22, 22, 22, 0.95);
+  --main-search-input: rgba(255, 255, 255, 0.15);
+  --text-input: rgba(255, 255, 255, 0.03);
+  --text-input-border: rgba(255, 255, 255, 0.04);
+  --profile-text-input: rgba(255, 255, 255, 0.1);
+  --profile-chat-item: rgba(255, 255, 255, 0.1);
+  --error-text-input: rgba(255, 202, 202);
+  --error-text-input-border: rgb(253, 119, 119, 1);
+  --yellow: rgb(244, 196, 48);
+  --muted-yellow: rgba(244, 196, 48, 0.5);
+  --green: rgba(0, 153, 0, 1);
+  --muted-green: rgba(0, 153, 0, 0.5);
+  --danger: rgb(226, 85, 85);
+  --radius: 30px;
+  --transition: 200ms ease;
+  --checkbox-transition: 0.15s ease-in-out;
+  --transition-cb: 220ms cubic-bezier(.2, .9, .2, 1);
 }
 
 #root {
@@ -24,22 +43,32 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.35;
+  color: var(--text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
 }
 
 .btn {
-  border: 2px solid var(--main-button-color);
+  border: 2px solid var(--yellow);
   border-radius: var(--radius);
   cursor: pointer;
   transition: background var(--transition), color var(--transition);
   font-weight: 700;
   font-size: 14px;
-  background: var(--main-button-color);
+  background: var(--yellow);
   color: var(--bg);
 }
 
-.btn:hover {
-  background-color: transparent;
-  color: var(--main-button-color);
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-add {
@@ -54,36 +83,15 @@ body {
   border-color: var(--danger);
 }
 
-.btn-danger:hover {
-  color: var(--danger);
-}
-
-.btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  color: var(--muted-text);
-}
-
-.btn-ghost:hover {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  color: var(--muted-text);
-}
-
 .link {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--muted-text);
   border: none;
   text-decoration: underline;
   text-decoration-color: transparent;
   text-underline-offset: 3px;
   font-size: 20px;
   font-weight: 400;
-  transition: color 0.1s, text-decoration-color 0.1s;
-}
-
-.link:hover {
-  color: rgba(244, 196, 48, 0.5);
-  text-decoration-color: rgba(244, 196, 48, 0.5);
+  transition: color var(--transition), text-decoration-color var(--transition);
 }
 
 input[type="checkbox"] {
@@ -91,34 +99,92 @@ input[type="checkbox"] {
   appearance: none;
   width: 1rem;
   height: 1rem;
-  border: 1px solid var(--main-button-color);
+  border: 1px solid var(--yellow);
   border-radius: 0.25rem;
   background-color: transparent;
   cursor: pointer;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: color var(--checkbox-transition), background-color var(--checkbox-transition), border-color var(--checkbox-transition), box-shadow var(--checkbox-transition);
   margin: 0;
 }
 
 input[type="checkbox"]:checked {
-  background-color: var(--main-button-color);
+  background-color: var(--yellow);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
 }
 
+input:not([type="checkbox"]),
+textarea {
+  font-family: "Montserrat", sans-serif;
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color var(--transition), background-color var(--transition), color var(--transition);
+}
+
+input:not([type="checkbox"])::placeholder,
+textarea::placeholder {
+  color: var(--muted-text);
+}
+
+input:not([type="checkbox"])[aria-invalid="true"] {
+  background-color: var(--error-text-input);
+  border-color: var(--error-text-input-border);
+  color: black;
+}
+
+input:not([type="checkbox"])[aria-invalid="true"]::placeholder {
+  color: black;
+}
+
+.loading-error {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 600;
+  margin: 20px;
+  margin-top: 70px;
+  color: var(--danger);
+}
+
 .full-loader {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.75));
-    z-index: 60;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
 }
 
 .spinner {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    border: 6px solid rgba(255, 255, 255, 0.06);
-    border-top-color: var(--yellow);
-    animation: spin 1s linear infinite;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 6px solid var(--muted-text);
+  border-top-color: var(--yellow);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background-color: transparent;
+    color: var(--yellow);
+  }
+
+  .btn:disabled:hover {
+    background-color: var(--yellow);
+    color: var(--bg);
+  }
+
+  .btn-danger:hover {
+    color: var(--danger);
+  }
+
+  .link:hover {
+    color: var(--muted-yellow);
+    text-decoration-color: var(--muted-yellow);
+  }
 }

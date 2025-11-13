@@ -1,199 +1,117 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Header from "../components/Header";
 import { userApi } from "../api/users";
 import { fileApi } from "../api/file";
-import AvatarPicker from "../components/AvatarPicker";
-
+import { chatApi } from "../api/chat";
+import { gameApi } from "../api/game";
+import AvatarControl from "../components/AvatarControl";
+import { formatDate } from "../utils/utils";
+import useBlobUrl from "../hooks/useBlobUrl";
+import { createObjectUrl, revokeObjectUrl } from "../utils/blobUtils";
 import "../css/ProfilePage.css";
 
 export default function ProfilePage() {
   const { userInfo: authUser } = useAuth() || {};
+  const navigate = useNavigate();
+
   const [currentUser, setCurrentUser] = useState(authUser || null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [globalError, setGlobalError] = useState(null);
 
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarErrorSet, setAvatarErrorSet] = useState("");
+
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [shortPwError, setShortPwError] = useState("");
-  const [diffPwError, setDiffPwError] = useState("");
-  const [pwError, setPwError] = useState("");
-  const [successChangePw, setSuccessChangePw] = useState("");
+  const [pwErrors, setPwErrors] = useState({ short: "", diff: "", general: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const attemptedRef = useRef(false);
-  const blobRef = useRef(null);
+  const [chats, setChats] = useState([]);
+  const [chatsLoading, setChatsLoading] = useState(true);
+
   const mountedRef = useRef(true);
-  const [avatarUrl, setAvatarUrl] = useState(null);
-  const [avatarLoading, setAvatarLoading] = useState(false);
-  const [avatarUploading, setAvatarUploading] = useState(false);
 
-  const revokeBlobRef = () => {
-    if (blobRef.current && typeof blobRef.current === "string" && blobRef.current.startsWith("blob:")) {
-      try {
-        URL.revokeObjectURL(blobRef.current);
-      } catch (revErr) {
-        // eslint-disable-next-line no-console
-        console.warn("Ошибка revokeObjectURL:", revErr);
-      }
-      blobRef.current = null;
-    }
-  };
-
-  const makeBlobUrl = (blob) => {
-    const url = URL.createObjectURL(blob);
-    blobRef.current = url;
-    return url;
-  };
+  const { url: avatarBlobUrl, loading: avatarLoadingFetch, error: avatarGetError, revoke: revokeAvatar, refresh: refreshAvatar } =
+    useBlobUrl(fileApi.getImageBlob, currentUser?.imageFileTitle, [currentUser?.imageFileTitle]);
 
   useEffect(() => {
     mountedRef.current = true;
-
-    const load = async () => {
+    const loadProfile = async () => {
       setLoading(true);
-      setError(null);
+      setGlobalError(null);
+      if (!mountedRef.current) return;
       try {
         const auth = await userApi.getAuthenticated();
-        if (!mountedRef.current) return;
         setCurrentUser(auth || null);
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error("Ошибка получения профиля:", err);
-        setError(err?.response?.data?.message || err?.message || "Не удалось загрузить данные пользователя");
+        setGlobalError(err?.response?.data?.message || err?.message || "Не удалось загрузить данные пользователя");
       } finally {
         if (mountedRef.current) setLoading(false);
       }
     };
-
-    load();
-
+    loadProfile();
     return () => {
       mountedRef.current = false;
-      revokeBlobRef();
+      if (avatarPreviewUrl) revokeObjectUrl(avatarPreviewUrl);
+      revokeAvatar();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    attemptedRef.current = false;
-    revokeBlobRef();
-    setAvatarUrl(null);
-
-    const imageFileTitle = currentUser?.imageFileTitle;
-    setAvatarLoading(!!imageFileTitle);
-
-    if (!imageFileTitle) {
-      setAvatarLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    (async () => {
-      if (attemptedRef.current) return;
-      attemptedRef.current = true;
-      setAvatarLoading(true);
-
-      try {
-        const blob = await fileApi.getImageBlob(imageFileTitle);
-        if (cancelled) {
-          if (blob) {
-            try {
-              const tmp = URL.createObjectURL(blob);
-              URL.revokeObjectURL(tmp);
-            } catch (_) {
-            }
-          }
-          return;
-        }
-        const url = makeBlobUrl(blob);
-        if (mountedRef.current) {
-          setAvatarUrl(url);
-          setAvatarLoading(false);
-          setError(null);
-        } else {
-          revokeBlobRef();
-        }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn("Не удалось загрузить изображение через blob:", imageFileTitle, err);
-        if (mountedRef.current) {
-          setAvatarUrl(null);
-          setAvatarLoading(false);
-          setError(err?.response?.data?.message || err?.message || "Не удалось загрузить изображение профиля");
-        }
-      } finally {
-        attemptedRef.current = false;
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currentUser?.imageFileTitle]);
-
-  useEffect(() => {
-    setPwError("");
-    setShortPwError("");
-    setDiffPwError("");
-
+    setPwErrors({ short: "", diff: "", general: "" });
     if (!newPassword && !repeatPassword) return;
-
     if (newPassword.length > 0 && (newPassword.length < 4 || newPassword.length > 30)) {
-      setShortPwError("Пароль должен быть не менее 4-х символов");
-      return;
+      setPwErrors(prev => ({ ...prev, short: "Слишком короткий пароль" }));
     }
     if (repeatPassword.length > 0 && newPassword !== repeatPassword) {
-      setDiffPwError("Пароли не совпадают");
+      setPwErrors(prev => ({ ...prev, diff: "Пароли не совпадают" }));
     }
   }, [newPassword, repeatPassword]);
 
-  const canSubmitPassword = newPassword.length >= 4 && newPassword.length <= 30 && newPassword === repeatPassword && !isSubmitting;
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setChatsLoading(true);
+      try {
+        const resp = await chatApi.getChatPreviewsByUser();
+        if (!mounted) return;
+        const arr = Array.isArray(resp) ? resp : [];
+        arr.sort((a, b) => (b.lastUseTime ? new Date(b.lastUseTime) : new Date()) - (a.lastUseTime ? new Date(a.lastUseTime) : new Date()));
+        const chats = await Promise.all(arr.slice(0, 5).map(async chat => {
+          if (chat.gameId) {
+            const game = await gameApi.read(chat.gameId);
+            return { ...chat, gameTitle: game.title };
+          }
+          return chat;
+        }));
+        setChats(chats);
+      } catch (err) {
+        setChats([]);
+      } finally {
+        if (mounted) setChatsLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-    if (!canSubmitPassword) return;
-    if (!currentUser || !currentUser.id) {
-      setPwError("Неизвестный пользователь — повторите вход.");
+  const handleAvatarChange = async (file) => {
+    if (!file) return;
+    if (!currentUser?.id) {
+      setAvatarErrorSet("Ошибка при изменении");
       return;
     }
-
-    setIsSubmitting(true);
-    setPwError("");
-    setSuccessChangePw("");
-
-    try {
-      await userApi.updatePassword(currentUser.id, { newPassword });
-      setNewPassword("");
-      setRepeatPassword("");
-      setSuccessChangePw("Пароль успешно изменён");
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Ошибка смены пароля:", err);
-      setPwError(err?.response?.data?.message || err?.message || "Не удалось сменить пароль");
-    } finally {
-      setIsSubmitting(false);
+    if (avatarPreviewUrl) {
+      try { revokeObjectUrl(avatarPreviewUrl); } catch (_) { }
     }
-  };
-
-  const handleAvatarSelect = async (file) => {
-    if (!file) {
-      setError("Файл не выбран");
-      return;
-    }
-    if (!currentUser || !currentUser.id) {
-      setError("Неизвестный пользователь — обновление невозможно.");
-      return;
-    }
-
-    const localPreview = URL.createObjectURL(file);
-    revokeBlobRef();
-    blobRef.current = localPreview;
-    setAvatarUrl(localPreview);
-    setError(null);
-
+    const localUrl = createObjectUrl(file);
+    setAvatarPreviewUrl(localUrl);
+    setAvatarErrorSet("");
     setAvatarUploading(true);
-
     try {
       const refreshed = await userApi.updateImage(currentUser.id, {
         email: currentUser.email ?? "",
@@ -202,146 +120,207 @@ export default function ProfilePage() {
         isAdmin: currentUser.isAdmin ?? false,
         imageFile: file,
       });
-
       if (!mountedRef.current) {
-        if (localPreview && localPreview.startsWith("blob:")) {
-          try {
-            URL.revokeObjectURL(localPreview);
-          } catch (revErr) {
-            // eslint-disable-next-line no-console
-            console.warn("Ошибка revoke local preview после размонтирования:", revErr);
-          }
+        if (localUrl) {
+          try { revokeObjectUrl(localUrl); } catch (_) { }
         }
         return;
       }
-
-      setCurrentUser(refreshed || null);
-
+      setCurrentUser(refreshed || currentUser);
       if (!refreshed?.imageFileTitle) {
-        setError("Аватар загружен, но сервер не вернул ссылку на изображение.");
-      } else {
-        setError(null);
+        setAvatarErrorSet("Ошибка при изменении");
+        try { refreshAvatar(); } catch (_) { }
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Ошибка загрузки аватара на сервер:", err);
-      if (localPreview && localPreview.startsWith("blob:")) {
-        try {
-          URL.revokeObjectURL(localPreview);
-        } catch (revErr) {
-          // eslint-disable-next-line no-console
-          console.warn("Ошибка освобождения локального preview после ошибки:", revErr);
-        }
+      if (avatarPreviewUrl) {
+        try { revokeObjectUrl(avatarPreviewUrl); } catch (_) { }
+        setAvatarPreviewUrl(null);
       }
-      blobRef.current = null;
-      setAvatarUrl(null);
-      setError(err?.response?.data?.message || err?.message || "Не удалось загрузить аватар на сервер");
+      setAvatarErrorSet("Ошибка при изменении");
     } finally {
       if (mountedRef.current) setAvatarUploading(false);
     }
   };
 
+  const handleAvatarDelete = async () => {
+    if (!currentUser?.id) {
+      setAvatarErrorSet("Ошибка при изменении");
+      return;
+    }
+
+    setAvatarUploading(true);
+    setAvatarErrorSet("");
+
+    try {
+      const payload = {
+        email: currentUser.email ?? "",
+        login: currentUser.login ?? "",
+        password: "",
+        isAdmin: currentUser.isAdmin ?? false,
+        imageFile: null,
+      };
+
+      try {
+        await userApi.updateImage(currentUser.id, payload);
+      } catch (err) {
+        payload.imageFile = new Blob();
+        await userApi.updateImage(currentUser.id, payload);
+      }
+
+      const refreshed = await userApi.getAuthenticated();
+      if (mountedRef.current) {
+        setCurrentUser(refreshed || null);
+        setAvatarPreviewUrl(null);
+        setAvatarErrorSet("");
+      }
+    } catch (err) {
+      if (mountedRef.current) {
+        setAvatarErrorSet("Ошибка при изменении");
+      }
+    } finally {
+      if (mountedRef.current) setAvatarUploading(false);
+    }
+  };
+
+
+  const canSubmitPassword = newPassword.length >= 4 && newPassword.length <= 30 && newPassword === repeatPassword && !isSubmitting;
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!canSubmitPassword) return;
+    if (!currentUser?.id) {
+      setPwErrors(prev => ({ ...prev, general: "Неизвестный пользователь — повторите вход." }));
+      return;
+    }
+    setIsSubmitting(true);
+    setPwErrors({ short: "", diff: "", general: "" });
+    try {
+      await userApi.updatePassword(currentUser.id, { newPassword });
+      setNewPassword("");
+      setRepeatPassword("");
+      setShowPasswordForm(false);
+    } catch (err) {
+      setPwErrors(prev => ({ ...prev, general: err?.response?.data?.message || err?.message || "Не удалось сменить пароль" }));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleChatClick = (chat) => {
+    if (!chat?.gameId || !chat?.id) return;
+    navigate(`/games/ai/${chat.gameId}/${chat.id}`);
+  };
+
+  const avatarUrl = avatarPreviewUrl || avatarBlobUrl;
+  const avatarLoading = avatarLoadingFetch || avatarUploading;
+  const avatarErrorGetText = avatarPreviewUrl || avatarUploading ? "" : (avatarGetError ? (avatarGetError?.response?.data?.message || avatarGetError?.message || "Ошибка при получении") : "");
+
   return (
     <div className="profile-root">
-      <Header currentUser={currentUser} title={"Профиль"}/>
+      <Header currentUser={currentUser} />
 
-      {loading && <div className="profile-message">Загрузка...</div>}
-      {error && <div className="profile-error" role="alert">{error}</div>}
+      {loading &&
+        <div className="full-loader">
+          <div className="spinner" />
+        </div>
+      }
+      {globalError && <div className="loading-error" role="alert">{globalError}</div>}
 
-      {!loading && currentUser && (
-        <>
-          <div className="profile-grid">
-            <section className="profile-panel profile-panel-left">
+      {!loading && (
+        <div className="profile-grid">
+          <div className="profile-left-column">
+            <section className="profile-panel info-panel">
               <div className="profile-panel-inner">
-                <h2 className="profile-section-title small">Профиль</h2>
+                <h3 className="profile-panel-title">Основная информация</h3>
+                <div className="profile-info-lines">
+                  <div className="profile-info-line"><span className="profile-info-label">Почта:</span><span className="profile-info-value">{currentUser?.email || "—"}</span></div>
+                  <div className="profile-info-line"><span className="profile-info-label">Логин:</span><span className="profile-info-value">{currentUser?.login || "—"}</span></div>
+                </div>
 
-                <AvatarPicker
-                  initialUrl={avatarUrl}
-                  onSelectFile={handleAvatarSelect}
-                  disabled={avatarUploading}
-                  loading={avatarLoading || avatarUploading}
-                  loadingText={avatarUploading ? "Отправка на сервер..." : "Загрузка изображения..."}
-                />
-
-                <div className="user-info">
-                  <div className="user-field">
-                    <div className="user-field-label">Логин</div>
-                    <div className="user-field-value">{currentUser.login || "—"}</div>
-                  </div>
-
-                  <div className="user-field">
-                    <div className="user-field-label">Электронная почта</div>
-                    <div className="user-field-value">{currentUser.email || "—"}</div>
-                  </div>
+                <div className="avatar-block">
+                  <AvatarControl
+                    url={avatarUrl}
+                    loading={avatarLoading}
+                    loadingText={avatarUploading ? "Отправка на сервер..." : "Загрузка изображения..."}
+                    onSelectFile={handleAvatarChange}
+                    onDelete={handleAvatarDelete}
+                    showDelete={!!currentUser?.imageFileTitle}
+                    errorGet={avatarErrorGetText}
+                    errorSet={avatarErrorSet}
+                  />
                 </div>
               </div>
             </section>
 
-            <section className="profile-panel profile-panel-right">
+            <section className="profile-panel security-panel">
               <div className="profile-panel-inner">
-                <h2 className="profile-section-title">Сменить пароль</h2>
+                <h3 className="profile-panel-title">Безопасность</h3>
+                {!showPasswordForm ? (
+                  <button className="security-toggle" onClick={() => setShowPasswordForm(true)}>Сменить пароль</button>
+                ) : (
+                  <form className="password-form" onSubmit={handlePasswordSubmit} noValidate>
+                    <label className="password-row">
+                      <input
+                        type="password"
+                        placeholder="Введите новый пароль"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="profile-input"
+                        aria-invalid={!!pwErrors.short}
+                      />
+                      {pwErrors.short && <div className="profile-field-error">{pwErrors.short}</div>}
+                    </label>
 
-                <form className="password-form" onSubmit={handlePasswordSubmit} noValidate>
-                  <label className="profile-form-row">
-                    <div className="user-field-label">Новый пароль</div>
-                    <input
-                      type="password"
-                      maxLength={30}
-                      value={newPassword}
-                      onChange={(e) => {
-                        if (successChangePw) setSuccessChangePw("");
-                        setNewPassword(e.target.value);
-                      }}
-                      className="profile-input"
-                      placeholder="Введите пароль"
-                      aria-invalid={!!pwError}
-                    />
-                    {shortPwError && <span className="user-field-error">{shortPwError}</span>}
-                  </label>
+                    <label className="password-row">
+                      <input
+                        type="password"
+                        placeholder="Повторите новый пароль"
+                        value={repeatPassword}
+                        onChange={(e) => setRepeatPassword(e.target.value)}
+                        className="profile-input"
+                        aria-invalid={!!pwErrors.diff}
+                      />
+                      {pwErrors.diff && <div className="profile-field-error">{pwErrors.diff}</div>}
+                    </label>
 
-                  <label className="profile-form-row">
-                    <div className="user-field-label">Повторите новый пароль</div>
-                    <input
-                      type="password"
-                      maxLength={30}
-                      value={repeatPassword}
-                      onChange={(e) => {
-                        if (successChangePw) setSuccessChangePw("");
-                        setRepeatPassword(e.target.value);
-                      }}
-                      className="profile-input"
-                      placeholder="Повторите пароль"
-                      aria-invalid={!!pwError}
-                    />
-                    {diffPwError && <span className="user-field-error">{diffPwError}</span>}
-                  </label>
+                    {pwErrors.general && <div className="profile-field-error">{pwErrors.general}</div>}
 
-                  {pwError && <div className="user-field-error" role="alert">{pwError}</div>}
-                  {successChangePw && <div className="profile-success-note" role="status">{successChangePw}</div>}
-
-                  <div className="profile-password-actions">
-                    <button
-                      type="submit"
-                      className="btn"
-                      disabled={!canSubmitPassword}
-                    >
-                      {isSubmitting ? "Сменяем..." : "Сменить"}
+                    <button type="submit" className="btn btn-green" disabled={!canSubmitPassword}>
+                      {isSubmitting ? "Смена..." : "Сменить пароль"}
                     </button>
-                  </div>
-                </form>
-              </div>
-            </section>
-
-            <section className="profile-panel sessions-panel">
-              <div className="profile-panel-inner">
-                <h2 className="profile-section-title">Последние сессии с ИИ</h2>
-                <div className="profile-sessions-placeholder">
-                  <div className="profile-empty-note">История сессий пока отсутствует</div>
-                </div>
+                  </form>
+                )}
               </div>
             </section>
           </div>
-        </>
+
+          <aside className="profile-right-column">
+            <section className="profile-panel chats-panel">
+              <div className="profile-panel-inner">
+                <h3 className="profile-panel-title">Последние чаты</h3>
+                {chatsLoading ? (
+                  <div className="profile-message">Загрузка...</div>
+                ) : (
+                  <>
+                    {(!chats || chats.length === 0) ? (
+                      <div className="profile-empty-note">У вас ещё нет чатов</div>
+                    ) : (
+                      <ul className="profile-chats-list">
+                        {chats.map((c) => (
+                          <li key={c.id} className="profile-chat-item" onClick={() => handleChatClick(c)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && handleChatClick(c)}>
+                            <div className="profile-chat-game">{c.gameTitle || "—"}</div>
+                            <div className="profile-chat-title">{c.title || "—"}</div>
+                            <div className="profile-chat-time">{formatDate(c.lastUseTime)}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </div>
+            </section>
+          </aside>
+        </div>
       )}
     </div>
   );

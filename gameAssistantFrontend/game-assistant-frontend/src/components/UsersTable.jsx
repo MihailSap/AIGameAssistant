@@ -9,7 +9,7 @@ export default function UsersTable({ users = [], currentUser = null, onDelete, o
 
   const filtered = useMemo(() => {
     const q = (search || "").trim();
-    if (q.length < 3) return users;
+    if (q.length < 2) return users;
     const qq = q.toLowerCase();
     return users.filter(u => (u.login || "").toLowerCase().includes(qq) || (u.email || "").toLowerCase().includes(qq));
   }, [users, search]);
