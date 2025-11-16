@@ -12,18 +12,21 @@ import reactor.core.publisher.Flux;
 import ru.project.gameAssistantBackend.enums.ChatRole;
 import ru.project.gameAssistantBackend.models.Message;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StreamAssistantService {
-
-    private final AssistantServiceImpl assistantServiceImpl;
 
     @Value("${yandex-cloud.gpt.api-key}")
     private String apiKey;
 
     @Value("${yandex-cloud.gpt.api-url}")
     private String apiUrl;
+
+    @Value("${yandex-cloud.gpt.catalog-id}")
+    private String catalogId;
 
     private final ObjectMapper objectMapper;
 
@@ -32,11 +35,9 @@ public class StreamAssistantService {
     @Autowired
     public StreamAssistantService(
             ObjectMapper objectMapper,
-            WebClient webClient,
-            AssistantServiceImpl assistantServiceImpl) {
+            WebClient webClient) {
         this.objectMapper = objectMapper;
         this.webClient = webClient;
-        this.assistantServiceImpl = assistantServiceImpl;
     }
 
     public Flux<String> getStreamedAnswer(String prompt) {
@@ -48,7 +49,7 @@ public class StreamAssistantService {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.AUTHORIZATION,
                         "Bearer " + (apiKey.startsWith("Api-Key ") ? apiKey.substring(8) : apiKey))
-                .bodyValue(assistantServiceImpl.buildRequestBody(List.of(userMessage)))
+                .bodyValue(buildRequestBody(List.of(userMessage)))
                 .retrieve()
                 .bodyToFlux(String.class)
                 .map(this::extractStreamPart);
@@ -70,5 +71,21 @@ public class StreamAssistantService {
 
         }
         return "";
+    }
+
+    public String buildRequestBody(List<Message> messages) {
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("modelUri", String.format("gpt://%s/yandexgpt-lite", catalogId));
+            Map<String, Object> options = new HashMap<>();
+            options.put("stream", true);
+            options.put("temperature", 0.6);
+            options.put("maxTokens", 2000);
+            body.put("completionOptions", options);
+            body.put("messages", messages);
+            return objectMapper.writeValueAsString(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при формировании JSON-запроса", e);
+        }
     }
 }

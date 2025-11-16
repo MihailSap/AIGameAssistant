@@ -17,8 +17,8 @@ public class StreamChatController {
         this.streamAssistantService = streamAssistantService;
     }
 
-    @GetMapping(value = "/ask", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> askStream(@RequestParam String prompt) {
+    @PostMapping(value = "/ask", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> askStream(@RequestBody String prompt) {
         return streamAssistantService.getStreamedAnswer(prompt);
     }
 }
