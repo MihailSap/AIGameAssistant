@@ -79,7 +79,7 @@ export default function TopCarousel({ items = [], onOpenGame }) {
     const gap = 20;
     const [itemWidth, setItemWidth] = useState(0);
 
-    const TRANS_MS = 420;
+    const TRANS_MS = 1000;
     const FINISH_PAD = 70;
     const animTimeoutRef = useRef(null);
     const autoTimerRef = useRef(null);

@@ -6,6 +6,7 @@ import Hero from "../components/Hero";
 import GameGrid from "../components/GameGrid";
 import GameModal from "../components/GameModal";
 import ToggleSlider from "../components/ToggleSlider";
+import CategoryDropdown from "../components/CategoryDropdown";
 import useDebounce from "../hooks/useDebounce";
 import { userApi } from "../api/users";
 import useAuth from "../hooks/useAuth";
@@ -26,6 +27,7 @@ export default function MainPage() {
   const [selectedGame, setSelectedGame] = useState(null);
 
   const [showFavourites, setShowFavourites] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -114,15 +116,21 @@ export default function MainPage() {
 
   const filterGames = (list) => {
     const q = (debouncedSearch || "").trim();
-    if (q.length < 2) return list;
-    const qq = q.toLowerCase();
-    return list.filter(g => (g.title || "").toLowerCase().includes(qq) || (g.description || "").toLowerCase().includes(qq));
+    let out = list.slice();
+    if (q.length >= 2) {
+      const qq = q.toLowerCase();
+      out = out.filter(g => (g.title || "").toLowerCase().includes(qq) || (g.description || "").toLowerCase().includes(qq));
+    }
+    if (selectedCategory) {
+      out = out.filter(g => g.category === selectedCategory);
+    }
+    return out;
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filtered = useMemo(() => filterGames(games), [games, debouncedSearch]);
+  const filtered = useMemo(() => filterGames(games), [games, debouncedSearch, selectedCategory]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filteredFavourites = useMemo(() => filterGames(favourites), [favourites, debouncedSearch]);
+  const filteredFavourites = useMemo(() => filterGames(favourites), [favourites, debouncedSearch, selectedCategory]);
 
   const sourceList = (showFavourites ? filteredFavourites : filtered)
     .slice()
@@ -174,12 +182,15 @@ export default function MainPage() {
 
             <div className="grid-container">
               <div className="grid-top-controls">
-                <ToggleSlider
-                  leftLabel="Избранное"
-                  rightLabel="Все игры"
-                  value={showFavourites}
-                  onChange={(v) => setShowFavourites(v)}
-                />
+                <CategoryDropdown value={selectedCategory} onChange={(v) => setSelectedCategory(v)} />
+                <div className="slider-container">
+                  <ToggleSlider
+                    leftLabel="Избранное"
+                    rightLabel="Все игры"
+                    value={showFavourites}
+                    onChange={(v) => setShowFavourites(v)}
+                  />
+                </div>
               </div>
 
               <div className="games-area">
