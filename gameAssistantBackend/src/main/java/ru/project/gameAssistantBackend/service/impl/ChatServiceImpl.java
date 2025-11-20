@@ -11,7 +11,6 @@ import ru.project.gameAssistantBackend.models.Message;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.ChatRepository;
 import ru.project.gameAssistantBackend.service.ChatServiceI;
-import ru.project.gameAssistantBackend.utils.PdfToMarkdown;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -24,7 +23,6 @@ public class ChatServiceImpl implements ChatServiceI {
     private final GameServiceImpl gameServiceImpl;
     private final PromptServiceImpl promptServiceImpl;
     private final AssistantServiceImpl assistantServiceImpl;
-    private final PdfToMarkdown pdfToMarkdown;
     private final AuthServiceImpl authServiceImpl;
     private final ChatRepository chatRepository;
     private final FileServiceImpl fileServiceImpl;
@@ -34,13 +32,12 @@ public class ChatServiceImpl implements ChatServiceI {
                            PromptServiceImpl promptServiceImpl,
                            ChatRepository chatRepository,
                            AssistantServiceImpl assistantServiceImpl,
-                           PdfToMarkdown pdfToMarkdown,
-                           AuthServiceImpl authServiceImpl, FileServiceImpl fileServiceImpl) {
+                           AuthServiceImpl authServiceImpl,
+                           FileServiceImpl fileServiceImpl) {
         this.gameServiceImpl = gameServiceImpl;
         this.promptServiceImpl = promptServiceImpl;
         this.chatRepository = chatRepository;
         this.assistantServiceImpl = assistantServiceImpl;
-        this.pdfToMarkdown = pdfToMarkdown;
         this.authServiceImpl = authServiceImpl;
         this.fileServiceImpl = fileServiceImpl;
     }

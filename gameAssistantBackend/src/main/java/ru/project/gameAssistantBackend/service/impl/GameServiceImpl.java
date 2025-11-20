@@ -1,6 +1,6 @@
 package ru.project.gameAssistantBackend.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
@@ -18,11 +18,21 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class GameServiceImpl implements GameServiceI {
 
     private final GameRepository gameRepository;
     private final FileServiceImpl fileServiceImpl;
+    private final Converter converter;
+
+    @Autowired
+    public GameServiceImpl(
+            GameRepository gameRepository,
+            FileServiceImpl fileServiceImpl,
+            Converter converter) {
+        this.gameRepository = gameRepository;
+        this.fileServiceImpl = fileServiceImpl;
+        this.converter = converter;
+    }
 
     @Transactional
     @Override
@@ -39,7 +49,7 @@ public class GameServiceImpl implements GameServiceI {
         var rulesFile = gameRequestDTO.rulesFile();
         var rulesFileTitle = fileServiceImpl.save(rulesFile);
         game.setRulesFileTitle(rulesFileTitle);
-        fileServiceImpl.pdfToMd(rulesFileTitle);
+        converter.convertPdfToMdAsync(rulesFileTitle);
         gameRepository.save(game);
         return mapToDTO(game);
     }

@@ -1,7 +1,5 @@
 package ru.project.gameAssistantBackend.service.impl;
 
-import com.aspose.pdf.Document;
-import com.aspose.pdf.SaveFormat;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -13,14 +11,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 @Service
 public class FileServiceImpl implements FileServiceI {
 
-    private final String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
+    public final String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
 
     public FileServiceImpl() {
         try {
@@ -73,62 +69,6 @@ public class FileServiceImpl implements FileServiceI {
             return Files.readString(Paths.get(uploadDir, real), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException("Ошибка чтения файла: " + real, e);
-        }
-    }
-
-    public void pdfToMd(String pdfPath){
-        String resultPdfPath = uploadDir + File.separator + pdfPath;
-        String docxPath = resultPdfPath.replace(".pdf", ".docx");
-        String mdPath = resultPdfPath.replace(".pdf", ".md");
-
-        pdfToDocx(resultPdfPath, docxPath);
-        docxToMd(docxPath, mdPath);
-
-        delete(new File(docxPath).getName());
-
-        String asposeImagePath = resultPdfPath.replace(".pdf", ".001.png");
-        delete(new File(asposeImagePath).getName());
-
-        cleanMd(mdPath);
-    }
-
-    public void pdfToDocx(String pdfPath, String docxPath) {
-        Document pdfDoc = new Document(pdfPath);
-        pdfDoc.save(docxPath, SaveFormat.DocX);
-    }
-
-    public void docxToMd(String docxPath, String mdPath) {
-        com.aspose.words.Document wordDoc = null;
-        try {
-            wordDoc = new com.aspose.words.Document(docxPath);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            wordDoc.save(mdPath, com.aspose.words.SaveFormat.MARKDOWN);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void cleanMd(String mdPath) {
-        Path path = Path.of(mdPath);
-
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines(path);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        List<String> newLines = lines.size() > 3 ?
-                lines.subList(8, lines.size()) :
-                List.of();
-
-        try {
-            Files.write(path, newLines);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
