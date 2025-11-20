@@ -27,6 +27,7 @@ public class ChatServiceImpl implements ChatServiceI {
     private final PdfToMarkdown pdfToMarkdown;
     private final AuthServiceImpl authServiceImpl;
     private final ChatRepository chatRepository;
+    private final FileServiceImpl fileServiceImpl;
 
     @Autowired
     public ChatServiceImpl(GameServiceImpl gameServiceImpl,
@@ -34,13 +35,14 @@ public class ChatServiceImpl implements ChatServiceI {
                            ChatRepository chatRepository,
                            AssistantServiceImpl assistantServiceImpl,
                            PdfToMarkdown pdfToMarkdown,
-                           AuthServiceImpl authServiceImpl) {
+                           AuthServiceImpl authServiceImpl, FileServiceImpl fileServiceImpl) {
         this.gameServiceImpl = gameServiceImpl;
         this.promptServiceImpl = promptServiceImpl;
         this.chatRepository = chatRepository;
         this.assistantServiceImpl = assistantServiceImpl;
         this.pdfToMarkdown = pdfToMarkdown;
         this.authServiceImpl = authServiceImpl;
+        this.fileServiceImpl = fileServiceImpl;
     }
 
     @Transactional
@@ -109,10 +111,11 @@ public class ChatServiceImpl implements ChatServiceI {
     }
 
     @Override
-    public String getSystemMessageTextMd(Long gameId) throws IOException {
+    public String getSystemMessageTextMd(Long gameId) {
         String promptText = promptServiceImpl.getPromptText();
-        String rulesText = gameServiceImpl.getRulesText(gameId);
-        String rulesMdText = pdfToMarkdown.convertTextToMarkdown(rulesText);
+        String rulesFileTitle = gameServiceImpl.getById(gameId).getRulesFileTitle();
+        String rulesMdText = fileServiceImpl.extractTextFromMarkdown(rulesFileTitle);
+        System.out.println(rulesMdText);
         return String.format("%s %s", promptText, rulesMdText);
     }
 

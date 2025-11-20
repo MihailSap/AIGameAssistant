@@ -14,5 +14,5 @@ public interface FileServiceI {
 
     Resource getFileResource(String fileTitle) throws MalformedURLException;
 
-    String extractTextFromPDF(String fileTitle) throws IOException;
+    String extractTextFromMarkdown(String fileTitle) throws IOException;
 }

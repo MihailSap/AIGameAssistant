@@ -39,7 +39,7 @@ public class GameServiceImpl implements GameServiceI {
         var rulesFile = gameRequestDTO.rulesFile();
         var rulesFileTitle = fileServiceImpl.save(rulesFile);
         game.setRulesFileTitle(rulesFileTitle);
-
+        fileServiceImpl.pdfToMd(rulesFileTitle);
         gameRepository.save(game);
         return mapToDTO(game);
     }
@@ -144,7 +144,7 @@ public class GameServiceImpl implements GameServiceI {
     public String getRulesText(Long id) throws IOException {
         Game game = getById(id);
         String rulesFileTitle = game.getRulesFileTitle();
-        return fileServiceImpl.extractTextFromPDF(rulesFileTitle);
+        return fileServiceImpl.extractTextFromMarkdown(rulesFileTitle);
     }
 
     @Override

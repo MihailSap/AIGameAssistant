@@ -41,6 +41,6 @@ public class FileController {
 
     @GetMapping("/rules/text/{rulesFileTitle}")
     public String getTextFromFile(@PathVariable("rulesFileTitle") String rulesFileTitle) throws IOException {
-        return fileServiceImpl.extractTextFromPDF(rulesFileTitle);
+        return fileServiceImpl.extractTextFromMarkdown(rulesFileTitle);
     }
 }
