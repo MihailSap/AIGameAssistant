@@ -15,9 +15,10 @@ import ru.project.gameAssistantBackend.models.Message;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Service
-public class StreamAssistantService {
+public class AsyncAssistantServiceImpl {
 
     @Value("${yandex-cloud.gpt.api-key}")
     private String apiKey;
@@ -33,26 +34,32 @@ public class StreamAssistantService {
     private final WebClient webClient;
 
     @Autowired
-    public StreamAssistantService(
+    public AsyncAssistantServiceImpl(
             ObjectMapper objectMapper,
             WebClient webClient) {
         this.objectMapper = objectMapper;
         this.webClient = webClient;
     }
 
-    public Flux<String> getStreamedAnswer(String prompt) {
-        Message userMessage = new Message();
-        userMessage.setRole(ChatRole.user);
-        userMessage.setText(prompt);
+    public Flux<String> getStreamedAnswer(
+            List<Message> messages,
+            Consumer<String> onComplete) {
+        StringBuilder fullAnswer = new StringBuilder();
         return webClient.post()
                 .uri(apiUrl)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION,
-                        "Bearer " + (apiKey.startsWith("Api-Key ") ? apiKey.substring(8) : apiKey))
-                .bodyValue(buildRequestBody(List.of(userMessage)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + (apiKey.startsWith("Api-Key ")
+                        ? apiKey.substring(8)
+                        : apiKey))
+                .bodyValue(buildRequestBody(messages))
                 .retrieve()
                 .bodyToFlux(String.class)
-                .map(this::extractStreamPart);
+                .map(this::extractStreamPart)
+                .doOnNext(chunk -> {
+                    fullAnswer.setLength(0);
+                    fullAnswer.append(chunk);
+                })
+                .doOnComplete(() -> onComplete.accept(fullAnswer.toString()));
     }
 
     private String extractStreamPart(String jsonChunk) {
@@ -67,9 +74,7 @@ public class StreamAssistantService {
                         .path("text")
                         .asText();
             }
-        } catch (Exception ignored) {
-
-        }
+        } catch (Exception ignored) { }
         return "";
     }
 
@@ -87,5 +92,20 @@ public class StreamAssistantService {
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при формировании JSON-запроса", e);
         }
+    }
+
+    public Flux<String> getStreamedAnswer(String prompt) {
+        Message userMessage = new Message();
+        userMessage.setRole(ChatRole.user);
+        userMessage.setText(prompt);
+        return webClient.post()
+                .uri(apiUrl)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + (apiKey.startsWith("Api-Key ") ? apiKey.substring(8) : apiKey))
+                .bodyValue(buildRequestBody(List.of(userMessage)))
+                .retrieve()
+                .bodyToFlux(String.class)
+                .map(this::extractStreamPart);
     }
 }

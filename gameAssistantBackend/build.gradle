@@ -34,8 +34,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
-//	implementation "com.aspose:aspose-words:25.9"
-//	implementation "com.aspose:aspose-pdf:25.9"
 	implementation(files("lib/aspose-pdf-25.9.jar"))
 	implementation(files("lib/aspose-words-25.9-jdk17.jar"))
 	implementation("javax.xml.bind:jaxb-api:2.3.1")

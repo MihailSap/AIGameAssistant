@@ -14,7 +14,6 @@ import ru.project.gameAssistantBackend.service.ChatServiceI;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,24 +21,23 @@ public class ChatServiceImpl implements ChatServiceI {
 
     private final GameServiceImpl gameServiceImpl;
     private final PromptServiceImpl promptServiceImpl;
-    private final AssistantServiceImpl assistantServiceImpl;
     private final AuthServiceImpl authServiceImpl;
     private final ChatRepository chatRepository;
     private final FileServiceImpl fileServiceImpl;
+    private final AssistantServiceImpl assistantServiceImpl;
 
     @Autowired
     public ChatServiceImpl(GameServiceImpl gameServiceImpl,
                            PromptServiceImpl promptServiceImpl,
                            ChatRepository chatRepository,
-                           AssistantServiceImpl assistantServiceImpl,
                            AuthServiceImpl authServiceImpl,
-                           FileServiceImpl fileServiceImpl) {
+                           FileServiceImpl fileServiceImpl, AssistantServiceImpl assistantServiceImpl) {
         this.gameServiceImpl = gameServiceImpl;
         this.promptServiceImpl = promptServiceImpl;
         this.chatRepository = chatRepository;
-        this.assistantServiceImpl = assistantServiceImpl;
         this.authServiceImpl = authServiceImpl;
         this.fileServiceImpl = fileServiceImpl;
+        this.assistantServiceImpl = assistantServiceImpl;
     }
 
     @Transactional
@@ -49,13 +47,9 @@ public class ChatServiceImpl implements ChatServiceI {
         String systemMessageText = getSystemMessageTextMd(startChatDTO.gameId());
         chat.addMessage(systemMessageText, ChatRole.system);
         chat.addMessage(startChatDTO.request(), ChatRole.user);
-
-        String assistantAnswerText = assistantServiceImpl.getAssistantAnswer(chat.getMessages());
-        chat.addMessage(assistantAnswerText, ChatRole.assistant);
         chat.setLastUseTime(Instant.now());
-
-        String titlePrompt = getPromptForTitle(chat.getMessages());
-        String title = assistantServiceImpl.getAnswer(titlePrompt);
+        String promptForTitle = getPromptForTitle(chat.getMessages());
+        String title = assistantServiceImpl.getAnswer(promptForTitle);
         chat.setTitle(title);
         return chatRepository.save(chat);
     }
@@ -65,9 +59,6 @@ public class ChatServiceImpl implements ChatServiceI {
     public Chat continueChat(Long id, PromptDTO promptDTO){
         Chat chat = getChatById(id);
         chat.addMessage(promptDTO.text(), ChatRole.user);
-        String assistantAnswerText = assistantServiceImpl.getAssistantAnswer(chat.getMessages());
-        chat.addMessage(assistantAnswerText, ChatRole.assistant);
-        chat.setLastUseTime(Instant.now());
         return chatRepository.save(chat);
     }
 
@@ -97,22 +88,10 @@ public class ChatServiceImpl implements ChatServiceI {
     }
 
     @Override
-    public ChatDTO mapToDTO(Chat chat){
-        List<Message> messages = chat.getMessages();
-        List<MessageDTO> messageDTOs = new ArrayList<>();
-        for (Message message : messages) {
-            if(message.getRole().equals(ChatRole.system)) continue;
-            messageDTOs.add(new MessageDTO(message.getRole(), message.getText(), message.getTimestamp()));
-        }
-        return new ChatDTO(chat.getId(), chat.getTitle(), chat.getLastUseTime(), messageDTOs);
-    }
-
-    @Override
     public String getSystemMessageTextMd(Long gameId) {
         String promptText = promptServiceImpl.getPromptText();
         String rulesFileTitle = gameServiceImpl.getById(gameId).getRulesFileTitle();
         String rulesMdText = fileServiceImpl.extractTextFromMarkdown(rulesFileTitle);
-        System.out.println(rulesMdText);
         return String.format("%s %s", promptText, rulesMdText);
     }
 
@@ -140,26 +119,16 @@ public class ChatServiceImpl implements ChatServiceI {
         return chatRepository.findByUzerIdAndGameId(user.getId(), gameId);
     }
 
-    @Override
-    public List<ChatPreviewDTO> mapToPreviews(List<Chat> chats){
-        List<ChatPreviewDTO> previewDTOs = new ArrayList<>();
-        for (Chat chat : chats) {
-            previewDTOs.add(mapToChatPreviewDTO(chat));
-        }
-        return previewDTOs;
-    }
-
-    public ChatPreviewDTO mapToChatPreviewDTO(Chat chat){
-        Long gameId = -1L;
-        if(chat.getGame() != null){
-            gameId = chat.getGame().getId();
-        }
-
-        return new ChatPreviewDTO(chat.getId(), gameId, chat.getTitle(), chat.getLastUseTime());
-    }
-
     public List<Chat> getChatsByAuthUser(){
         User user = authServiceImpl.getAuthenticatedUser();
         return chatRepository.findByUzerId(user.getId());
+    }
+
+    @Transactional
+    public void saveAssistantStreamingAnswer(Long chatId, String text) {
+        Chat chat = getChatById(chatId);
+        chat.addMessage(text, ChatRole.assistant);
+        chat.setLastUseTime(Instant.now());
+        chatRepository.save(chat);
     }
 }

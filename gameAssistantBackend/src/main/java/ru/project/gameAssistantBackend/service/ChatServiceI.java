@@ -22,15 +22,10 @@ public interface ChatServiceI {
 
     Chat getChatById(Long chatId);
 
-    ChatDTO mapToDTO(Chat chat);
-
     String getSystemMessageTextMd(Long gameId) throws IOException;
 
     String getPromptForTitle(List<Message> messages);
 
     List<Chat> getChatsByGameAndUser(Long gameId);
 
-    List<ChatPreviewDTO> mapToPreviews(List<Chat> chats);
-
-    ChatPreviewDTO mapToChatPreviewDTO(Chat chat);
 }
