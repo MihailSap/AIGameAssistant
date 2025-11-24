@@ -9,6 +9,7 @@ import ru.project.gameAssistantBackend.mapper.ChatMapper;
 import ru.project.gameAssistantBackend.models.Chat;
 import ru.project.gameAssistantBackend.service.impl.AsyncAssistantServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.ChatServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.OpenaiAssistantService;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,14 +24,18 @@ public class ChatController {
 
     private final AsyncAssistantServiceImpl asyncAssistantServiceImpl;
 
+    private final OpenaiAssistantService openaiAssistantService;
+
     @Autowired
     public ChatController(
             ChatServiceImpl chatServiceImpl,
             ChatMapper chatMapper,
-            AsyncAssistantServiceImpl asyncAssistantServiceImpl) {
+            AsyncAssistantServiceImpl asyncAssistantServiceImpl,
+            OpenaiAssistantService openaiAssistantService) {
         this.chatServiceImpl = chatServiceImpl;
         this.chatMapper = chatMapper;
         this.asyncAssistantServiceImpl = asyncAssistantServiceImpl;
+        this.openaiAssistantService = openaiAssistantService;
     }
 
     @GetMapping("/{id}")
@@ -58,6 +63,12 @@ public class ChatController {
                 chat.getMessages(),
                 answer -> chatServiceImpl.saveAssistantStreamingAnswer(chatId, answer)
         );
+    }
+
+    @GetMapping("/{chatId}/openai")
+    public String getOpenAIAnswer(@PathVariable("chatId") Long chatId){
+        Chat chat = chatServiceImpl.getChatById(chatId);
+        return openaiAssistantService.getAssistantAnswer(chat.getMessages());
     }
 
     @DeleteMapping("/{id}")
