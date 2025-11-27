@@ -2,8 +2,7 @@ import React from "react";
 import TopCarousel from "./TopCarousel";
 import "../css/Hero.css";
 
-export default function Hero({ topIds = [], gamesMap = {}, onOpenGame }) {
-    const topGames = topIds.map(id => gamesMap[id]).filter(Boolean);
+export default function Hero({ topGames = [], onOpenGame }) {
     return (
         <section className="hero-root">
             <div className="hero-bg" />

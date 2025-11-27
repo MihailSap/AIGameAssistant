@@ -8,7 +8,7 @@ import useAuth from "../hooks/useAuth";
 import "../css/MainPage.css";
 import "../css/GameModal.css";
 import useBlobUrl from "../hooks/useBlobUrl";
-import { downloadBlob } from "../utils/blobUtils";
+import { BASE_URL } from "../api/axios";
 
 export default function GameModal({ game, onClose, onFavouriteChange }) {
     const navigate = useNavigate();
@@ -94,17 +94,6 @@ export default function GameModal({ game, onClose, onFavouriteChange }) {
         if (mountedRef.current) setLoadingImage(false);
     };
 
-    const handleDownloadRules = async () => {
-        const rulesFileTitle = gameData?.rulesFileTitle;
-        if (!rulesFileTitle) return alert("Правила отсутствуют");
-        try {
-            const blob = await fileApi.getRulesBlob(rulesFileTitle);
-            await downloadBlob(blob, rulesFileTitle);
-        } catch (err) {
-            alert("Не удалось скачать правила");
-        }
-    };
-
     const toggleFavourite = async () => {
         if (!isAuthenticated) {
             navigate("/login");
@@ -163,7 +152,7 @@ export default function GameModal({ game, onClose, onFavouriteChange }) {
                         <div className="gm-btn-row">
                             <button
                                 className="btn gm-circle-btn"
-                                onClick={handleDownloadRules}
+                                onClick={() => { window.open(`${BASE_URL}/api/file/rules/${gameData?.rulesFileTitle}`, "_blank", "noopener,noreferrer"); }}
                                 disabled={loadingGame || !gameData}
                                 title="Смотреть правила игры"
                                 aria-label="Смотреть правила игры"

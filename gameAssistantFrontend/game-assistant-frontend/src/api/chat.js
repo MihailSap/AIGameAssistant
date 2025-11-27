@@ -1,5 +1,6 @@
-import { apiClient } from "./axios";
+import { apiClient, BASE_URL } from "./axios";
 import { escapeText } from "../utils/utils";
+import { getAccessToken } from "../utils/storage";
 
 export const chatApi = {
   getChat: async (id) => {
@@ -72,5 +73,77 @@ export const chatApi = {
       console.error("Error get chat previews by user:", error);
       throw error;
     }
+  },
+
+  streamAnswer: (chatId, { onChunk, onComplete, onError } = {}) => {
+    const controller = new AbortController();
+    const token = getAccessToken();
+    const url = `${BASE_URL.replace(/\/$/, "")}/api/chat/${chatId}/answer`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "text/event-stream",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      signal: controller.signal,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          if (res.status === 401) {
+            window.location.href = "/login";
+            return;
+          }
+          throw new Error(`stream response not ok: ${res.status}`);
+        }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+
+        const processEvent = (raw) => {
+          const lines = raw.split(/\r?\n/);
+          const dataLines = [];
+          for (let line of lines) {
+            if (line.startsWith("data:")) {
+              dataLines.push(line.slice(5));
+            }
+          }
+          const data = dataLines.join("\n").trim();
+          if (data) {
+            try {
+              onChunk && onChunk(data);
+            } catch (err) {
+              console.error("onChunk handler error:", err);
+            }
+          }
+        };
+
+        const pump = () =>
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              if (buffer.trim()) {
+                processEvent(buffer);
+              }
+              onComplete && onComplete();
+              return;
+            }
+            buffer += decoder.decode(value, { stream: true });
+            const parts = buffer.split("\n\n");
+            for (let i = 0; i < parts.length - 1; i++) {
+              processEvent(parts[i]);
+            }
+            buffer = parts[parts.length - 1];
+            return pump();
+          });
+
+        return pump();
+      })
+      .catch((err) => {
+        if (err && err.name === "AbortError") return;
+        onError && onError(err);
+      });
+
+    return {
+      close: () => controller.abort(),
+    };
   },
 };

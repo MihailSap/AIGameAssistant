@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import "../css/AdminPage.css";
 import "../css/GameForm.css";
-import CategoryDropdown from "../components/CategoryDropdown";
+import SelectDropdown from "../components/SelectDropdown";
+import { backendToLabel } from "../utils/categories";
+import { gameApi } from "../api/game";
 
 export default function GameForm({ mode = "create", initial = null, onCancel, onSave }) {
   const [title, setTitle] = useState(initial?.title || "");
@@ -44,7 +46,7 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
       <label className="form-row">
         <span className="form-label">Категория</span>
         <div className="form-input">
-          <CategoryDropdown value={category} onChange={(v) => setCategory(v)} />
+          <SelectDropdown fetchItems={() => gameApi.getCategories()} cacheKey="categories" value={category} onChange={(v) => setCategory(v)} allowNull={true} labelFunc={backendToLabel} placeholder="Категория игр" />
         </div>
       </label>
 
@@ -72,7 +74,7 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
         <input
           className="form-input"
           type="file"
-          accept=".pdf,.doc,.docx,.txt,.md,.rtf"
+          accept=".pdf"
           onChange={(e) => setRulesFile(e.target.files && e.target.files[0])}
           required={initial == null}
         />

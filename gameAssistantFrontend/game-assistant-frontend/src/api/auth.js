@@ -3,7 +3,6 @@ import { setTokens, clearTokens, getRefreshToken } from "../utils/storage";
 import { markUserLoggedOut } from "./axios";
 
 function buildFormData(userRequestDTO) {
-  console.log(userRequestDTO);
   const fd = new FormData();
   if (userRequestDTO.email !== undefined && userRequestDTO.email !== null) fd.append("email", userRequestDTO.email);
   if (userRequestDTO.login !== undefined && userRequestDTO.login !== null) fd.append("login", userRequestDTO.login);

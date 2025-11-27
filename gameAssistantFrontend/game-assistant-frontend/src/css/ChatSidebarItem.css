@@ -14,6 +14,14 @@
     background: rgba(255, 255, 255, 0.25);
 }
 
+.chat-session-item:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chat-session-item.active:active {
+    background: rgba(255, 255, 255, 0.25);
+}
+
 .session-info {
     min-width: 0;
     overflow: hidden;
@@ -58,6 +66,10 @@
 
     .chat-session-item:hover {
         background: rgba(255, 255, 255, 0.1);
+    }
+
+    .chat-session-item.active:hover {
+        background: rgba(255, 255, 255, 0.25);
     }
 
     .chat-session-item:hover .chat-sidebar-icon-btn {

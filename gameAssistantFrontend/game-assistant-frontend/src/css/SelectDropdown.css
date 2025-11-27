@@ -1,4 +1,4 @@
-.catdd-root {
+.seldd-root {
     position: relative;
     display: inline-block;
     width: 100%;
@@ -6,11 +6,15 @@
     box-sizing: border-box;
 }
 
-.grid-top-controls .catdd-root {
+.form-input .seldd-root {
+    max-width: 100%;
+}
+
+.grid-top-controls .seldd-root {
     max-width: 20vw;
 }
 
-.catdd-button {
+.seldd-button {
     width: 100%;
     display: flex;
     align-items: center;
@@ -26,32 +30,36 @@
     transition: background-color var(--transition), border-color var(--transition), color var(--transition);
 }
 
-.catdd-button .catdd-arrow svg {
+.chat-root .seldd-button, .admin-root .seldd-button {
+    padding: 5px 10px;
+}
+
+.seldd-button .seldd-arrow svg {
     stroke: var(--bg);
 }
 
-.catdd-button.unset .catdd-arrow svg {
+.seldd-button.unset .seldd-arrow svg {
     stroke: var(--text);
 }
 
-.catdd-button.unset {
+.seldd-button.unset {
     background-color: var(--modal-bg);
     border-color: var(--text-input-border);
     color: var(--text);
 }
 
-.grid-top-controls .catdd-button.unset {
+.grid-top-controls .seldd-button.unset {
     padding: 12px 15px;
     background-color: var(--game-grid-bg);
     border-color: var(--section-border);
 }
 
-.catdd-button.open {
+.seldd-button.open {
     outline: none;
     box-shadow: 0 0 0 1px var(--yellow);
 }
 
-.catdd-label {
+.seldd-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -61,24 +69,28 @@
     font-size: 18px;
 }
 
-.grid-top-controls .catdd-label {
+.chat-root .seldd-label {
+    margin-left: 30px;
+}
+
+.grid-top-controls .seldd-label {
     font-size: 20px;
     font-weight: 700;
 }
 
-.catdd-button.unset .catdd-label {
+.seldd-button.unset .seldd-label {
     color: var(--muted-text);
 }
 
-.catdd-arrow {
+.seldd-arrow {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--muted-text);
 }
 
-.catdd-portal-list,
-.catdd-list {
+.seldd-list {
+    position: absolute;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -90,18 +102,37 @@
     max-height: 360px;
     overflow-y: auto;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-    z-index: 99999;
-    box-sizing: border-box;
-}
-
-.catdd-list {
     z-index: 2000;
+    box-sizing: border-box;
+    width: 100%;
     top: 100%;
     left: 0;
-    width: 100%
 }
 
-.catdd-item {
+.modal .seldd-list {
+    max-height: 270px;
+}
+
+.seldd-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.seldd-list::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 20px;
+}
+
+.seldd-list::-webkit-scrollbar-thumb {
+    background-color: var(--muted-text);
+    border-radius: var(--radius);
+    transition: background-color var(--transition);
+}
+
+.seldd-list::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text);
+}
+
+.seldd-item {
     padding: 7px 10px;
     border-radius: var(--radius);
     cursor: pointer;
@@ -115,79 +146,80 @@
     transition: background-color var(--transition), color var(--transition);
 }
 
-.catdd-item.selected {
+.chat-root .seldd-item, .admin-root .seldd-item {
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
+.seldd-item.selected {
     background-color: var(--yellow);
     color: var(--bg);
 }
 
-.catdd-portal-list::-webkit-scrollbar,
-.catdd-list::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+.seldd-item:active {
+    background-color: var(--muted-yellow);
+    color: white;
 }
 
-.catdd-portal-list::-webkit-scrollbar-track,
-.catdd-list::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 25px;
-}
-
-.catdd-portal-list::-webkit-scrollbar-thumb,
-.catdd-list::-webkit-scrollbar-thumb {
-    background-color: var(--muted-text);
-    border-radius: var(--radius);
-    transition: background-color var(--transition);
-}
-
-.catdd-portal-list::-webkit-scrollbar-thumb:hover,
-.catdd-list::-webkit-scrollbar-thumb:hover {
-    background-color: var(--text);
+.seldd-item.selected:active {
+    background-color: var(--yellow);
+    color: var(--bg);
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .catdd-item:hover {
+    .seldd-item:hover {
         background-color: var(--muted-yellow);
         color: white;
     }
 
-    .catdd-item.selected:hover {
+    .seldd-item.selected:hover {
         background-color: var(--yellow);
         color: var(--bg);
     }
 }
 
 @media (max-width: 1399px) {
-    .grid-top-controls .catdd-root {
+    .grid-top-controls .seldd-root {
         max-width: 30vw;
     }
 }
 
 @media (max-width: 999px) {
-    .grid-top-controls .catdd-root {
+    .grid-top-controls .seldd-root {
         max-width: 45vw;
     }
 }
 
 @media (max-width: 699px) {
-    .grid-top-controls .catdd-root {
+    .grid-top-controls .seldd-root {
         max-width: 60vw;
+    }
+
+    .admin-root .seldd-root {
+        max-width: 100%;
     }
 }
 
 @media (max-width: 499px) {
-    .grid-top-controls .catdd-root {
+    .grid-top-controls .seldd-root {
         max-width: 85vw;
     }
 
-    .grid-top-controls .catdd-button.unset {
+    .grid-top-controls .seldd-button.unset {
         padding: 11.25px 15px;
     }
 
-    .catdd-label {
+    .seldd-label {
         font-size: 18px;
     }
 
-    catdd-item {
+    .seldd-item {
         font-size: 16px;
+    }
+}
+
+@media (max-width: 420px) {
+    .chat-root .seldd-root {
+        max-width: 70%;
     }
 }
