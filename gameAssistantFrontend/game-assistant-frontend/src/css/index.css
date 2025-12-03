@@ -94,6 +94,25 @@ h6 {
   transition: color var(--transition), text-decoration-color var(--transition);
 }
 
+  .btn:active {
+    background-color: transparent;
+    color: var(--yellow);
+  }
+
+  .btn:disabled:active {
+    background-color: var(--yellow);
+    color: var(--bg);
+  }
+
+  .btn-danger:active {
+    color: var(--danger);
+  }
+
+  .link:active {
+    color: var(--muted-yellow);
+    text-decoration-color: var(--muted-yellow);
+  }
+
 input[type="checkbox"] {
   -webkit-appearance: none;
   appearance: none;

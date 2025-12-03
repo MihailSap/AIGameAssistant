@@ -37,6 +37,14 @@
     text-align: center;
 }
 
+.ts-tab:active {
+    transform: translateY(-2px);
+}
+
+.ts-tab.active:active {
+    transform: unset;
+}
+
 .auth-root .ts-tab {
     padding: 5px 15px;
     font-size: 18px;
@@ -119,5 +127,9 @@
 @media (hover: hover) and (pointer: fine) {
     .ts-tab:hover {
         transform: translateY(-2px);
+    }
+
+    .ts-tab.active:hover {
+        transform: unset;
     }
 }

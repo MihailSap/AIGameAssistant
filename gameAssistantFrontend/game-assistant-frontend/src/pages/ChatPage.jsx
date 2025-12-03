@@ -5,6 +5,7 @@ import Modal from "../components/Modal";
 import ChatSidebarItem from "../components/ChatSidebarItem";
 import ChatMessage from "../components/ChatMessage";
 import FileViewer from "../components/FileViewer";
+import SelectDropdown from "../components/SelectDropdown";
 import { chatApi } from "../api/chat";
 import { userApi } from "../api/users";
 import { gameApi } from "../api/game";
@@ -80,8 +81,13 @@ export default function ChatPage() {
     const [sidebarOpen, setSidebarOpen] = useState(typeof window !== "undefined" ? window.innerWidth >= 900 : false);
     const [rulesSidebarOpen, setRulesSidebarOpen] = useState(false);
 
+    const [models, setModels] = useState(['Yandex-GPT', 'Chat-GPT', 'Gemini']);
+    const [selectedModel, setSelectedModel] = useState('Yandex-GPT');
+
     const messagesRef = useRef(null);
     const inputRef = useRef(null);
+
+    const activeStreamRef = useRef(null);
 
     const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null });
 
@@ -154,7 +160,10 @@ export default function ChatPage() {
         setGameLoading(true);
         let mounted = true;
         (async () => {
-            if (!routeGameId) return;
+            if (!routeGameId) {
+                setGameLoading(false);
+                return;
+            }
             try {
                 const g = await gameApi.read(routeGameId);
                 if (!mounted) return;
@@ -188,6 +197,14 @@ export default function ChatPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [game, routeChatId]);
 
+    useEffect(() => {
+        return () => {
+            if (activeStreamRef.current && typeof activeStreamRef.current.close === "function") {
+                activeStreamRef.current.close();
+            }
+        };
+    }, []);
+
     const fetchIdRef = useRef(0);
 
     const selectSession = async (session, { navigateToRoute = true } = {}) => {
@@ -216,7 +233,10 @@ export default function ChatPage() {
                 createdAt: m.timestamp ? new Date(m.timestamp).toISOString() : new Date().toISOString(),
             }));
 
+            mapped.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
             setMessages(mapped);
+
             setChatError(null);
 
             if (typeof window !== "undefined") {
@@ -268,6 +288,19 @@ export default function ChatPage() {
         setTimeout(() => messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight, behavior: "smooth" }), 40);
     };
 
+    const closeActiveStream = () => {
+        if (activeStreamRef.current && typeof activeStreamRef.current.close === "function") {
+            try { activeStreamRef.current.close(); } catch (e) { }
+            activeStreamRef.current = null;
+        }
+    };
+
+    const mergeChunkWithPrev = (prev, chunk) => {
+        if (!prev) return chunk;
+        if (chunk.length >= prev.length && chunk.startsWith(prev)) return chunk;
+        return prev + chunk;
+    };
+
     const handleSend = async () => {
         if (!game && !activeSession) {
             alert("Выберите игру или откройте существующую сессию.");
@@ -277,6 +310,7 @@ export default function ChatPage() {
         const text = input.slice(0, 10000);
         setInput("");
         setSending(true);
+        closeActiveStream();
         const now = new Date().toISOString();
         let sessionToUse = activeSession;
         let createdTempSession = null;
@@ -303,14 +337,16 @@ export default function ChatPage() {
             createdAt: now,
             _temp: true,
         };
-        const tmpBot = {
-            id: makeId("b_tmp"),
+        const initialStreamId = `${sessionToUse.id}_stream_${Date.now()}`;
+        const streamPlaceholder = {
+            id: initialStreamId,
             role: "assistant",
-            text: "Думаю...",
+            text: "",
             createdAt: now,
             _temp: true,
+            _streaming: true,
         };
-        setMessages(prev => [...prev, tmpUser, tmpBot]);
+        setMessages(prev => [...prev, tmpUser, streamPlaceholder]);
         scrollToBottom();
         try {
             if (createdTempSession) {
@@ -328,14 +364,57 @@ export default function ChatPage() {
                 });
                 navigate(`/games/ai/${game.id}/${serverSession.id}`, { replace: true });
                 setActiveSession(serverSession);
-                const mapped = (chatDto?.messageDTOs || []).map((m, i) => ({
-                    id: `${serverSession.id}_${i}_${new Date(m.timestamp || Date.now()).getTime()}`,
-                    role: m.role ? String(m.role).toLowerCase() : "assistant",
-                    text: m.text || "",
-                    createdAt: m.timestamp ? new Date(m.timestamp).toISOString() : new Date().toISOString(),
-                }));
-                setMessages(mapped);
-                await refreshAllSessions();
+
+                const streamId = `${serverSession.id}_stream_${Date.now()}`;
+
+                setMessages(prev => {
+                    const withoutTemp = prev.filter(m => !(m._temp && m.role === "assistant"));
+                    const existing = withoutTemp.find(m => m.id === streamId);
+                    if (existing) {
+                        return withoutTemp.map(m => m.id === streamId ? { ...m, _streaming: true, text: "" } : m);
+                    }
+                    return [...withoutTemp, { id: streamId, role: "assistant", text: "", createdAt: new Date().toISOString(), _streaming: true }];
+                });
+
+                const streamController = chatApi.streamAnswer(serverSession.id, {
+                    onChunk: (chunk) => {
+                        setMessages(prev => {
+                            const copy = prev.slice();
+                            const idx = copy.findIndex(m => m.id === streamId);
+                            if (idx >= 0) {
+                                const prevText = copy[idx].text || "";
+                                const newText = mergeChunkWithPrev(prevText, chunk);
+                                copy[idx] = { ...copy[idx], text: newText };
+                            } else {
+                                copy.push({ id: streamId, role: "assistant", text: chunk, createdAt: new Date().toISOString(), _streaming: true });
+                            }
+                            return copy;
+                        });
+                        scrollToBottom();
+                    },
+                    onComplete: () => {
+                        setMessages(prev => prev.map(m => m.id === streamId ? { ...m, _streaming: false } : m));
+                        setSending(false);
+                        refreshAllSessions();
+                        activeStreamRef.current = null;
+                        scrollToBottom();
+                    },
+                    onError: (err) => {
+                        setMessages(prev => {
+                            const copy = prev.slice();
+                            const idx = copy.findIndex(m => m.id === streamId);
+                            if (idx >= 0) {
+                                copy[idx] = { id: makeId("b_err"), role: "error", text: "Ошибка при получении ответа от сервера.", createdAt: new Date().toISOString() };
+                            }
+                            return copy;
+                        });
+                        setSending(false);
+                        activeStreamRef.current = null;
+                        console.error(err);
+                    }
+                });
+
+                activeStreamRef.current = { controller: streamController, streamId };
             } else {
                 const chatDto = await chatApi.continueChat(sessionToUse.id, { text });
                 const serverId = chatDto?.id != null ? String(chatDto.id) : sessionToUse.id;
@@ -350,14 +429,57 @@ export default function ChatPage() {
                     navigate(`/games/ai/${game.id}/${updatedSession.id}`, { replace: false });
                 }
                 setActiveSession(updatedSession);
-                const mapped = (chatDto?.messageDTOs || []).map((m, i) => ({
-                    id: `${updatedSession.id}_${i}_${new Date(m.timestamp || Date.now()).getTime()}`,
-                    role: m.role ? String(m.role).toLowerCase() : "assistant",
-                    text: m.text || "",
-                    createdAt: m.timestamp ? new Date(m.timestamp).toISOString() : new Date().toISOString(),
-                }));
-                setMessages(mapped);
-                await refreshAllSessions();
+
+                const streamId = `${updatedSession.id}_stream_${Date.now()}`;
+
+                setMessages(prev => {
+                    const withoutTemp = prev.filter(m => !(m._temp && m.role === "assistant"));
+                    const existing = withoutTemp.find(m => m.id === streamId);
+                    if (existing) {
+                        return withoutTemp.map(m => m.id === streamId ? { ...m, _streaming: true, text: "" } : m);
+                    }
+                    return [...withoutTemp, { id: streamId, role: "assistant", text: "", createdAt: new Date().toISOString(), _streaming: true }];
+                });
+
+                const streamController = chatApi.streamAnswer(updatedSession.id, {
+                    onChunk: (chunk) => {
+                        setMessages(prev => {
+                            const copy = prev.slice();
+                            const idx = copy.findIndex(m => m.id === streamId);
+                            if (idx >= 0) {
+                                const prevText = copy[idx].text || "";
+                                const newText = mergeChunkWithPrev(prevText, chunk);
+                                copy[idx] = { ...copy[idx], text: newText };
+                            } else {
+                                copy.push({ id: streamId, role: "assistant", text: chunk, createdAt: new Date().toISOString(), _streaming: true });
+                            }
+                            return copy;
+                        });
+                        scrollToBottom();
+                    },
+                    onComplete: () => {
+                        setMessages(prev => prev.map(m => m.id === streamId ? { ...m, _streaming: false } : m));
+                        setSending(false);
+                        refreshAllSessions();
+                        activeStreamRef.current = null;
+                        scrollToBottom();
+                    },
+                    onError: (err) => {
+                        setMessages(prev => {
+                            const copy = prev.slice();
+                            const idx = copy.findIndex(m => m.id === streamId);
+                            if (idx >= 0) {
+                                copy[idx] = { id: makeId("b_err"), role: "error", text: "Ошибка при получении ответа от сервера.", createdAt: new Date().toISOString() };
+                            }
+                            return copy;
+                        });
+                        setSending(false);
+                        activeStreamRef.current = null;
+                        console.error(err);
+                    }
+                });
+
+                activeStreamRef.current = { controller: streamController, streamId };
             }
         } catch (err) {
             setMessages(prev => {
@@ -373,8 +495,9 @@ export default function ChatPage() {
                 }
                 return copy;
             });
-        } finally {
             setSending(false);
+            console.error(err);
+        } finally {
             scrollToBottom();
         }
     };
@@ -395,7 +518,7 @@ export default function ChatPage() {
 
     return (
         <div className="chat-root">
-            <Header currentUser={currentUser} />
+            <Header currentUser={currentUser} centralTitle={(!gameLoading && !error) ? game?.title : ""} />
 
             {gameLoading && (
                 <div className="full-loader">
@@ -406,8 +529,15 @@ export default function ChatPage() {
             {!gameLoading && error && <div className="loading-error">{error}</div>}
 
             {!gameLoading && !error &&
-                <div className="chat-page-title-center">
-                    {game && <h1 className="chat-game-title">{game.title}</h1>}
+                <div className="chat-page-switch-container">
+                    <SelectDropdown
+                        items={models}
+                        value={selectedModel}
+                        onChange={(m) => { setSelectedModel(m); }}
+                        allowNull={false}
+                        placeholder="Выберите модель"
+                        ariaLabel="Модель нейросети"
+                    />
                 </div>
             }
 
@@ -576,4 +706,4 @@ export default function ChatPage() {
             }
         </div >
     );
-}
+} 

@@ -8,11 +8,12 @@
     padding: 4px 24px;
 }
 
-.profile-root .site-header, .chat-root .site-header {
+.profile-root .site-header,
+.chat-root .site-header {
     background: transparent;
 }
 
-.header-center.header-mobile-search {
+.header-center.header-mobile {
     display: none;
 }
 
@@ -43,11 +44,17 @@
     justify-content: center;
 }
 
-.header-page-title {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 700;
-    text-transform: uppercase;
+.header-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text);
+    text-align: center;
+    margin-right: 72px;
+}
+
+.header-inner.admin .header-title {
+    margin-right: 0;
+    margin-left: 34px;
 }
 
 .search-wrap {
@@ -95,6 +102,12 @@
         padding: 4px 14px;
     }
 
+    .header-title {
+        font-size: 28px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
     .header-inner {
         width: 100%;
         justify-content: space-between;
@@ -104,16 +117,16 @@
         display: none;
     }
 
-    .header-center.header-mobile-search {
+    .header-center.header-mobile {
         display: block;
         width: 100%;
     }
 
-    .header-center.header-mobile-search {
-        padding-top: 10px;
+    .header-center.header-mobile {
+        padding-top: 5px;
     }
 
-    .header-mobile-search .search-wrap {
+    .header-mobile .search-wrap {
         width: 100%;
     }
 }

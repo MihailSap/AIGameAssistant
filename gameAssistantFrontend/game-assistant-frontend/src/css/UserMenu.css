@@ -136,6 +136,11 @@
     transition: background-color var(--transition), color var(--transition);
 }
 
+.user-popup-btn:active {
+    background-color: var(--yellow);
+    color: black;
+}
+
 @media (max-width: 549px) {
     .user-popup-btn {
         font-size: 18px;

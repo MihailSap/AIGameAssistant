@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { backendToLabel } from '../utils/categories.js';
 import "../css/AdminPage.css";
 import "../css/AdminTable.css";
 
@@ -34,6 +35,7 @@ export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFil
                         <tr>
                             <th>Id</th>
                             <th>Название</th>
+                            <th>Категория</th>
                             <th>Описание</th>
                             <th>Изображение</th>
                             <th>Правила</th>
@@ -45,6 +47,7 @@ export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFil
                             <tr key={g.id ?? idx}>
                                 <td>{g.id}</td>
                                 <td>{g.title.length > 20 ? g.title.slice(0, 20) + "…" : g.title}</td>
+                                <td>{backendToLabel(g.category)}</td>
                                 <td>{g.description ? (g.description.length > 30 ? g.description.slice(0, 30) + "…" : g.description) : "-"}</td>
                                 <td>
                                     {g.imageFileTitle ? (

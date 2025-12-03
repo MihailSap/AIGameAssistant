@@ -131,6 +131,16 @@
     color: var(--text);
 }
 
+.password-form .btn-green:active {
+    color: rgba(0, 153, 0, 1);
+    background: transparent;
+}
+
+.password-form .btn-green:disabled:active {
+    background: rgba(0, 153, 0, 0.5);
+    color: var(--text);
+}
+
 .profile-chats-list {
     list-style: none;
     margin: 0;
@@ -153,6 +163,10 @@
     white-space: nowrap;
     cursor: pointer;
     transition: background var(--transition);
+}
+
+.profile-chat-item:active {
+    background: rgb(255, 255, 255, 0.25);
 }
 
 .profile-chat-game {

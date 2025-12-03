@@ -6,10 +6,11 @@ import Hero from "../components/Hero";
 import GameGrid from "../components/GameGrid";
 import GameModal from "../components/GameModal";
 import ToggleSlider from "../components/ToggleSlider";
-import CategoryDropdown from "../components/CategoryDropdown";
+import SelectDropdown from "../components/SelectDropdown";
 import useDebounce from "../hooks/useDebounce";
 import { userApi } from "../api/users";
 import useAuth from "../hooks/useAuth";
+import { backendToLabel } from "../utils/categories";
 import "../css/MainPage.css";
 
 export default function MainPage() {
@@ -174,15 +175,14 @@ export default function MainPage() {
           <>
             <div className="hero-anchor">
               <Hero
-                topIds={["7", "8", "9", "11", "12", "13", "14", "15", "16", "17"]}
-                gamesMap={games.reduce((acc, g) => { acc[g.id] = g; return acc }, {})}
+                topGames={games.slice(0, 10)}
                 onOpenGame={(g) => setSelectedGame(g)}
               />
             </div>
 
             <div className="grid-container">
               <div className="grid-top-controls">
-                <CategoryDropdown value={selectedCategory} onChange={(v) => setSelectedCategory(v)} />
+                <SelectDropdown fetchItems={() => gameApi.getCategories()} cacheKey="categories" value={selectedCategory} onChange={(v) => setSelectedCategory(v)} allowNull={true} labelFunc={backendToLabel} placeholder="Категория игр" />
                 <div className="slider-container">
                   <ToggleSlider
                     leftLabel="Избранное"

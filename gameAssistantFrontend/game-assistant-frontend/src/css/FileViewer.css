@@ -3,7 +3,6 @@
     flex-direction: column;
     gap: 20px;
     overflow: hidden;
-    max-height: 85vh;
 }
 
 .rules-sidebar .file-viewer-root {
@@ -30,6 +29,10 @@
 .file-viewer-header .btn {
     padding: 5px;
     font-size: 16px;
+}
+
+.file-viewer-header .btn:active svg {
+    fill: var(--yellow);
 }
 
 .rules-sidebar .file-viewer-header .btn {
@@ -87,6 +90,7 @@
 
 .rules-sidebar .fv-pdf-wrap {
     padding-left: 0;
+    max-height: 74vh;
 }
 
 .fv-pdf-wrap::-webkit-scrollbar {
@@ -175,26 +179,18 @@
 
 @media (max-width: 900px) {
     .rules-sidebar .fv-pdf-wrap {
-        max-height: 77vh;
+        max-height: 80vh;
     }
 }
 
 @media (max-width: 600px) {
-    .file-viewer-root {
-        max-height: 75vh;
-    }
-
-    .rules-sidebar .file-viewer-root {
-        max-height: 85vh;
-    }
-
     .fv-pdf-wrap {
         max-height: 60vh;
         padding: 0 4px;
     }
 
     .rules-sidebar .fv-pdf-wrap {
-        max-height: 78vh;
+        max-height: 80vh;
     }
 
     .fv-center,
@@ -204,47 +200,67 @@
     }
 }
 
-@media (max-height: 800px) {
+@media (max-height: 850px) {
+    @media (min-width: 901px) {
+        .rules-sidebar .fv-pdf-wrap {
+            max-height: 72vh;
+        }
+    }
+
     @media (max-width: 900px) {
+        .rules-sidebar .fv-pdf-wrap {
+            max-height: 76vh;
+        }
+    }
+
+    @media (max-width: 599px) {
         .rules-sidebar .fv-pdf-wrap {
             max-height: 78vh;
         }
     }
+}
 
-    @media (min-width: 901px) {
+@media (max-height: 750px) {
+    @media (min-width: 600px) {
         .rules-sidebar .fv-pdf-wrap {
-            max-height: 68vh;
+            max-height: 74vh;
+        }
+    }
+
+    @media (max-width: 599px) {
+        .rules-sidebar .fv-pdf-wrap {
+            max-height: 76vh;
         }
     }
 }
 
-@media (max-height: 700px) {
+@media (max-height: 650px) {
     .rules-sidebar .fv-pdf-wrap {
         max-height: 72vh;
     }
 }
 
-@media (max-height: 600px) {
+@media (max-height: 570px) {
     .rules-sidebar .fv-pdf-wrap {
         max-height: 68vh;
     }
 }
 
-@media (max-height: 470px) {
+@media (max-height: 500px) {
     .rules-sidebar .fv-pdf-wrap {
-        max-height: 60vh;
+        max-height: 62vh;
     }
 }
 
-@media (max-height: 400px) {
+@media (max-height: 420px) {
     .rules-sidebar .fv-pdf-wrap {
-        max-height: 50vh;
+        max-height: 55vh;
     }
 }
 
-@media (max-height: 320px) {
+@media (max-height: 360px) {
     .rules-sidebar .fv-pdf-wrap {
-        max-height: 40vh;
+        max-height: 43vh;
     }
 }
 

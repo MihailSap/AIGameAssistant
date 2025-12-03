@@ -154,6 +154,12 @@
   filter: grayscale(0.15) brightness(0.95);
 }
 
+.auth-form-actions .btn[disabled]:hover,
+.auth-form-actions .btn[aria-disabled="true"]:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .auth-footer {
   font-size: 16px;
   font-weight: 500;
@@ -232,13 +238,5 @@
 
   .auth-form-error {
     width: calc(95% - 20px);
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .auth-form-actions .btn[disabled]:hover,
-  .auth-form-actions .btn[aria-disabled="true"]:hover {
-    transform: none;
-    box-shadow: none;
   }
 }

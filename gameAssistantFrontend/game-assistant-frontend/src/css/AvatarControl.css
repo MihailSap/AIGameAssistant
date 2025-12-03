@@ -57,12 +57,16 @@
     border-radius: var(--radius);
     cursor: pointer;
     pointer-events: auto;
-    transition: background var(--transition), opacity var(--transition);
+    transition: background var(--transition), opacity var(--transition), transform var(--transition);
 }
 
 .avatar-btn svg {
     width: 35px;
     height: 35px;
+}
+
+.avatar-btn:active {
+    transform: scale(0.9);
 }
 
 .avatar-btn-delete {

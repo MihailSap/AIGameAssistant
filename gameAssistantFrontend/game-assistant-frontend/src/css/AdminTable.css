@@ -124,7 +124,25 @@
   color: var(--danger);
 }
 
-@media (max-width: 740px) {
+  .icon-btn:active {
+    background: rgba(255, 255, 255, 0.02);
+    transform: translateY(-2px);
+  }
+
+  .link-btn:active {
+    text-decoration-color: var(--yellow);
+  }
+
+  .admin-root .pagination-btn:active {
+    color: var(--muted-text);
+  }
+
+  .admin-root .pagination-btn:disabled:active {
+    background: var(--muted-button-bg);
+    color: var(--muted-text);
+  }
+
+@media (max-width: 950px) {
   .admin-section {
     min-width: 0;
   }

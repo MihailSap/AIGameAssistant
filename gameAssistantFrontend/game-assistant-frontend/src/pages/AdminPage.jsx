@@ -10,6 +10,7 @@ import FileViewer from "../components/FileViewer";
 import Modal from "../components/Modal";
 import GameForm from "../components/GameForm";
 import PromptEditor from "../components/PromptEditor";
+import SelectDropdown from "../components/SelectDropdown";
 import "../css/AdminPage.css";
 import { downloadBlob } from "../utils/blobUtils";
 
@@ -26,6 +27,9 @@ export default function AdminPage() {
 
   const [usersSearch, setUsersSearch] = useState("");
   const [gamesSearch, setGamesSearch] = useState("");
+
+  const [models, setModels] = useState(['Yandex-GPT', 'Chat-GPT', 'Gemini']);
+  const [selectedModel, setSelectedModel] = useState('Yandex-GPT');
 
   const [viewerState, setViewerState] = useState({ open: false, fileType: null, fileTitle: null });
   const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null });
@@ -283,12 +287,27 @@ export default function AdminPage() {
 
       <main className="admin-main">
         {activeTab === "settings" && (
-          <section className="admin-section">
-            <div className="admin-table-header">
-              <h2 className="admin-table-title">Промпт</h2>
-            </div>
-            <PromptEditor />
-          </section>
+          <>
+            <section className="admin-section">
+              <div className="admin-table-header">
+                <h2 className="admin-table-title">Модель</h2>
+              </div>
+              <SelectDropdown
+                items={models}
+                value={selectedModel}
+                onChange={(m) => { setSelectedModel(m); }}
+                allowNull={false}
+                placeholder="Выберите модель"
+                ariaLabel="Модель нейросети"
+              />
+            </section>
+            <section className="admin-section">
+              <div className="admin-table-header">
+                <h2 className="admin-table-title">Промпт</h2>
+              </div>
+              <PromptEditor />
+            </section>
+          </>
         )}
 
         {activeTab === "users" && (

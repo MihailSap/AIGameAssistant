@@ -83,6 +83,14 @@
   transition: color var(--transition);
 }
 
+.gm-btn-row .gm-circle-btn:active svg {
+  color: var(--yellow);
+}
+
+.gm-btn-row .gm-circle-btn:disabled:active svg {
+  color: black;
+}
+
 .gm-tooltip {
   position: absolute;
   bottom: calc(100% + 8px);
