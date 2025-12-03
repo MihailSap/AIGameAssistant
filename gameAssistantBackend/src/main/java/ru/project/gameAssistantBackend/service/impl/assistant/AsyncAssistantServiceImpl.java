@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service.impl;
+package ru.project.gameAssistantBackend.service.impl.assistant;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

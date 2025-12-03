@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service.impl;
+package ru.project.gameAssistantBackend.service.impl.assistant;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +30,6 @@ public class OpenaiAssistantService implements AIServiceI {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
-
 
     public String getAssistantAnswer(List<Message> messages) {
         String jsonBody = buildRequestBody(messages);

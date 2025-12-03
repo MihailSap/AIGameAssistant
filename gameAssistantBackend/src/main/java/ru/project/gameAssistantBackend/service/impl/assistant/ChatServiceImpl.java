@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.service.impl;
+package ru.project.gameAssistantBackend.service.impl.assistant;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,10 @@ import ru.project.gameAssistantBackend.models.Message;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.ChatRepository;
 import ru.project.gameAssistantBackend.service.ChatServiceI;
+import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.FileServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.PromptServiceImpl;
 
 import java.io.IOException;
 import java.time.Instant;

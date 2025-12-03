@@ -1,6 +1,7 @@
 package ru.project.gameAssistantBackend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.category.CategoryRequestDTO;
 import ru.project.gameAssistantBackend.dto.category.CategoryResponseDTO;
@@ -36,6 +37,7 @@ public class CategoryController {
         return categoryMapper.mapToCategoryResponseDTO(category);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public CategoryResponseDTO create(@RequestBody CategoryRequestDTO categoryRequestDTO){
         if(categoryService.isExists(categoryRequestDTO.name())){
@@ -47,6 +49,7 @@ public class CategoryController {
         return categoryMapper.mapToCategoryResponseDTO(category);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{categoryId}")
     public String deleteCategoryById(@PathVariable("categoryId") Long categoryId){
         Category category = categoryService.getById(categoryId);

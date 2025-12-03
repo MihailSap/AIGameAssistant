@@ -33,3 +33,5 @@ databaseChangeLog:
       file: db/changelog/016-create-correct-game-category-table.yaml
   - include:
       file: db/changelog/017-drop-category-column.yaml
+  - include:
+      file: db/changelog/018-insert-default-categories.yaml

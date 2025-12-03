@@ -7,9 +7,9 @@ import reactor.core.publisher.Flux;
 import ru.project.gameAssistantBackend.dto.chat.*;
 import ru.project.gameAssistantBackend.mapper.ChatMapper;
 import ru.project.gameAssistantBackend.models.Chat;
-import ru.project.gameAssistantBackend.service.impl.AsyncAssistantServiceImpl;
-import ru.project.gameAssistantBackend.service.impl.ChatServiceImpl;
-import ru.project.gameAssistantBackend.service.impl.OpenaiAssistantService;
+import ru.project.gameAssistantBackend.service.impl.assistant.AsyncAssistantServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.assistant.ChatServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.assistant.OpenaiAssistantService;
 
 import java.io.IOException;
 import java.util.List;
