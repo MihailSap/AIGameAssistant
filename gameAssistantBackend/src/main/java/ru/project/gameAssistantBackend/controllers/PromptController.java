@@ -19,13 +19,6 @@ public class PromptController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping
-    public PromptDTO createPrompt(@RequestBody PromptDTO promptDTO) {
-        Prompt prompt = promptServiceImpl.create(promptDTO);
-        return promptServiceImpl.mapToDTO(prompt);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public PromptDTO getPrompt(){
         Prompt prompt = promptServiceImpl.get();
@@ -37,12 +30,5 @@ public class PromptController {
     public PromptDTO updatePrompt(@RequestBody PromptDTO promptDTO){
         Prompt prompt = promptServiceImpl.update(promptDTO);
         return promptServiceImpl.mapToDTO(prompt);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping
-    public String deletePrompt(){
-        promptServiceImpl.delete();
-        return "Промпт был успешно удален";
     }
 }

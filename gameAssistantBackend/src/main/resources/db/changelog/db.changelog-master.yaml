@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/011-update-chat.yaml
   - include:
       file: db/changelog/012-update-game-category.yaml
+  - include:
+      file: db/changelog/013-update-prompt.yaml

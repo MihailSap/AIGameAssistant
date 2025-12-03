@@ -18,18 +18,6 @@ public class PromptServiceImpl implements PromptServiceI {
         this.promptRepository = promptRepository;
     }
 
-    @Transactional
-    @Override
-    public Prompt create(PromptDTO promptDTO){
-        if(isPromptExists()){
-            throw new RuntimeException("Промпт уже создан");
-        }
-
-        Prompt prompt = new Prompt();
-        prompt.setText(promptDTO.text());
-        return promptRepository.save(prompt);
-    }
-
     @Override
     public Prompt get(){
         return promptRepository.findAll().stream().findFirst()
@@ -51,17 +39,6 @@ public class PromptServiceImpl implements PromptServiceI {
         Prompt prompt = get();
         prompt.setText(promptDTO.text());
         return promptRepository.save(prompt);
-    }
-
-    @Transactional
-    @Override
-    public void delete(){
-        if(!isPromptExists()){
-            throw new RuntimeException("Промпт ещё не создан");
-        }
-
-        Prompt prompt = get();
-        promptRepository.delete(prompt);
     }
 
     @Override
