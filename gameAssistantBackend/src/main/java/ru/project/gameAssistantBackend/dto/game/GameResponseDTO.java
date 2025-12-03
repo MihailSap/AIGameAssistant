@@ -1,12 +1,12 @@
 package ru.project.gameAssistantBackend.dto.game;
 
-import ru.project.gameAssistantBackend.enums.GameCategory;
+import java.util.List;
 
 public record GameResponseDTO(
         Long id,
         String title,
         String description,
-        GameCategory category,
+        List<String> categories,
         String imageFileTitle,
         String rulesFileTitle
 ) {

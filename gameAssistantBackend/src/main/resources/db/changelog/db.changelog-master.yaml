@@ -25,3 +25,11 @@ databaseChangeLog:
       file: db/changelog/012-update-game-category.yaml
   - include:
       file: db/changelog/013-update-prompt.yaml
+  - include:
+      file: db/changelog/014-create-category.yaml
+  - include:
+      file: db/changelog/015-create-game-category-table.yaml
+  - include:
+      file: db/changelog/016-create-correct-game-category-table.yaml
+  - include:
+      file: db/changelog/017-drop-category-column.yaml

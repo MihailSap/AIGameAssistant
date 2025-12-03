@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
 import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
-import ru.project.gameAssistantBackend.enums.GameCategory;
+import ru.project.gameAssistantBackend.mapper.GameMapper;
+import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
 
 import java.util.List;
@@ -18,42 +19,43 @@ public class GameController {
 
     private final GameServiceImpl gameServiceImpl;
 
+    private final GameMapper gameMapper;
+
     @Autowired
-    public GameController(GameServiceImpl gameServiceImpl) {
+    public GameController(GameServiceImpl gameServiceImpl, GameMapper gameMapper) {
         this.gameServiceImpl = gameServiceImpl;
+        this.gameMapper = gameMapper;
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create")
     public GameResponseDTO create(@ModelAttribute GameRequestDTO gameRequestDTO){
-        return gameServiceImpl.create(gameRequestDTO);
+        Game game = gameServiceImpl.create(gameRequestDTO);
+        return gameMapper.mapToGameResponseDTO(game);
     }
 
     @GetMapping("/{id}")
     public GameResponseDTO read(@PathVariable("id") Long id){
-        return gameServiceImpl.getGameDTOById(id);
+        Game game = gameServiceImpl.getById(id);
+        return gameMapper.mapToGameResponseDTO(game);
+    }
+
+    @GetMapping("/all")
+    public List<GamePreviewDTO> readAll(){
+        List<Game> games = gameServiceImpl.getAll();
+        return gameMapper.mapToGamePreviewDTOs(games);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping(value = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public GameResponseDTO update(@PathVariable("id") Long id, @ModelAttribute GameRequestDTO gameDTO){
-        return gameServiceImpl.update(id, gameDTO);
+        Game game = gameServiceImpl.update(id, gameDTO);
+        return gameMapper.mapToGameResponseDTO(game);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}/delete")
     public void delete(@PathVariable("id") Long id){
         gameServiceImpl.delete(id);
-    }
-
-    @GetMapping("/all")
-    public List<GamePreviewDTO> readAll(){
-        var games = gameServiceImpl.getAll();
-        return gameServiceImpl.mapToPreviews(games);
-    }
-
-    @GetMapping("/categories")
-    public List<GameCategory> getCategories(){
-        return gameServiceImpl.getCategories();
     }
 }

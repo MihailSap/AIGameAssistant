@@ -8,7 +8,7 @@ import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.FavouritesServiceImpl;
-import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
+import ru.project.gameAssistantBackend.mapper.GameMapper;
 import ru.project.gameAssistantBackend.service.impl.UserServiceImpl;
 
 import java.util.List;
@@ -21,14 +21,14 @@ public class FavouritesController {
     private final FavouritesServiceImpl favouritesServiceImpl;
     private final AuthServiceImpl authServiceImpl;
     private final UserServiceImpl userServiceImpl;
-    private final GameServiceImpl gameServiceImpl;
+    private final GameMapper gameMapper;
 
     @Autowired
-    public FavouritesController(FavouritesServiceImpl favouritesServiceImpl, AuthServiceImpl authServiceImpl, UserServiceImpl userServiceImpl, GameServiceImpl gameServiceImpl) {
+    public FavouritesController(FavouritesServiceImpl favouritesServiceImpl, AuthServiceImpl authServiceImpl, UserServiceImpl userServiceImpl, GameMapper gameMapper) {
         this.favouritesServiceImpl = favouritesServiceImpl;
         this.authServiceImpl = authServiceImpl;
         this.userServiceImpl = userServiceImpl;
-        this.gameServiceImpl = gameServiceImpl;
+        this.gameMapper = gameMapper;
     }
 
     @PostMapping("/{gameId}/add")
@@ -54,6 +54,6 @@ public class FavouritesController {
         String userEmail = authServiceImpl.getAuthenticatedUserEmail();
         User user = userServiceImpl.getByEmail(userEmail).get();
         Set<Game> games = user.getGames();
-        return gameServiceImpl.mapToPreviews(games);
+        return gameMapper.mapToGamePreviewDTOs(games);
     }
 }
