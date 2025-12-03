@@ -29,7 +29,7 @@ public class Game {
     @ManyToMany(mappedBy = "games")
     private Set<User> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Chat> chats;
 
     public Game(Long id, String title, String description, GameCategory category, String imageFileTitle, String rulesFileTitle) {
