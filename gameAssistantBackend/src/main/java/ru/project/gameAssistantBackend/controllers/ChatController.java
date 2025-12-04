@@ -7,9 +7,9 @@ import reactor.core.publisher.Flux;
 import ru.project.gameAssistantBackend.dto.chat.*;
 import ru.project.gameAssistantBackend.mapper.ChatMapper;
 import ru.project.gameAssistantBackend.models.Chat;
-import ru.project.gameAssistantBackend.service.impl.assistant.AsyncAssistantServiceImpl;
+import ru.project.gameAssistantBackend.service.AssistantService;
+import ru.project.gameAssistantBackend.service.impl.assistant.ChatModelFactory;
 import ru.project.gameAssistantBackend.service.impl.assistant.ChatServiceImpl;
-import ru.project.gameAssistantBackend.service.impl.assistant.OpenaiAssistantService;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,20 +22,16 @@ public class ChatController {
 
     private final ChatMapper chatMapper;
 
-    private final AsyncAssistantServiceImpl asyncAssistantServiceImpl;
-
-    private final OpenaiAssistantService openaiAssistantService;
+    private final ChatModelFactory chatModelFactory;
 
     @Autowired
     public ChatController(
             ChatServiceImpl chatServiceImpl,
             ChatMapper chatMapper,
-            AsyncAssistantServiceImpl asyncAssistantServiceImpl,
-            OpenaiAssistantService openaiAssistantService) {
+            ChatModelFactory chatModelFactory) {
         this.chatServiceImpl = chatServiceImpl;
         this.chatMapper = chatMapper;
-        this.asyncAssistantServiceImpl = asyncAssistantServiceImpl;
-        this.openaiAssistantService = openaiAssistantService;
+        this.chatModelFactory = chatModelFactory;
     }
 
     @GetMapping("/{id}")
@@ -56,19 +52,15 @@ public class ChatController {
         return chatMapper.mapToChatDTO(chat);
     }
 
-    @GetMapping(value = "/{chatId}/answer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> stream(@PathVariable Long chatId) {
+    @PostMapping(value = "/{chatId}/answer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> getStreamedAnswer(
+            @PathVariable Long chatId, @RequestParam(defaultValue = "yandex") String model) {
         Chat chat = chatServiceImpl.getChatById(chatId);
-        return asyncAssistantServiceImpl.getStreamedAnswer(
+        AssistantService service = chatModelFactory.getModel(model);
+        return service.getStreamedAnswer(
                 chat.getMessages(),
                 answer -> chatServiceImpl.saveAssistantStreamingAnswer(chatId, answer)
         );
-    }
-
-    @GetMapping("/{chatId}/openai")
-    public String getOpenAIAnswer(@PathVariable("chatId") Long chatId){
-        Chat chat = chatServiceImpl.getChatById(chatId);
-        return openaiAssistantService.getAssistantAnswer(chat.getMessages());
     }
 
     @DeleteMapping("/{id}")

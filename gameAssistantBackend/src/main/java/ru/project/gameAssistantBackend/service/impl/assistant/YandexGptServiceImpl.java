@@ -9,16 +9,16 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import ru.project.gameAssistantBackend.enums.ChatRole;
 import ru.project.gameAssistantBackend.models.Message;
+import ru.project.gameAssistantBackend.service.AssistantService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@Service
-public class AsyncAssistantServiceImpl {
+@Service("yandex")
+public class YandexGptServiceImpl implements AssistantService {
 
     @Value("${yandex-cloud.gpt.api-key}")
     private String apiKey;
@@ -34,32 +34,66 @@ public class AsyncAssistantServiceImpl {
     private final WebClient webClient;
 
     @Autowired
-    public AsyncAssistantServiceImpl(
+    public YandexGptServiceImpl(
             ObjectMapper objectMapper,
             WebClient webClient) {
         this.objectMapper = objectMapper;
         this.webClient = webClient;
     }
 
+//    @Override
+//    public Flux<String> getStreamedAnswer(
+//            List<Message> messages,
+//            Consumer<String> onComplete) {
+//        StringBuilder fullAnswer = new StringBuilder();
+//        return webClient.post()
+//                .uri(apiUrl)
+//                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + (apiKey.startsWith("Api-Key ")
+//                        ? apiKey.substring(8)
+//                        : apiKey))
+//                .bodyValue(buildRequestBody(messages))
+//                .retrieve()
+//                .bodyToFlux(String.class)
+//                .map(this::extractStreamPart)
+//                .doOnNext(chunk -> {
+//                    fullAnswer.setLength(0);
+//                    fullAnswer.append(chunk);
+//                })
+//                .doOnComplete(() -> onComplete.accept(fullAnswer.toString()));
+//    }
+
+    @Override
     public Flux<String> getStreamedAnswer(
             List<Message> messages,
-            Consumer<String> onComplete) {
-        StringBuilder fullAnswer = new StringBuilder();
+            Consumer<String> onComplete
+    ) {
+        StringBuilder finalText = new StringBuilder();
+        StringBuilder lastChunk = new StringBuilder();
         return webClient.post()
                 .uri(apiUrl)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + (apiKey.startsWith("Api-Key ")
-                        ? apiKey.substring(8)
-                        : apiKey))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + normalizeApiKey(apiKey))
                 .bodyValue(buildRequestBody(messages))
                 .retrieve()
                 .bodyToFlux(String.class)
                 .map(this::extractStreamPart)
-                .doOnNext(chunk -> {
-                    fullAnswer.setLength(0);
-                    fullAnswer.append(chunk);
+                .map(fullChunk -> {
+                    String prev = lastChunk.toString();
+                    lastChunk.setLength(0);
+                    lastChunk.append(fullChunk);
+                    if (fullChunk.startsWith(prev)) {
+                        return fullChunk.substring(prev.length());
+                    } else {
+                        return fullChunk;
+                    }
                 })
-                .doOnComplete(() -> onComplete.accept(fullAnswer.toString()));
+                .doOnNext(finalText::append)
+                .doOnComplete(() -> onComplete.accept(finalText.toString()));
+    }
+
+    private String normalizeApiKey(String key) {
+        return key.startsWith("Api-Key ") ? key.substring(8) : key;
     }
 
     private String extractStreamPart(String jsonChunk) {
@@ -78,7 +112,7 @@ public class AsyncAssistantServiceImpl {
         return "";
     }
 
-    public String buildRequestBody(List<Message> messages) {
+    private String buildRequestBody(List<Message> messages) {
         try {
             Map<String, Object> body = new HashMap<>();
             body.put("modelUri", String.format("gpt://%s/yandexgpt-lite", catalogId));
@@ -92,20 +126,5 @@ public class AsyncAssistantServiceImpl {
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при формировании JSON-запроса", e);
         }
-    }
-
-    public Flux<String> getStreamedAnswer(String prompt) {
-        Message userMessage = new Message();
-        userMessage.setRole(ChatRole.user);
-        userMessage.setText(prompt);
-        return webClient.post()
-                .uri(apiUrl)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION,
-                        "Bearer " + (apiKey.startsWith("Api-Key ") ? apiKey.substring(8) : apiKey))
-                .bodyValue(buildRequestBody(List.of(userMessage)))
-                .retrieve()
-                .bodyToFlux(String.class)
-                .map(this::extractStreamPart);
     }
 }
