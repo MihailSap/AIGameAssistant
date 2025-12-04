@@ -39,6 +39,3 @@ yandex-cloud:
 
 openai:
   key: ${OPENAI_KEY}
-
-gemini:
-  key: ${GEMINI_KEY}
