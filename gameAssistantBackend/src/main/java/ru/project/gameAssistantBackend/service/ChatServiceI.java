@@ -1,8 +1,6 @@
 package ru.project.gameAssistantBackend.service;
 
-import ru.project.gameAssistantBackend.dto.chat.ChatDTO;
-import ru.project.gameAssistantBackend.dto.chat.ChatPreviewDTO;
-import ru.project.gameAssistantBackend.dto.chat.PromptDTO;
+import ru.project.gameAssistantBackend.dto.chat.SystemPropertiesDTO;
 import ru.project.gameAssistantBackend.dto.chat.StartChatDTO;
 import ru.project.gameAssistantBackend.models.Chat;
 import ru.project.gameAssistantBackend.models.Message;
@@ -14,7 +12,7 @@ public interface ChatServiceI {
 
     Chat startChat(StartChatDTO startChatDTO) throws IOException;
 
-    Chat continueChat(Long id, PromptDTO promptDTO);
+    Chat continueChat(Long id, SystemPropertiesDTO systemPropertiesDTO);
 
     Chat create(Long gameId);
 

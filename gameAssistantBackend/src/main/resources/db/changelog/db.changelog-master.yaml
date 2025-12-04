@@ -35,3 +35,9 @@ databaseChangeLog:
       file: db/changelog/017-drop-category-column.yaml
   - include:
       file: db/changelog/018-insert-default-categories.yaml
+  - include:
+      file: db/changelog/019-update-prompt-to-system-properties.yaml
+  - include:
+      file: db/changelog/020-add-model-to-user.yaml
+  - include:
+      file: db/changelog/021-add-default-model.yaml

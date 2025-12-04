@@ -7,6 +7,7 @@ import ru.project.gameAssistantBackend.dto.ResponseDTO;
 import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
+import ru.project.gameAssistantBackend.enums.Model;
 import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
@@ -36,6 +37,11 @@ public class UserController {
     @PatchMapping("/{id}/update/password")
     public void updatePassword(@PathVariable("id") Long id, @RequestBody UpdatePasswordDTO updatePasswordDTO){
         userServiceImpl.updatePassword(id, updatePasswordDTO);
+    }
+
+    @PatchMapping("/{userId}/model")
+    public void updateModel(@PathVariable("userId") Long userId, @RequestParam Model model){
+        userServiceImpl.updateModel(userId, model);
     }
 
     @PatchMapping("/{id}/update/image")

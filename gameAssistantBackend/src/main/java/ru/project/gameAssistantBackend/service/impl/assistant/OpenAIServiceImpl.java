@@ -11,12 +11,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import ru.project.gameAssistantBackend.models.Message;
 import ru.project.gameAssistantBackend.service.AssistantService;
-import ru.project.gameAssistantBackend.service.AssistantServiceI;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-@Service("openai")
+@Service("OPENAI")
 public class OpenAIServiceImpl implements AssistantService {
 
     @Value("${openai.key}")

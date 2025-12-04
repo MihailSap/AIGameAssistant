@@ -14,7 +14,7 @@ import ru.project.gameAssistantBackend.service.ChatServiceI;
 import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.FileServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
-import ru.project.gameAssistantBackend.service.impl.PromptServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -24,7 +24,7 @@ import java.util.List;
 public class ChatServiceImpl implements ChatServiceI {
 
     private final GameServiceImpl gameServiceImpl;
-    private final PromptServiceImpl promptServiceImpl;
+    private final SystemPropertiesServiceImpl systemPropertiesServiceImpl;
     private final AuthServiceImpl authServiceImpl;
     private final ChatRepository chatRepository;
     private final FileServiceImpl fileServiceImpl;
@@ -32,12 +32,12 @@ public class ChatServiceImpl implements ChatServiceI {
 
     @Autowired
     public ChatServiceImpl(GameServiceImpl gameServiceImpl,
-                           PromptServiceImpl promptServiceImpl,
+                           SystemPropertiesServiceImpl systemPropertiesServiceImpl,
                            ChatRepository chatRepository,
                            AuthServiceImpl authServiceImpl,
                            FileServiceImpl fileServiceImpl, AssistantServiceImpl assistantServiceImpl) {
         this.gameServiceImpl = gameServiceImpl;
-        this.promptServiceImpl = promptServiceImpl;
+        this.systemPropertiesServiceImpl = systemPropertiesServiceImpl;
         this.chatRepository = chatRepository;
         this.authServiceImpl = authServiceImpl;
         this.fileServiceImpl = fileServiceImpl;
@@ -60,9 +60,9 @@ public class ChatServiceImpl implements ChatServiceI {
 
     @Transactional
     @Override
-    public Chat continueChat(Long id, PromptDTO promptDTO){
+    public Chat continueChat(Long id, SystemPropertiesDTO systemPropertiesDTO){
         Chat chat = getChatById(id);
-        chat.addMessage(promptDTO.text(), ChatRole.user);
+        chat.addMessage(systemPropertiesDTO.prompt(), ChatRole.user);
         return chatRepository.save(chat);
     }
 
@@ -93,7 +93,7 @@ public class ChatServiceImpl implements ChatServiceI {
 
     @Override
     public String getSystemMessageTextMd(Long gameId) {
-        String promptText = promptServiceImpl.getPromptText();
+        String promptText = systemPropertiesServiceImpl.getPromptText();
         String rulesFileTitle = gameServiceImpl.getById(gameId).getRulesFileTitle();
         String rulesMdText = fileServiceImpl.extractTextFromMarkdown(rulesFileTitle);
         return String.format("%s %s", promptText, rulesMdText);

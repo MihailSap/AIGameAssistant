@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@Service("yandex")
+@Service("YANDEX_GPT")
 public class YandexGptServiceImpl implements AssistantService {
 
     @Value("${yandex-cloud.gpt.api-key}")
@@ -40,28 +40,6 @@ public class YandexGptServiceImpl implements AssistantService {
         this.objectMapper = objectMapper;
         this.webClient = webClient;
     }
-
-//    @Override
-//    public Flux<String> getStreamedAnswer(
-//            List<Message> messages,
-//            Consumer<String> onComplete) {
-//        StringBuilder fullAnswer = new StringBuilder();
-//        return webClient.post()
-//                .uri(apiUrl)
-//                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + (apiKey.startsWith("Api-Key ")
-//                        ? apiKey.substring(8)
-//                        : apiKey))
-//                .bodyValue(buildRequestBody(messages))
-//                .retrieve()
-//                .bodyToFlux(String.class)
-//                .map(this::extractStreamPart)
-//                .doOnNext(chunk -> {
-//                    fullAnswer.setLength(0);
-//                    fullAnswer.append(chunk);
-//                })
-//                .doOnComplete(() -> onComplete.accept(fullAnswer.toString()));
-//    }
 
     @Override
     public Flux<String> getStreamedAnswer(

@@ -1,10 +1,10 @@
 package ru.project.gameAssistantBackend.models;
 
 import jakarta.persistence.*;
+import ru.project.gameAssistantBackend.enums.Model;
 import ru.project.gameAssistantBackend.enums.Role;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -27,6 +27,9 @@ public class User {
     private Token refreshToken;
 
     private String imageFileTitle;
+
+    @Enumerated(EnumType.STRING)
+    private Model model;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -103,6 +106,14 @@ public class User {
 
     public void setGames(Set<Game> games) {
         this.games = games;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
     }
 
     public void addGame(Game game) {

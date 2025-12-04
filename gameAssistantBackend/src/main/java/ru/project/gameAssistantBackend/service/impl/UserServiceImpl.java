@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
 import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
+import ru.project.gameAssistantBackend.enums.Model;
 import ru.project.gameAssistantBackend.enums.Role;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.UserRepository;
@@ -56,7 +57,8 @@ public class UserServiceImpl implements UserServiceI {
                 user.getEmail(),
                 user.getLogin(),
                 user.getRole().equals(Role.ADMIN),
-                user.getImageFileTitle()
+                user.getImageFileTitle(),
+                user.getModel()
         );
     }
 
@@ -68,6 +70,13 @@ public class UserServiceImpl implements UserServiceI {
         user.setPassword(newEncodedPassword);
         userRepository.save(user);
         log.info("Пароль успешно обновлен");
+    }
+
+    @Transactional
+    public void updateModel(Long userId, Model model){
+        User user = getById(userId);
+        user.setModel(model);
+        userRepository.save(user);
     }
 
     @Transactional

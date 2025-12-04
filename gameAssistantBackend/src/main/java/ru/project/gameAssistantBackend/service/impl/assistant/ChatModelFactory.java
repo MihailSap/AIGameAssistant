@@ -15,7 +15,7 @@ public class ChatModelFactory {
     }
 
     public AssistantService getModel(String name) {
-        AssistantService model = models.get(name.toLowerCase());
+        AssistantService model = models.get(name);
         if (model == null) {
             throw new IllegalArgumentException("Unknown model: " + name);
         }

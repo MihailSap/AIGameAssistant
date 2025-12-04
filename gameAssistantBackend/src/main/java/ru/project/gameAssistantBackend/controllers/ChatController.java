@@ -5,9 +5,14 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import ru.project.gameAssistantBackend.dto.chat.*;
+import ru.project.gameAssistantBackend.enums.Model;
 import ru.project.gameAssistantBackend.mapper.ChatMapper;
 import ru.project.gameAssistantBackend.models.Chat;
+import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.AssistantService;
+import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
+import ru.project.gameAssistantBackend.service.impl.assistant.AssistantServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.assistant.ChatModelFactory;
 import ru.project.gameAssistantBackend.service.impl.assistant.ChatServiceImpl;
 
@@ -24,14 +29,19 @@ public class ChatController {
 
     private final ChatModelFactory chatModelFactory;
 
+    private final AuthServiceImpl authServiceImpl;
+    private final SystemPropertiesServiceImpl systemPropertiesServiceImpl;
+
     @Autowired
     public ChatController(
             ChatServiceImpl chatServiceImpl,
             ChatMapper chatMapper,
-            ChatModelFactory chatModelFactory) {
+            ChatModelFactory chatModelFactory, AuthServiceImpl authServiceImpl, SystemPropertiesServiceImpl systemPropertiesServiceImpl) {
         this.chatServiceImpl = chatServiceImpl;
         this.chatMapper = chatMapper;
         this.chatModelFactory = chatModelFactory;
+        this.authServiceImpl = authServiceImpl;
+        this.systemPropertiesServiceImpl = systemPropertiesServiceImpl;
     }
 
     @GetMapping("/{id}")
@@ -47,16 +57,24 @@ public class ChatController {
     }
 
     @PutMapping("/{id}")
-    public ChatDTO continueChat(@PathVariable("id") Long id, @RequestBody PromptDTO promptDTO) {
-        Chat chat = chatServiceImpl.continueChat(id, promptDTO);
+    public ChatDTO continueChat(@PathVariable("id") Long id, @RequestBody SystemPropertiesDTO systemPropertiesDTO) {
+        Chat chat = chatServiceImpl.continueChat(id, systemPropertiesDTO);
         return chatMapper.mapToChatDTO(chat);
     }
 
     @PostMapping(value = "/{chatId}/answer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> getStreamedAnswer(
-            @PathVariable Long chatId, @RequestParam(defaultValue = "yandex") String model) {
+    public Flux<String> getStreamedAnswer(@PathVariable Long chatId) {
+        Model userModel = authServiceImpl.getAuthenticatedUser().getModel();
+        Model model = systemPropertiesServiceImpl.get().getModel();
+
+        AssistantService service = null;
+        if(userModel != null){
+            service = chatModelFactory.getModel(String.valueOf(userModel));
+        } else {
+            service = chatModelFactory.getModel(String.valueOf(model));
+        }
+
         Chat chat = chatServiceImpl.getChatById(chatId);
-        AssistantService service = chatModelFactory.getModel(model);
         return service.getStreamedAnswer(
                 chat.getMessages(),
                 answer -> chatServiceImpl.saveAssistantStreamingAnswer(chatId, answer)
@@ -83,5 +101,10 @@ public class ChatController {
     public List<ChatPreviewDTO> getChatPreviews() {
         List<Chat> chats = chatServiceImpl.getChatsByAuthUser();
         return chatMapper.mapToPreviewDTOs(chats);
+    }
+
+    @GetMapping("/models")
+    public List<Model> getModels(){
+        return List.of(Model.values());
     }
 }
