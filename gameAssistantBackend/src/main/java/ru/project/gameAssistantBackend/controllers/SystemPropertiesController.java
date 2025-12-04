@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.chat.SystemPropertiesDTO;
+import ru.project.gameAssistantBackend.enums.Model;
 import ru.project.gameAssistantBackend.models.SystemProperties;
 import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
 
@@ -20,9 +21,21 @@ public class SystemPropertiesController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
-    public SystemPropertiesDTO getPrompt(){
+    public SystemPropertiesDTO getSystemProperties(){
         SystemProperties systemProperties = systemPropertiesServiceImpl.get();
         return systemPropertiesServiceImpl.mapToDTO(systemProperties);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/prompt")
+    public String getPrompt(){
+        return systemPropertiesServiceImpl.get().getPrompt();
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/model")
+    public Model getModel(){
+        return systemPropertiesServiceImpl.get().getModel();
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
