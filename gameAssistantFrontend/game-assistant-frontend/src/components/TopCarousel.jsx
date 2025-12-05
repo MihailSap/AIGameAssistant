@@ -308,7 +308,7 @@ function useResponsiveCount() {
     function calc() {
         const w = window.innerWidth;
         if (w < 550) return 1;
-        if ((w < 1200 && w > 899) || w < 700) return 2;
+        if ((w < 1200 && w > 899) || w < 750) return 2;
         return 3;
     }
 }

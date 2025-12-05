@@ -69,30 +69,41 @@
         grid-template-columns: repeat(1, 1fr);
         width: 80%;
         margin: 0 auto;
-    }
-
-    .grid-wrap,
-    .catalog-info {
-        margin: 0 40px;
+        gap: 25px;
     }
 
     .catalog-info {
         font-size: 28px;
     }
-}
 
-@media(max-width:449px) {
-    .games-grid {
-        grid-template-columns: repeat(1, 1fr);
-        width: 90%;
+    .grid-surface,
+    .catalog-info {
+        padding: 25px;
     }
 
     .grid-wrap,
     .catalog-info {
-        margin: 0 10px;
+        margin: 0 80px;
+    }
+}
+
+@media(max-width:499px) {
+    .grid-wrap,
+    .catalog-info {
+        margin: 0 30px;
     }
 
     .catalog-info {
         font-size: 24px;
+    }
+}
+
+@media(max-width:399px) {
+    .games-grid {
+        width: 90%;
+    }
+
+    .catalog-info {
+        font-size: 20px;
     }
 }

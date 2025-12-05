@@ -7,9 +7,11 @@ import { fileApi } from "../api/file";
 import { chatApi } from "../api/chat";
 import { gameApi } from "../api/game";
 import AvatarControl from "../components/AvatarControl";
+import SelectDropdown from "../components/SelectDropdown";
 import { formatDate } from "../utils/utils";
 import useBlobUrl from "../hooks/useBlobUrl";
 import { createObjectUrl, revokeObjectUrl } from "../utils/blobUtils";
+import { motion, AnimatePresence } from "framer-motion";
 import "../css/ProfilePage.css";
 
 export default function ProfilePage() {
@@ -30,8 +32,12 @@ export default function ProfilePage() {
   const [pwErrors, setPwErrors] = useState({ short: "", diff: "", general: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [visibleCount, setVisibleCount] = useState(8);
+
   const [chats, setChats] = useState([]);
   const [chatsLoading, setChatsLoading] = useState(true);
+  const [chatsGames, setChatsGames] = useState([]);
+  const [selectedGame, setSelectedGame] = useState(null);
 
   const mountedRef = useRef(true);
 
@@ -74,6 +80,33 @@ export default function ProfilePage() {
   }, [newPassword, repeatPassword]);
 
   useEffect(() => {
+    const calc = () => {
+      const w = window.innerWidth;
+      let increment = 8;
+      if (w < 950) increment = 5;
+      else increment = 8;
+      setVisibleCount(increment);
+    };
+
+    calc();
+
+    let raf = 0;
+    const onResize = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(calc);
+    };
+
+    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("orientationchange", onResize);
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
     (async () => {
       setChatsLoading(true);
@@ -82,7 +115,7 @@ export default function ProfilePage() {
         if (!mounted) return;
         const arr = Array.isArray(resp) ? resp : [];
         arr.sort((a, b) => (b.lastUseTime ? new Date(b.lastUseTime) : new Date()) - (a.lastUseTime ? new Date(a.lastUseTime) : new Date()));
-        const chats = await Promise.all(arr.slice(0, 5).map(async chat => {
+        const chats = await Promise.all(arr.map(async chat => {
           if (chat.gameId) {
             const game = await gameApi.read(chat.gameId);
             return { ...chat, gameTitle: game.title };
@@ -90,6 +123,8 @@ export default function ProfilePage() {
           return chat;
         }));
         setChats(chats);
+        const chatsGames = [...(new Set(chats.map(c => c.gameTitle)))]
+        setChatsGames(chatsGames);
       } catch (err) {
         setChats([]);
       } finally {
@@ -182,7 +217,6 @@ export default function ProfilePage() {
     }
   };
 
-
   const canSubmitPassword = newPassword.length >= 4 && newPassword.length <= 30 && newPassword === repeatPassword && !isSubmitting;
 
   const handlePasswordSubmit = async (e) => {
@@ -210,6 +244,8 @@ export default function ProfilePage() {
     if (!chat?.gameId || !chat?.id) return;
     navigate(`/games/ai/${chat.gameId}/${chat.id}`);
   };
+
+  const visibleChats = chats.filter(c => !selectedGame || c.gameTitle === selectedGame).slice(0, visibleCount);
 
   const avatarUrl = avatarPreviewUrl || avatarBlobUrl;
   const avatarLoading = avatarLoadingFetch || avatarUploading;
@@ -297,7 +333,10 @@ export default function ProfilePage() {
           <aside className="profile-right-column">
             <section className="profile-panel chats-panel">
               <div className="profile-panel-inner">
-                <h3 className="profile-panel-title">Последние чаты</h3>
+                <div className="profile-chats-header">
+                  <SelectDropdown fetchItems={() => chatsGames} value={selectedGame} onChange={(v) => setSelectedGame(v)} allowNull={true} placeholder="Все игры" />
+                  <h3 className="profile-panel-title">Последние чаты</h3>
+                </div>
                 {chatsLoading ? (
                   <div className="profile-message">Загрузка...</div>
                 ) : (
@@ -306,13 +345,33 @@ export default function ProfilePage() {
                       <div className="profile-empty-note">У вас ещё нет чатов</div>
                     ) : (
                       <ul className="profile-chats-list">
-                        {chats.map((c) => (
-                          <li key={c.id} className="profile-chat-item" onClick={() => handleChatClick(c)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && handleChatClick(c)}>
-                            <div className="profile-chat-game">{c.gameTitle || "—"}</div>
-                            <div className="profile-chat-title">{c.title || "—"}</div>
-                            <div className="profile-chat-time">{formatDate(c.lastUseTime)}</div>
-                          </li>
-                        ))}
+                        <AnimatePresence mode="popLayout" initial={false}>
+                          {visibleChats.map((c) => (
+                            <motion.li
+                              key={c.id}
+                              layout
+                              layoutId={`chat-${c.id}`}
+                              className="profile-chat-item"
+                              initial={{ opacity: 0, y: 8, scale: 0.995 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: -8, scale: 0.995 }}
+                              transition={{
+                                opacity: { duration: 0.22 },
+                                y: { duration: 0.32, ease: [0.2, 0.8, 0.2, 1] },
+                                scale: { duration: 0.32, ease: [0.2, 0.8, 0.2, 1] },
+                                layout: { duration: 0.36, ease: [0.2, 0.8, 0.2, 1] }
+                              }}
+                              onClick={() => handleChatClick(c)}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => e.key === "Enter" && handleChatClick(c)}
+                            >
+                              <div className="profile-chat-game">{c.gameTitle || "—"}</div>
+                              <div className="profile-chat-title">{c.title || "—"}</div>
+                              <div className="profile-chat-time">{formatDate(c.lastUseTime)}</div>
+                            </motion.li>
+                          ))}
+                        </AnimatePresence>
                       </ul>
                     )}
                   </>

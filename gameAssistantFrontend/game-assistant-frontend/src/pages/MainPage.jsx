@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, /*useRef*/ } from "react";
 import { gameApi } from "../api/game";
+import { categoryApi } from "../api/category";
 import { favouriteApi } from "../api/favourite";
 import Header from "../components/Header";
 import Hero from "../components/Hero";
@@ -10,7 +11,6 @@ import SelectDropdown from "../components/SelectDropdown";
 import useDebounce from "../hooks/useDebounce";
 import { userApi } from "../api/users";
 import useAuth from "../hooks/useAuth";
-import { backendToLabel } from "../utils/categories";
 import "../css/MainPage.css";
 
 export default function MainPage() {
@@ -123,7 +123,7 @@ export default function MainPage() {
       out = out.filter(g => (g.title || "").toLowerCase().includes(qq) || (g.description || "").toLowerCase().includes(qq));
     }
     if (selectedCategory) {
-      out = out.filter(g => g.category === selectedCategory);
+      out = out.filter(g => g.categories.includes(selectedCategory));
     }
     return out;
   };
@@ -182,7 +182,14 @@ export default function MainPage() {
 
             <div className="grid-container">
               <div className="grid-top-controls">
-                <SelectDropdown fetchItems={() => gameApi.getCategories()} cacheKey="categories" value={selectedCategory} onChange={(v) => setSelectedCategory(v)} allowNull={true} labelFunc={backendToLabel} placeholder="Категория игр" />
+                <SelectDropdown
+                  fetchItems={() => categoryApi.getAll().then(list => Array.isArray(list) ? list.map(c => c.name) : [])}
+                  cacheKey="categories"
+                  value={selectedCategory}
+                  onChange={(v) => setSelectedCategory(v)}
+                  allowNull={true}
+                  placeholder="Категория игр"
+                />
                 <div className="slider-container">
                   <ToggleSlider
                     leftLabel="Избранное"

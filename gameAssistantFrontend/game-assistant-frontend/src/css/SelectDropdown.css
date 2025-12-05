@@ -14,6 +14,10 @@
     max-width: 20vw;
 }
 
+.profile-root .seldd-root {
+    max-width: 250px;
+}
+
 .seldd-button {
     width: 100%;
     display: flex;
@@ -30,7 +34,8 @@
     transition: background-color var(--transition), border-color var(--transition), color var(--transition);
 }
 
-.chat-root .seldd-button, .admin-root .seldd-button {
+.chat-root .seldd-button,
+.admin-root .seldd-button {
     padding: 5px 10px;
 }
 
@@ -67,9 +72,6 @@
     width: calc(100% - 30px);
     font-weight: 600;
     font-size: 18px;
-}
-
-.chat-root .seldd-label {
     margin-left: 30px;
 }
 
@@ -146,7 +148,8 @@
     transition: background-color var(--transition), color var(--transition);
 }
 
-.chat-root .seldd-item, .admin-root .seldd-item {
+.chat-root .seldd-item,
+.admin-root .seldd-item {
     font-size: 16px;
     padding: 5px 10px;
 }
@@ -164,6 +167,20 @@
 .seldd-item.selected:active {
     background-color: var(--yellow);
     color: var(--bg);
+}
+
+.seldd-item input[type="checkbox"] {
+    display: none;
+}
+
+.seldd-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.seldd-item:focus {
+    outline: 2px solid var(--muted-yellow);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -190,6 +207,12 @@
     }
 }
 
+@media (max-width: 950px) {
+    .profile-root .seldd-list {
+        max-height: 240px;
+    }
+}
+
 @media (max-width: 699px) {
     .grid-top-controls .seldd-root {
         max-width: 60vw;
@@ -197,6 +220,17 @@
 
     .admin-root .seldd-root {
         max-width: 100%;
+    }
+}
+
+@media (max-width: 620px) {
+    .profile-root .seldd-button {
+        padding: 5px 10px;
+    }
+
+    .profile-root .seldd-item {
+        padding: 5px 10px;
+        font-size: 16px;
     }
 }
 
@@ -209,7 +243,7 @@
         padding: 11.25px 15px;
     }
 
-    .seldd-label {
+    .grid-top-controls .seldd-label {
         font-size: 18px;
     }
 
@@ -221,5 +255,9 @@
 @media (max-width: 420px) {
     .chat-root .seldd-root {
         max-width: 70%;
+    }
+
+    .profile-root .seldd-label {
+        font-size: 16px;
     }
 }

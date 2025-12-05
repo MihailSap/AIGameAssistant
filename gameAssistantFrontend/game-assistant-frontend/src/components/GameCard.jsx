@@ -20,7 +20,7 @@ export default function GameCard({ game, onOpen = () => { }, imageBlobUrl = null
   }, [url, blobLoading, imageBlobUrl]);
 
   return (
-    <div className={'tile-card'} role="button" tabIndex={0} onClick={onOpen} onKeyDown={(e) => e.key === "Enter" && onOpen()}>
+    <div className="tile-card" role="button" tabIndex={0} onClick={onOpen} onKeyDown={(e) => e.key === "Enter" && onOpen()}>
       <div className="tile-media">
         {loading && <div className="tile-empty">Загрузка...</div>}
         {imageUrl ? <img src={imageUrl} alt={game.title} className="tile-img" /> : <div className="tile-empty">Не удалось загрузить</div>}

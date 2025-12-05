@@ -4,7 +4,7 @@ function buildFormData(gameDTO) {
   const fd = new FormData();
   fd.append("title", gameDTO.title);
   fd.append("description", gameDTO.description);
-  fd.append("category", gameDTO.category);
+  fd.append("categories", gameDTO.categories);
   if (gameDTO.imageFile) {
     fd.append("imageFile", gameDTO.imageFile)
   } else {

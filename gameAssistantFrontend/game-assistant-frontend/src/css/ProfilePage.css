@@ -42,10 +42,22 @@
     gap: 15px;
 }
 
+.profile-chats-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
 .profile-panel-title {
     font-size: 20px;
     font-weight: 600;
     text-align: center;
+}
+
+.profile-chats-header .profile-panel-title {
+    margin: 0 auto;
+    padding-right: 250px;
 }
 
 .profile-info-lines {
@@ -203,6 +215,13 @@
     }
 }
 
+@media (max-width: 1200px) {
+    .profile-chats-header .profile-panel-title {
+        margin: 0;
+        padding-right: 0;
+    }
+}
+
 @media (max-width: 1050px) {
     .profile-chat-item {
         grid-template-columns: 20% auto 110px;
@@ -293,6 +312,15 @@
 
     .profile-info-line {
         font-size: 14px;
+    }
+
+    .profile-chats-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .profile-chats-header .profile-panel-title {
+        order: -1;
     }
 }
 

@@ -56,7 +56,6 @@
     min-width: 220px;
     border: 1px solid var(--section-border);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-    z-index: 80;
     transform-origin: top right;
     visibility: hidden;
     opacity: 0;
