@@ -1,6 +1,6 @@
 .hero-root {
     position: relative;
-    padding: 100px 0;
+    padding: 100px 0 70px 0;
     display: flex;
     align-items: center;
     overflow: hidden
@@ -9,7 +9,7 @@
 .hero-bg {
     position: absolute;
     inset: 0;
-    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.7), black), url('../img/hero-bg.png');
+    background-image: var(--hero-image-gradient), url('../img/hero-bg.png');
     background-size: cover;
     background-position: center;
     filter: grayscale(.02) brightness(.6);
@@ -35,6 +35,7 @@
     font-size: 40px;
     text-align: center;
     font-weight: 700;
+    color: var(--card-text);
 }
 
 .hero-right {
@@ -47,6 +48,7 @@
     font-weight: 800;
     font-size: 24px;
     text-align: center;
+    color: var(--card-text);
 }
 
 @media(max-width:1399px) {
@@ -135,11 +137,15 @@
 
 @media(max-width:599px) {
     .hero-root {
-        padding: 120px 0 30px 0;
+        padding: 120px 0 10px 0;
     }
 }
 
 @media(max-width:549px) {
+    .hero-root {
+        padding: 120px 0 0 0;
+    }
+
     .hero-title {
         font-size: 28px;
     }

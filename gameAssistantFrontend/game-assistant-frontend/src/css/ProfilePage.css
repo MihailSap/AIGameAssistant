@@ -178,7 +178,7 @@
 }
 
 .profile-chat-item:active {
-    background: rgb(255, 255, 255, 0.25);
+    background: var(--profile-chat-item-active)
 }
 
 .profile-chat-game {
@@ -336,6 +336,7 @@
     }
 
     .profile-chat-item:hover {
-        background: rgb(255, 255, 255, 0.25);
+        background: var(--profile-chat-item-active)
+;
     }
 }

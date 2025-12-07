@@ -7,7 +7,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--section-bg);
+  background: var(--admin-section-bg);
   padding: 18px 22px;
   border-radius: var(--radius);
   border: 1px solid var(--section-border);
@@ -22,6 +22,7 @@
 .admin-header-right {
   display: flex;
   gap: 20px;
+  align-items: center;
 }
 
 .main-link {
@@ -67,7 +68,7 @@
 }
 
 .admin-section {
-  background: var(--section-bg);
+  background: var(--admin-section-bg);
   padding: 16px;
   border-radius: var(--radius);
   border: 1px solid var(--section-border);

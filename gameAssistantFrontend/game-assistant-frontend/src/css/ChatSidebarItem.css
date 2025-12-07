@@ -11,15 +11,15 @@
 }
 
 .chat-session-item.active {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--profile-chat-item-active);
 }
 
 .chat-session-item:active {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--profile-chat-item);
 }
 
 .chat-session-item.active:active {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--profile-chat-item-active);
 }
 
 .session-info {
@@ -65,11 +65,11 @@
     }
 
     .chat-session-item:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--profile-chat-item);
     }
 
     .chat-session-item.active:hover {
-        background: rgba(255, 255, 255, 0.25);
+        background: var(--profile-chat-item-active);
     }
 
     .chat-session-item:hover .chat-sidebar-icon-btn {

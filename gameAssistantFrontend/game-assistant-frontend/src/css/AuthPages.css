@@ -19,6 +19,12 @@
   z-index: 0;
 }
 
+[data-theme="light"] .auth-bg {
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.55)),
+    url('../img/auth-background-light.jpg');
+}
+
 .auth-top {
   width: 100%;
   display: flex;
@@ -135,7 +141,7 @@
   color: var(--danger);
   padding: 10px;
   border-radius: var(--radius);
-  background: rgba(255, 0, 0, 0.04);
+  background: var(--background-error-massage);
   border: 1px solid rgba(255, 0, 0, 0.06);
   font-size: 14px;
   text-align: center;

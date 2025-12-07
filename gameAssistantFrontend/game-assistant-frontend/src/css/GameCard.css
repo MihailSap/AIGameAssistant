@@ -7,7 +7,7 @@
     cursor: pointer;
     transition: transform var(--transition-cb), box-shadow var(--transition-cb);
     background: var(--bg);
-    border: 1px solid var(--section-border);
+    border: var(--card-border);
 }
 
 .tile-card:active {
@@ -44,7 +44,7 @@
     right: 0;
     height: 22%;
     backdrop-filter: blur(10px);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+    background: var(--gradient);
     transition: opacity var(--transition);
     display: flex;
     align-items: center;
@@ -60,6 +60,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--card-text);
 }
 
 .tile-overlay {
@@ -76,7 +77,7 @@
 }
 
 .tile-desc {
-    color: white;
+    color: var(--text);
     font-size: 20px;
     font-weight: 400;
     max-width: 100%;
@@ -120,7 +121,7 @@
     .tile-card:hover .tile-overlay {
         opacity: 1;
         backdrop-filter: blur(10px);
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+        background: var(--gradient);
         transform: translateY(0);
     }
 }

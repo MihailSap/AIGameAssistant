@@ -3,8 +3,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import ToggleSlider from "../components/ToggleSlider";
 import useAuth from "../hooks/useAuth";
 import { validateEmail } from "../utils/utils";
+import logoDark from "../img/LOGO-dark.svg";
+import logoLight from "../img/LOGO-light.svg";
+import { useTheme } from "../contexts/ThemeContext";
 import "../css/AuthPages.css";
-import logo from "../img/LOGO.svg";
 
 export default function AuthPage() {
   const location = useLocation();
@@ -31,12 +33,18 @@ export default function AuthPage() {
     navigate(target, { replace: false });
   };
 
+  const { currentTheme } = useTheme();
+
+  const logoSrc = currentTheme === "light" ? logoLight : logoDark;
+
   return (
     <div className="auth-root">
       <div className="auth-bg" role="presentation" aria-hidden="true" />
       <div className="auth-top">
         <Link to="/" className="auth-logo-link" aria-label="На главную">
-          <div className="auth-logo"><img src={logo} alt="AIGameAssistant" /></div>
+          <div className="auth-logo">
+            <img src={logoSrc} alt="AIGameAssistant" />
+          </div>
         </Link>
       </div>
 
