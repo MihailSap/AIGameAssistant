@@ -111,4 +111,8 @@ public class GameServiceImpl implements GameServiceI {
         fileServiceImpl.delete(rulesFileTitle);
         gameRepository.delete(game);
     }
+
+    public long getCountByCategory(Category category){
+        return gameRepository.countByCategories_Name(category.getName());
+    }
 }

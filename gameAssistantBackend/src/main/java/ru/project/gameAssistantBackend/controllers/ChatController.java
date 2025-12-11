@@ -64,7 +64,9 @@ public class ChatController {
     }
 
     @PutMapping("/{chatId}")
-    public ChatDTO continueChat(@PathVariable("chatId") Long chatId, @RequestBody SystemPropertiesDTO systemPropertiesDTO)
+    public ChatDTO continueChat(
+            @PathVariable("chatId") Long chatId,
+            @RequestBody SystemPropertiesDTO systemPropertiesDTO)
             throws ChatNotFoundException {
         Chat chat = chatServiceImpl.continueChat(chatId, systemPropertiesDTO);
         return chatMapper.mapToChatDTO(chat);

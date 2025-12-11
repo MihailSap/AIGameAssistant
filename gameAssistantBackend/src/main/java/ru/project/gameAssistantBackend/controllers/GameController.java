@@ -56,7 +56,8 @@ public class GameController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping(value = "/{gameId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public GameResponseDTO update(
-            @PathVariable("gameId") Long gameId, @ModelAttribute GameRequestDTO gameDTO)
+            @PathVariable("gameId") Long gameId,
+            @ModelAttribute GameRequestDTO gameDTO)
             throws GameNotFoundException, CategoryNotFoundException {
         Game game = gameServiceImpl.update(gameId, gameDTO);
         return gameMapper.mapToGameResponseDTO(game);
