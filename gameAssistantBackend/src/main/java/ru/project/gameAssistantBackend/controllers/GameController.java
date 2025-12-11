@@ -54,7 +54,7 @@ public class GameController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping(value = "/{gameId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{gameId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public GameResponseDTO update(
             @PathVariable("gameId") Long gameId,
             @ModelAttribute GameRequestDTO gameDTO)

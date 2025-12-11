@@ -64,7 +64,10 @@ public class ChatServiceImpl implements ChatServiceI {
         chat.setLastUseTime(Instant.now());
         String promptForTitle = getPromptForTitle(chat.getMessages());
         String title = assistantServiceImpl.getAnswer(promptForTitle);
-        chat.setTitle(title.substring(0, 30));
+        if(title.length() > 30){
+            title = title.substring(0, 30);
+        }
+        chat.setTitle(title);
         return chatRepository.save(chat);
     }
 
@@ -115,7 +118,7 @@ public class ChatServiceImpl implements ChatServiceI {
     public String getPromptForTitle(List<Message> messages){
         String promptStr = """
                 Сформулируй название для чата. 
-                Название должно состоять не более чем из 30 символов.
+                Длина названия должна составлять от 10 до 20 символов
                 Название чата должно затрагивать саму игру и мой вопрос.
                 Верни только название чата и ничего более. Сообщения чата: 
                 """;

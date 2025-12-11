@@ -73,17 +73,25 @@ public class GameServiceImpl implements GameServiceI {
 
     @Transactional
     @Override
-    public Game update(Long id, GameRequestDTO gameRequestDTO) throws GameNotFoundException, CategoryNotFoundException {
+    public Game update(Long id, GameRequestDTO gameRequestDTO)
+            throws GameNotFoundException, CategoryNotFoundException {
         Game game = getGameById(id);
-        game.setTitle(gameRequestDTO.title());
-        game.setDescription(gameRequestDTO.description());
+        if(gameRequestDTO.title() != null) {
+            game.setTitle(gameRequestDTO.title());
+        }
+
+        if(gameRequestDTO.description() != null) {
+            game.setDescription(gameRequestDTO.description());
+        }
 
         List<String> categoryNames = gameRequestDTO.categories();
-        Set<Category> categories = categoryService.getCategories(categoryNames);
-        game.setCategories(categories);
+        if(categoryNames != null && !categoryNames.isEmpty()){
+            Set<Category> categories = categoryService.getCategories(categoryNames);
+            game.setCategories(categories);
+        }
 
         MultipartFile newImageFile = gameRequestDTO.imageFile();
-        if(!newImageFile.isEmpty()){
+        if(newImageFile != null && !newImageFile.isEmpty()){
             String oldImageFileTitle = game.getImageFileTitle();
             fileServiceImpl.delete(oldImageFileTitle);
             String newImageFileTitle = fileServiceImpl.save(newImageFile);
@@ -91,10 +99,12 @@ public class GameServiceImpl implements GameServiceI {
         }
 
         MultipartFile newRulesFile = gameRequestDTO.rulesFile();
-        if(!newRulesFile.isEmpty()){
+        if(newRulesFile != null && !newRulesFile.isEmpty()){
             String oldRulesFileTitle = game.getRulesFileTitle();
             fileServiceImpl.delete(oldRulesFileTitle);
             String newRulesFileTitle = fileServiceImpl.save(newRulesFile);
+            converter.convertPdfToMdAsync(newRulesFileTitle);
+            fileServiceImpl.delete(oldRulesFileTitle.replace(".pdf", ".md"));
             game.setRulesFileTitle(newRulesFileTitle);
         }
 
