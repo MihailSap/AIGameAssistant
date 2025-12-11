@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.project.gameAssistantBackend.dto.chat.SystemPropertiesDTO;
-import ru.project.gameAssistantBackend.enums.Model;
 import ru.project.gameAssistantBackend.models.SystemProperties;
 import ru.project.gameAssistantBackend.repository.SystemPropertiesRepository;
 import ru.project.gameAssistantBackend.service.SystemPropertiesService;

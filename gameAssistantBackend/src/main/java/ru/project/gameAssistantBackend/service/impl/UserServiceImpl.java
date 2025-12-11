@@ -1,6 +1,5 @@
 package ru.project.gameAssistantBackend.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,12 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class UserServiceImpl implements UserServiceI {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+
     private final FileServiceImpl fileServiceImpl;
 
     @Autowired
@@ -40,7 +40,8 @@ public class UserServiceImpl implements UserServiceI {
 
     @Override
     public UserResponseDTO getResponseDTOByEmail(String email) {
-        var user = getByEmail(email).orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        var user = getByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         return mapToResponseDTO(user);
     }
 
@@ -69,7 +70,6 @@ public class UserServiceImpl implements UserServiceI {
         var newEncodedPassword = passwordEncoder.encode(updatePasswordDTO.newPassword());
         user.setPassword(newEncodedPassword);
         userRepository.save(user);
-        log.info("Пароль успешно обновлен");
     }
 
     @Transactional

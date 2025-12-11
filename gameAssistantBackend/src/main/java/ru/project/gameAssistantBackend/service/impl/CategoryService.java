@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.project.gameAssistantBackend.models.Category;
 import ru.project.gameAssistantBackend.repository.CategoryRepository;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

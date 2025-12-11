@@ -8,11 +8,9 @@ import ru.project.gameAssistantBackend.dto.chat.*;
 import ru.project.gameAssistantBackend.enums.Model;
 import ru.project.gameAssistantBackend.mapper.ChatMapper;
 import ru.project.gameAssistantBackend.models.Chat;
-import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.AssistantService;
 import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
-import ru.project.gameAssistantBackend.service.impl.assistant.AssistantServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.assistant.ChatModelFactory;
 import ru.project.gameAssistantBackend.service.impl.assistant.ChatServiceImpl;
 

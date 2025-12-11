@@ -2,7 +2,6 @@ package ru.project.gameAssistantBackend.service.impl;
 
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +46,7 @@ public class AuthServiceImpl implements AuthServiceI {
 
     @Transactional
     @Override
-    public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
+    public JwtResponse login(JwtRequest authRequest) throws AuthException {
         final User user = userServiceImpl.getByEmail(authRequest.getEmail())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
 
@@ -95,7 +94,7 @@ public class AuthServiceImpl implements AuthServiceI {
     }
 
     @Override
-    public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthException {
+    public JwtResponse getAccessToken(String refreshToken) throws AuthException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
@@ -112,7 +111,7 @@ public class AuthServiceImpl implements AuthServiceI {
 
     @Transactional
     @Override
-    public JwtResponse refresh(@NonNull String refreshToken) throws AuthException {
+    public JwtResponse refresh(String refreshToken) throws AuthException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
