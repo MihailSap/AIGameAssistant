@@ -35,7 +35,10 @@ public class ChatController {
     public ChatController(
             ChatServiceImpl chatServiceImpl,
             ChatMapper chatMapper,
-            ChatModelFactory chatModelFactory, AuthServiceImpl authServiceImpl, SystemPropertiesServiceImpl systemPropertiesServiceImpl) {
+            ChatModelFactory chatModelFactory,
+            AuthServiceImpl authServiceImpl,
+            SystemPropertiesServiceImpl systemPropertiesServiceImpl
+    ) {
         this.chatServiceImpl = chatServiceImpl;
         this.chatMapper = chatMapper;
         this.chatModelFactory = chatModelFactory;

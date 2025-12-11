@@ -27,7 +27,12 @@ public class FavouritesController {
     private final GameMapper gameMapper;
 
     @Autowired
-    public FavouritesController(FavouritesServiceImpl favouritesServiceImpl, AuthServiceImpl authServiceImpl, UserServiceImpl userServiceImpl, GameMapper gameMapper) {
+    public FavouritesController(
+            FavouritesServiceImpl favouritesServiceImpl,
+            AuthServiceImpl authServiceImpl,
+            UserServiceImpl userServiceImpl,
+            GameMapper gameMapper
+    ) {
         this.favouritesServiceImpl = favouritesServiceImpl;
         this.authServiceImpl = authServiceImpl;
         this.userServiceImpl = userServiceImpl;

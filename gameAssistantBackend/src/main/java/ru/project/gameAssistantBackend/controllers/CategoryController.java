@@ -20,7 +20,10 @@ public class CategoryController {
     private final CategoryMapper categoryMapper;
 
     @Autowired
-    public CategoryController(CategoryService categoryService, CategoryMapper categoryMapper) {
+    public CategoryController(
+            CategoryService categoryService,
+            CategoryMapper categoryMapper
+    ) {
         this.categoryService = categoryService;
         this.categoryMapper = categoryMapper;
     }

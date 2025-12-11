@@ -10,6 +10,4 @@ public interface SystemPropertiesService {
     String getPromptText();
 
     SystemProperties updatePrompt(SystemPropertiesDTO systemPropertiesDTO);
-
-    SystemPropertiesDTO mapToDTO(SystemProperties systemProperties);
 }

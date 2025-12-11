@@ -9,9 +9,9 @@ import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
 import ru.project.gameAssistantBackend.dto.jwt.RefreshJwtRequest;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
+import ru.project.gameAssistantBackend.mapper.UserMapper;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
-import ru.project.gameAssistantBackend.service.impl.UserServiceImpl;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,12 +19,15 @@ public class AuthController {
 
     private final AuthServiceImpl authServiceImpl;
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserMapper userMapper;
 
     @Autowired
-    public AuthController(AuthServiceImpl authServiceImpl, UserServiceImpl userServiceImpl) {
+    public AuthController(
+            AuthServiceImpl authServiceImpl,
+            UserMapper userMapper
+    ) {
         this.authServiceImpl = authServiceImpl;
-        this.userServiceImpl = userServiceImpl;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/login")
@@ -36,7 +39,7 @@ public class AuthController {
     @PostMapping("/register")
     public UserResponseDTO registration(@ModelAttribute UserRequestDTO userRequestDTO){
         User user = authServiceImpl.register(userRequestDTO);
-        return userServiceImpl.mapToResponseDTO(user);
+        return userMapper.mapToResponseDTO(user);
     }
 
     @PostMapping("/logout")

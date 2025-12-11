@@ -22,7 +22,10 @@ public class GameController {
     private final GameMapper gameMapper;
 
     @Autowired
-    public GameController(GameServiceImpl gameServiceImpl, GameMapper gameMapper) {
+    public GameController(
+            GameServiceImpl gameServiceImpl,
+            GameMapper gameMapper
+    ) {
         this.gameServiceImpl = gameServiceImpl;
         this.gameMapper = gameMapper;
     }

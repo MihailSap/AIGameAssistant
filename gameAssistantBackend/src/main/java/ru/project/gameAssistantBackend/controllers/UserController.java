@@ -7,6 +7,7 @@ import ru.project.gameAssistantBackend.dto.ResponseDTO;
 import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
+import ru.project.gameAssistantBackend.mapper.UserMapper;
 import ru.project.gameAssistantBackend.models.Model;
 import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.User;
@@ -23,16 +24,23 @@ public class UserController {
 
     private final AuthServiceImpl authServiceImpl;
 
+    private final UserMapper userMapper;
+
     @Autowired
-    public UserController(UserServiceImpl userServiceImpl, AuthServiceImpl authServiceImpl) {
+    public UserController(
+            UserServiceImpl userServiceImpl,
+            AuthServiceImpl authServiceImpl,
+            UserMapper userMapper
+    ) {
         this.userServiceImpl = userServiceImpl;
         this.authServiceImpl = authServiceImpl;
+        this.userMapper = userMapper;
     }
 
     @GetMapping("/{userId}")
     public UserResponseDTO getUser(@PathVariable("userId") Long userId){
         var user = userServiceImpl.getById(userId);
-        return userServiceImpl.mapToResponseDTO(user);
+        return userMapper.mapToResponseDTO(user);
     }
 
     @PatchMapping("/{userId}/password")
@@ -50,7 +58,7 @@ public class UserController {
     public UserResponseDTO updateImage(
             @PathVariable("userId") Long userId, @ModelAttribute UserRequestDTO userRequestDTO){
         User user = userServiceImpl.updateImage(userId, userRequestDTO.imageFile());
-        return userServiceImpl.mapToResponseDTO(user);
+        return userMapper.mapToResponseDTO(user);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -58,14 +66,15 @@ public class UserController {
     public UserResponseDTO getAuthenticatedUser() {
         final JwtAuthentication authInfo = authServiceImpl.getAuthInfo();
         var personEmail = authInfo.getPrincipal().toString();
-        return userServiceImpl.getResponseDTOByEmail(personEmail);
+        User user = userServiceImpl.getResponseDTOByEmail(personEmail);
+        return userMapper.mapToResponseDTO(user);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public List<UserResponseDTO> getAllUsers() {
         var usersData = userServiceImpl.getAllUsers();
-        return userServiceImpl.mapAllUsersDTO(usersData);
+        return userMapper.mapAllUsersDTO(usersData);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

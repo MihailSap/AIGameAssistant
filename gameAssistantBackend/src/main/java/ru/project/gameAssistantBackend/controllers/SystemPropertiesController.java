@@ -23,7 +23,7 @@ public class SystemPropertiesController {
     @GetMapping
     public SystemPropertiesDTO getSystemProperties(){
         SystemProperties systemProperties = systemPropertiesServiceImpl.get();
-        return systemPropertiesServiceImpl.mapToDTO(systemProperties);
+        return mapToDTO(systemProperties);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -42,13 +42,18 @@ public class SystemPropertiesController {
     @PatchMapping("/prompt")
     public SystemPropertiesDTO updatePrompt(@RequestBody SystemPropertiesDTO systemPropertiesDTO){
         SystemProperties systemProperties = systemPropertiesServiceImpl.updatePrompt(systemPropertiesDTO);
-        return systemPropertiesServiceImpl.mapToDTO(systemProperties);
+        return mapToDTO(systemProperties);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/model")
     public SystemPropertiesDTO updateModel(@RequestBody SystemPropertiesDTO systemPropertiesDTO){
         SystemProperties systemProperties = systemPropertiesServiceImpl.updateModel(systemPropertiesDTO);
-        return systemPropertiesServiceImpl.mapToDTO(systemProperties);
+        return mapToDTO(systemProperties);
+    }
+
+    public SystemPropertiesDTO mapToDTO(SystemProperties systemProperties){
+        return new SystemPropertiesDTO(
+                systemProperties.getPrompt(), systemProperties.getModel());
     }
 }

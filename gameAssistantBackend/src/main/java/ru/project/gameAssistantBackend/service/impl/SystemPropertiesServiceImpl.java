@@ -43,10 +43,4 @@ public class SystemPropertiesServiceImpl implements SystemPropertiesService {
         systemProperties.setModel(systemPropertiesDTO.model());
         return systemPropertiesRepository.save(systemProperties);
     }
-
-    @Override
-    public SystemPropertiesDTO mapToDTO(SystemProperties systemProperties){
-        return new SystemPropertiesDTO(
-                systemProperties.getPrompt(), systemProperties.getModel());
-    }
 }

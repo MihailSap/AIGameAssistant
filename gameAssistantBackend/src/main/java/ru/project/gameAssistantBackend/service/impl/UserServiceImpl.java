@@ -39,28 +39,15 @@ public class UserServiceImpl implements UserServiceI {
     }
 
     @Override
-    public UserResponseDTO getResponseDTOByEmail(String email) {
-        var user = getByEmail(email)
+    public User getResponseDTOByEmail(String email) {
+        return getByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        return mapToResponseDTO(user);
     }
 
     @Override
     public User getById(Long id){
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Пользователь с таким id не найден"));
-    }
-
-    @Override
-    public UserResponseDTO mapToResponseDTO(User user) {
-        return new UserResponseDTO(
-                user.getId(),
-                user.getEmail(),
-                user.getLogin(),
-                user.getRole().equals(Role.ADMIN),
-                user.getImageFileTitle(),
-                user.getModel()
-        );
     }
 
     @Transactional
@@ -97,15 +84,6 @@ public class UserServiceImpl implements UserServiceI {
     @Override
     public List<User> getAllUsers(){
         return userRepository.findAll();
-    }
-
-    @Override
-    public List<UserResponseDTO> mapAllUsersDTO(List<User> users){
-        List<UserResponseDTO> userResponseDTOS = new ArrayList<>();
-        for(var user : users){
-            userResponseDTOS.add(mapToResponseDTO(user));
-        }
-        return userResponseDTOS;
     }
 
     @Transactional
