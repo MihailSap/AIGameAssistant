@@ -43,7 +43,8 @@ public class ChatServiceImpl implements ChatServiceI {
                            SystemPropertiesServiceImpl systemPropertiesServiceImpl,
                            ChatRepository chatRepository,
                            AuthServiceImpl authServiceImpl,
-                           FileServiceImpl fileServiceImpl, AssistantServiceImpl assistantServiceImpl) {
+                           FileServiceImpl fileServiceImpl,
+                           AssistantServiceImpl assistantServiceImpl) {
         this.gameServiceImpl = gameServiceImpl;
         this.systemPropertiesServiceImpl = systemPropertiesServiceImpl;
         this.chatRepository = chatRepository;
@@ -63,13 +64,14 @@ public class ChatServiceImpl implements ChatServiceI {
         chat.setLastUseTime(Instant.now());
         String promptForTitle = getPromptForTitle(chat.getMessages());
         String title = assistantServiceImpl.getAnswer(promptForTitle);
-        chat.setTitle(title);
+        chat.setTitle(title.substring(0, 30));
         return chatRepository.save(chat);
     }
 
     @Transactional
     @Override
-    public Chat continueChat(Long id, SystemPropertiesDTO systemPropertiesDTO) throws ChatNotFoundException {
+    public Chat continueChat(Long id, SystemPropertiesDTO systemPropertiesDTO)
+            throws ChatNotFoundException {
         Chat chat = getChatById(id);
         chat.addMessage(systemPropertiesDTO.prompt(), ChatRole.user);
         return chatRepository.save(chat);
@@ -112,7 +114,8 @@ public class ChatServiceImpl implements ChatServiceI {
     @Override
     public String getPromptForTitle(List<Message> messages){
         String promptStr = """
-                Сформулируй название для чата. Название не должно состоять более чем из 5 слов.
+                Сформулируй название для чата. 
+                Название должно состоять не более чем из 30 символов.
                 Название чата должно затрагивать саму игру и мой вопрос.
                 Верни только название чата и ничего более. Сообщения чата: 
                 """;
