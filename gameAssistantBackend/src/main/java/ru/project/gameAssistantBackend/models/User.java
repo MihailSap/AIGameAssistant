@@ -1,8 +1,6 @@
 package ru.project.gameAssistantBackend.models;
 
 import jakarta.persistence.*;
-import ru.project.gameAssistantBackend.enums.Model;
-import ru.project.gameAssistantBackend.enums.Role;
 
 import java.util.HashSet;
 import java.util.Set;

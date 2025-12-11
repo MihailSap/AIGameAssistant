@@ -1,6 +1,6 @@
 package ru.project.gameAssistantBackend.dto.user;
 
-import ru.project.gameAssistantBackend.enums.Model;
+import ru.project.gameAssistantBackend.models.Model;
 
 public record UserResponseDTO(
         Long id,

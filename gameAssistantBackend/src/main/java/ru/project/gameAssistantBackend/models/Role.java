@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.enums;
+package ru.project.gameAssistantBackend.models;
 
 import org.springframework.security.core.GrantedAuthority;
 

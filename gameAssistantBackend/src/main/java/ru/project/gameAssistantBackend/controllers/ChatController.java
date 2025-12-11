@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import ru.project.gameAssistantBackend.dto.chat.*;
-import ru.project.gameAssistantBackend.enums.Model;
+import ru.project.gameAssistantBackend.models.Model;
 import ru.project.gameAssistantBackend.mapper.ChatMapper;
 import ru.project.gameAssistantBackend.models.Chat;
 import ru.project.gameAssistantBackend.service.AssistantService;

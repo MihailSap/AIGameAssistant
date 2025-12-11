@@ -1,4 +1,4 @@
-package ru.project.gameAssistantBackend.enums;
+package ru.project.gameAssistantBackend.models;
 
 public enum ChatRole {
     system,

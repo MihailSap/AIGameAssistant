@@ -1,6 +1,6 @@
 package ru.project.gameAssistantBackend.dto.chat;
 
-import ru.project.gameAssistantBackend.enums.ChatRole;
+import ru.project.gameAssistantBackend.models.ChatRole;
 
 import java.time.Instant;
 

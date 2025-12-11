@@ -2,7 +2,7 @@ package ru.project.gameAssistantBackend.jwt;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import ru.project.gameAssistantBackend.enums.Role;
+import ru.project.gameAssistantBackend.models.Role;
 
 import java.util.Collection;
 import java.util.Set;

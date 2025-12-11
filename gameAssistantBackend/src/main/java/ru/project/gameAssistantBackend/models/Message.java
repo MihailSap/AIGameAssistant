@@ -2,7 +2,6 @@ package ru.project.gameAssistantBackend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import ru.project.gameAssistantBackend.enums.ChatRole;
 
 import java.time.Instant;
 import java.util.Objects;

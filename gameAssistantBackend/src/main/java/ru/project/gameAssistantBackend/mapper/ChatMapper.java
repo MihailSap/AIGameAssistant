@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.project.gameAssistantBackend.dto.chat.ChatDTO;
 import ru.project.gameAssistantBackend.dto.chat.ChatPreviewDTO;
 import ru.project.gameAssistantBackend.dto.chat.MessageDTO;
-import ru.project.gameAssistantBackend.enums.ChatRole;
+import ru.project.gameAssistantBackend.models.ChatRole;
 import ru.project.gameAssistantBackend.models.Chat;
 import ru.project.gameAssistantBackend.models.Message;
 

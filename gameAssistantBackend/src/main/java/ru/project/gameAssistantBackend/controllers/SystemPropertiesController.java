@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.chat.SystemPropertiesDTO;
-import ru.project.gameAssistantBackend.enums.Model;
+import ru.project.gameAssistantBackend.models.Model;
 import ru.project.gameAssistantBackend.models.SystemProperties;
 import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
 

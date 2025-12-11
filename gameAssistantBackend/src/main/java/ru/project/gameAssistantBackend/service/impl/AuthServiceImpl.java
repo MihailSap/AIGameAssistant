@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
 import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
-import ru.project.gameAssistantBackend.enums.Role;
+import ru.project.gameAssistantBackend.models.Role;
 import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.Token;
 import ru.project.gameAssistantBackend.models.User;

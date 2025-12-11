@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.project.gameAssistantBackend.enums.ChatRole;
+import ru.project.gameAssistantBackend.models.ChatRole;
 import ru.project.gameAssistantBackend.models.Message;
 import ru.project.gameAssistantBackend.service.AssistantServiceI;
 

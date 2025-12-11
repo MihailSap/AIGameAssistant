@@ -1,7 +1,7 @@
 package ru.project.gameAssistantBackend.jwt;
 
 import io.jsonwebtoken.Claims;
-import ru.project.gameAssistantBackend.enums.Role;
+import ru.project.gameAssistantBackend.models.Role;
 
 import java.util.Set;
 
