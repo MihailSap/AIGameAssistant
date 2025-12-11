@@ -7,5 +7,6 @@ public record UserRequestDTO(
         String login,
         String password,
         Boolean isAdmin,
-        MultipartFile imageFile) {
+        MultipartFile imageFile
+) {
 }

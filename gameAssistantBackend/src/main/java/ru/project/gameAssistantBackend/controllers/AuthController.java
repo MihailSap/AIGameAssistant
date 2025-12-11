@@ -41,19 +41,19 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody RefreshJwtRequest request) throws AuthException {
-        authServiceImpl.logout(request.getRefreshToken());
+        authServiceImpl.logout(request.refreshToken());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/token")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody RefreshJwtRequest request) throws AuthException {
-        final JwtResponse token = authServiceImpl.getAccessToken(request.getRefreshToken());
+        final JwtResponse token = authServiceImpl.getAccessToken(request.refreshToken());
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody RefreshJwtRequest request) throws AuthException {
-        final JwtResponse token = authServiceImpl.refresh(request.getRefreshToken());
+        final JwtResponse token = authServiceImpl.refresh(request.refreshToken());
         return ResponseEntity.ok(token);
     }
 }

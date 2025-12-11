@@ -47,10 +47,10 @@ public class AuthServiceImpl implements AuthServiceI {
     @Transactional
     @Override
     public JwtResponse login(JwtRequest authRequest) throws AuthException {
-        final User user = userServiceImpl.getByEmail(authRequest.getEmail())
+        final User user = userServiceImpl.getByEmail(authRequest.email())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
 
-        if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(authRequest.password(), user.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             final String refreshToken = jwtProvider.generateRefreshToken(user);
 
