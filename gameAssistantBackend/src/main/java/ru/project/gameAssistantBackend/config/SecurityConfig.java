@@ -39,7 +39,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/file/**", "/api/auth/login", "/api/auth/logout", "/api/auth/token", "/api/auth/register", "/api/hello/some-user").permitAll()
+                        .requestMatchers(
+                                "/api/file/**",
+                                "/api/auth/login",
+                                "/api/auth/logout",
+                                "/api/auth/token",
+                                "/api/auth/register",
+                                "/api/hello/some-user",
+                                "/api/games"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
