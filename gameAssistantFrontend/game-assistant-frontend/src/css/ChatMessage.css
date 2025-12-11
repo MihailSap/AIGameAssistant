@@ -14,8 +14,8 @@
 
 .chat-message-bubble {
     max-width: 75%;
-    background: var(--text);
-    color: var(--bg);
+    background: var(--message-bubble-bg);
+    color: var(--chat-message-bubble-text);
     padding: 10px 20px;
     border-radius: var(--radius);
     border-bottom-right-radius: 0;

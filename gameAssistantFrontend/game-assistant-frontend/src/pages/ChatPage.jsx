@@ -9,6 +9,8 @@ import SelectDropdown from "../components/SelectDropdown";
 import { chatApi } from "../api/chat";
 import { userApi } from "../api/users";
 import { gameApi } from "../api/game";
+import { modelApi } from "../api/model";
+import { backendToFrontendModel } from "../utils/model";
 import "../css/ChatPage.css";
 
 function makeId(prefix = "id") {
@@ -65,9 +67,11 @@ export default function ChatPage() {
     const routeChatId = params.chatId;
 
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [gameLoading, setGameLoading] = useState(true);
     const [chatsLoading, setChatsLoading] = useState(true);
     const [chatLoading, setChatLoading] = useState(false);
+    const [modelChanging, setModelChanging] = useState(false);
     const [chatError, setChatError] = useState(null);
 
     const [game, setGame] = useState(null);
@@ -80,9 +84,7 @@ export default function ChatPage() {
     const [sending, setSending] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(typeof window !== "undefined" ? window.innerWidth >= 900 : false);
     const [rulesSidebarOpen, setRulesSidebarOpen] = useState(false);
-
-    const [models, setModels] = useState(['Yandex-GPT', 'Chat-GPT', 'Gemini']);
-    const [selectedModel, setSelectedModel] = useState('Yandex-GPT');
+    const [selectedModel, setSelectedModel] = useState(null);
 
     const messagesRef = useRef(null);
     const inputRef = useRef(null);
@@ -146,12 +148,22 @@ export default function ChatPage() {
     }, [input]);
 
     useEffect(() => {
+        setLoading(true);
         let mounted = true;
         (async () => {
             try {
-                const u = await userApi.getAuthenticated();
-                if (mounted) setCurrentUser(u);
-            } catch (err) { }
+                const user = await userApi.getAuthenticated();
+                if (!mounted) return;
+                setCurrentUser(user);
+                setSelectedModel(user.model || 'Yandex-GPT');
+            } catch (err) {
+                setError("Ошибка при получении данных пользователя")
+                if (!mounted) return;
+                setCurrentUser(null);
+                setSelectedModel(null);
+            } finally {
+                setLoading(false);
+            }
         })();
         return () => { mounted = false; };
     }, []);
@@ -297,7 +309,6 @@ export default function ChatPage() {
 
     const mergeChunkWithPrev = (prev, chunk) => {
         if (!prev) return chunk;
-        if (chunk.length >= prev.length && chunk.startsWith(prev)) return chunk;
         return prev + chunk;
     };
 
@@ -306,6 +317,7 @@ export default function ChatPage() {
             alert("Выберите игру или откройте существующую сессию.");
             return;
         }
+        if (modelChanging) return;
         if (!input.trim()) return;
         const text = input.slice(0, 10000);
         setInput("");
@@ -416,7 +428,7 @@ export default function ChatPage() {
 
                 activeStreamRef.current = { controller: streamController, streamId };
             } else {
-                const chatDto = await chatApi.continueChat(sessionToUse.id, { text });
+                const chatDto = await chatApi.continueChat(sessionToUse.id, text, selectedModel);
                 const serverId = chatDto?.id != null ? String(chatDto.id) : sessionToUse.id;
                 const updatedSession = {
                     id: serverId,
@@ -514,34 +526,50 @@ export default function ChatPage() {
         if (typeof window !== "undefined" && window.innerWidth < 900) setSidebarOpen(false);
     };
 
+    const handleChangeModel = async (newModel) => {
+        if (modelChanging) return;
+        try {
+            if (!newModel) return;
+            setModelChanging(true);
+            await modelApi.updateUser(currentUser.id, newModel);
+            setSelectedModel(newModel);
+        } catch (err) {
+            alert("Не удалось изменить модель.");
+        } finally {
+            setModelChanging(false);
+        }
+    }
+
     const grouped = groupSessionsByTime(sessions);
 
     return (
         <div className="chat-root">
             <Header currentUser={currentUser} centralTitle={(!gameLoading && !error) ? game?.title : ""} />
 
-            {gameLoading && (
+            {(gameLoading || loading) && (
                 <div className="full-loader">
                     <div className="spinner" />
                 </div>
             )}
 
-            {!gameLoading && error && <div className="loading-error">{error}</div>}
+            {!gameLoading && !loading && error && <div className="loading-error">{error}</div>}
 
-            {!gameLoading && !error &&
+            {!gameLoading && !loading && !error &&
                 <div className="chat-page-switch-container">
                     <SelectDropdown
-                        items={models}
+                        fetchItems={() => modelApi.getAll()}
+                        cacheKey="models"
                         value={selectedModel}
-                        onChange={(m) => { setSelectedModel(m); }}
+                        onChange={modelChanging ? () => {} : handleChangeModel}
                         allowNull={false}
                         placeholder="Выберите модель"
                         ariaLabel="Модель нейросети"
+                        labelFunc={(m) => backendToFrontendModel(m)}
                     />
                 </div>
             }
 
-            {!gameLoading && !error && (
+            {!gameLoading && !loading && !error && (
                 <div className="chat-container">
                     {game && (
                         <button
@@ -634,7 +662,7 @@ export default function ChatPage() {
                                             <button
                                                 className="btn send-btn"
                                                 onClick={handleSend}
-                                                disabled={sending || !input.trim() || !game}
+                                                disabled={sending || modelChanging || !input.trim() || !game}
                                                 aria-label="Отправить"
                                                 title="Отправить"
                                             >

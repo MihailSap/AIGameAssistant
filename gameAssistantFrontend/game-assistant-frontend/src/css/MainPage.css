@@ -11,10 +11,10 @@
 }
 
 .grid-top-controls {
-    padding: 0 150px;
+    padding: 30px 150px;
     display: flex;
     justify-content: space-between;
-    background: linear-gradient(black, var(--bg));
+    background: linear-gradient(var(--hero-image-gradient-last-color), var(--bg));
 }
 
 .slider-container {
@@ -22,10 +22,6 @@
     justify-content: center;
     width: 100%;
     margin-right: 20vw;
-}
-
-.games-area {
-    margin-top: 30px;
 }
 
 .load-more-wrap {
@@ -46,7 +42,7 @@
 
 @media(max-width:1399px) {
     .grid-top-controls {
-        padding: 0 110px;
+        padding: 30px 110px;
     }
 
     .slider-container {
@@ -57,7 +53,7 @@
 
 @media(max-width:1099px) {
     .grid-top-controls {
-        padding: 0 70px;
+        padding: 30px 70px;
     }
 }
 
@@ -76,18 +72,24 @@
 
 @media(max-width:799px) {
     .grid-top-controls {
-        padding: 0 50px;
+        padding: 30px 50px;
     }
 }
 
 @media(max-width:549px) {
     .grid-top-controls {
-        padding: 0 40px;
+        padding: 30px 40px;
+    }
+}
+
+@media (max-width: 499px) {
+    .load-more-wrap {
+        margin: 25px 0 0;
     }
 }
 
 @media (max-width: 449px) {
     .grid-top-controls {
-        padding: 0 10px;
+        padding: 25px 10px;
     }
 }

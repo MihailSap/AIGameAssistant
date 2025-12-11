@@ -5,6 +5,7 @@ import { fileApi } from "../api/file";
 import useBlobUrl from "../hooks/useBlobUrl";
 import "../css/MainPage.css";
 import "../css/UserMenu.css";
+import { useTheme } from "../contexts/ThemeContext";
 
 export default function UserMenu({ currentUser }) {
   const { isAuthenticated, logout } = useAuth();
@@ -32,6 +33,8 @@ export default function UserMenu({ currentUser }) {
 
   const firstLetter = (currentUser?.login || "U")[0].toUpperCase();
 
+  const { mode, setMode, currentTheme } = useTheme();
+
   return (
     <div className="user-menu-root" ref={ref}>
       {isAuthenticated ? (
@@ -57,11 +60,48 @@ export default function UserMenu({ currentUser }) {
       )}
 
       {isAuthenticated && (
-        <div className={`user-popup ${open ? 'is-open' : 'is-closing'}`}>
+        <div className={`user-popup ${open ? "is-open" : "is-closing"}`} role="dialog" aria-hidden={!open}>
           <div className="user-popup-header">
             <div className="user-popup-name">{currentUser?.login}</div>
             <div className="user-popup-email">{currentUser?.email}</div>
           </div>
+
+          <div className="user-popup-section">
+            <div className="theme-label">Тема</div>
+            <div className="theme-switch" role="radiogroup" aria-label="Выбор темы">
+              <button
+                className={`theme-btn ${mode === "auto" ? "active" : ""}`}
+                onClick={() => setMode("auto")}
+                role="radio"
+                aria-checked={mode === "auto"}
+                title={`Авто (система: ${currentTheme})`}
+                type="button"
+              >
+                Авто
+              </button>
+              <button
+                className={`theme-btn ${mode === "dark" ? "active" : ""}`}
+                onClick={() => setMode("dark")}
+                role="radio"
+                aria-checked={mode === "dark"}
+                title="Тёмная"
+                type="button"
+              >
+                Тёмная
+              </button>
+              <button
+                className={`theme-btn ${mode === "light" ? "active" : ""}`}
+                onClick={() => setMode("light")}
+                role="radio"
+                aria-checked={mode === "light"}
+                title="Светлая"
+                type="button"
+              >
+                Светлая
+              </button>
+            </div>
+          </div>
+
           <div className="user-popup-actions">
             <Link to="/profile" className="user-popup-btn">Личный кабинет</Link>
             <button className="user-popup-btn" onClick={logout}>Выйти</button>

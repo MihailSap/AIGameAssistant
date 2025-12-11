@@ -1,17 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import UserMenu from "./UserMenu";
-import logo from "../img/LOGO.svg";
 import searchIcon from "../img/search-icon.svg";
+import logoDark from "../img/LOGO-dark.svg";
+import logoLight from "../img/LOGO-light.svg";
+import { useTheme } from "../contexts/ThemeContext";
 import "../css/Header.css";
 
 export default function Header({ search = null, onSearchChange, currentUser, centralTitle }) {
     const isAdmin = currentUser?.isAdmin;
+
+    const { currentTheme } = useTheme();
+
+    const logoSrc = currentTheme === "light" ? logoLight : logoDark;
+
     return (
         <header className={"site-header"}>
             <div className={`header-inner ${isAdmin ? "admin" : ""}`}>
                 <div className={`header-left`}>
-                    <Link to="/" className="logo"><img src={logo} alt="AIGameAssistant" /></Link>
+                    <Link to="/" className="logo"><img src={logoSrc} alt="AIGameAssistant" /></Link>
                 </div>
 
                 <div className={"header-center"}>

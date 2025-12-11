@@ -24,10 +24,9 @@ export const chatApi = {
     }
   },
 
-  continueChat: async (id, prompt) => {
+  continueChat: async (id, prompt, model) => {
     try {
-      const payload = typeof prompt === "string" ? { request: escapeText(prompt) } : prompt;
-      const resp = await apiClient.put(`/api/chat/${id}`, payload);
+      const resp = await apiClient.put(`/api/chat/${id}`, {prompt, model});
       return resp?.data;
     } catch (error) {
       console.error("Error continuing chat:", error);
@@ -80,7 +79,7 @@ export const chatApi = {
     const token = getAccessToken();
     const url = `${BASE_URL.replace(/\/$/, "")}/api/chat/${chatId}/answer`;
     fetch(url, {
-      method: "GET",
+      method: "POST",
       headers: {
         Accept: "text/event-stream",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -107,7 +106,7 @@ export const chatApi = {
               dataLines.push(line.slice(5));
             }
           }
-          const data = dataLines.join("\n").trim();
+          const data = dataLines.join("\n");
           if (data) {
             try {
               onChunk && onChunk(data);

@@ -56,7 +56,6 @@
     min-width: 220px;
     border: 1px solid var(--section-border);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-    z-index: 80;
     transform-origin: top right;
     visibility: hidden;
     opacity: 0;
@@ -129,6 +128,7 @@
     padding: 8px 10px;
     border-radius: var(--radius);
     font-size: 16px;
+    font-weight: 500;
     text-decoration: none;
     color: var(--text);
     text-align: left;
@@ -139,6 +139,51 @@
 .user-popup-btn:active {
     background-color: var(--yellow);
     color: black;
+}
+
+.user-popup-section {
+    border-top: 1px solid var(--section-border);
+    border-bottom: 1px solid var(--section-border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.theme-label {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.theme-switch {
+    display: inline-flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.theme-btn {
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--text-input-border);
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background var(--transition), color var(--transition), transform var(--transition);
+    text-align: center;
+    color: var(--muted-text);
+}
+
+.theme-btn:active {
+    transform: translateY(1px);
+}
+
+.theme-btn.active {
+    background: var(--yellow);
+    color: var(--bg);
+    border-color: var(--yellow);
 }
 
 @media (max-width: 549px) {
@@ -156,9 +201,21 @@
     }
 }
 
+@media (max-width: 420px) {
+    .theme-switch {
+        gap: 6px;
+    }
+
+    .theme-btn {
+        padding: 6px 8px;
+        min-width: 52px;
+        font-size: 12px;
+    }
+}
+
 @media (hover: hover) and (pointer: fine) {
     .user-popup-btn:hover {
-        background-color: var(--yellow);
-        color: black;
+        background-color: var(--muted-yellow);
+        color: var(--bg);
     }
 }

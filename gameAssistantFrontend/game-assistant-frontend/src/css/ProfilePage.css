@@ -42,10 +42,22 @@
     gap: 15px;
 }
 
+.profile-chats-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
 .profile-panel-title {
     font-size: 20px;
     font-weight: 600;
     text-align: center;
+}
+
+.profile-chats-header .profile-panel-title {
+    margin: 0 auto;
+    padding-right: 250px;
 }
 
 .profile-info-lines {
@@ -166,7 +178,7 @@
 }
 
 .profile-chat-item:active {
-    background: rgb(255, 255, 255, 0.25);
+    background: var(--profile-chat-item-active)
 }
 
 .profile-chat-game {
@@ -200,6 +212,13 @@
 @media (max-width: 1500px) {
     .profile-chat-item {
         grid-template-columns: 15% auto 110px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .profile-chats-header .profile-panel-title {
+        margin: 0;
+        padding-right: 0;
     }
 }
 
@@ -294,6 +313,15 @@
     .profile-info-line {
         font-size: 14px;
     }
+
+    .profile-chats-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .profile-chats-header .profile-panel-title {
+        order: -1;
+    }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -308,6 +336,7 @@
     }
 
     .profile-chat-item:hover {
-        background: rgb(255, 255, 255, 0.25);
+        background: var(--profile-chat-item-active)
+;
     }
 }

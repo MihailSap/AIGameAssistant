@@ -2,15 +2,14 @@ import React, { useState } from "react";
 import "../css/AdminPage.css";
 import "../css/GameForm.css";
 import SelectDropdown from "../components/SelectDropdown";
-import { backendToLabel } from "../utils/categories";
-import { gameApi } from "../api/game";
+import { categoryApi } from "../api/category";
 
 export default function GameForm({ mode = "create", initial = null, onCancel, onSave }) {
   const [title, setTitle] = useState(initial?.title || "");
   const [description, setDescription] = useState(initial?.description || "");
   const [imageFile, setImageFile] = useState(null);
   const [rulesFile, setRulesFile] = useState(null);
-  const [category, setCategory] = useState(initial?.category ?? null);
+  const [categories, setCategories] = useState(initial?.categories ?? []);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -18,13 +17,13 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
     e.preventDefault();
     setSubmitting(true);
     try {
-      if (!category) {
-        alert("Пожалуйста, выберите категорию.");
+      if (!categories || categories.length === 0) {
+        alert("Пожалуйста, выберите хотя бы одну категорию.");
         setSubmitting(false);
         return;
       }
 
-      const payload = { title, description, category };
+      const payload = { title, description, categories };
       if (imageFile) payload.imageFile = imageFile;
       if (rulesFile) payload.rulesFile = rulesFile;
 
@@ -44,9 +43,17 @@ export default function GameForm({ mode = "create", initial = null, onCancel, on
       </label>
 
       <label className="form-row">
-        <span className="form-label">Категория</span>
+        <span className="form-label">Категории</span>
         <div className="form-input">
-          <SelectDropdown fetchItems={() => gameApi.getCategories()} cacheKey="categories" value={category} onChange={(v) => setCategory(v)} allowNull={true} labelFunc={backendToLabel} placeholder="Категория игр" />
+          <SelectDropdown
+            fetchItems={() => categoryApi.getAll().then(list => Array.isArray(list) ? list.map(c => c.name) : [])}
+            cacheKey="categories"
+            multiple={true}
+            maxSelections={5}
+            value={categories}
+            onChange={(v) => setCategories(v)}
+            placeholder="Категории"
+          />
         </div>
       </label>
 

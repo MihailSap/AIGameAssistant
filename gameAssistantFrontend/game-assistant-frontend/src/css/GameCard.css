@@ -7,7 +7,7 @@
     cursor: pointer;
     transition: transform var(--transition-cb), box-shadow var(--transition-cb);
     background: var(--bg);
-    border: 1px solid var(--section-border);
+    border: var(--card-border);
 }
 
 .tile-card:active {
@@ -44,7 +44,7 @@
     right: 0;
     height: 22%;
     backdrop-filter: blur(10px);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+    background: var(--gradient);
     transition: opacity var(--transition);
     display: flex;
     align-items: center;
@@ -54,12 +54,13 @@
 
 .tile-title {
     width: 100%;
-    font-weight: 400;
-    font-size: 20px;
+    font-weight: 500;
+    font-size: 24px;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--card-text);
 }
 
 .tile-overlay {
@@ -76,7 +77,7 @@
 }
 
 .tile-desc {
-    color: white;
+    color: var(--text);
     font-size: 20px;
     font-weight: 400;
     max-width: 100%;
@@ -86,6 +87,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0 10px;
+    word-break: break-word;
 }
 
 .tile-desc::-webkit-scrollbar {
@@ -119,7 +121,167 @@
     .tile-card:hover .tile-overlay {
         opacity: 1;
         backdrop-filter: blur(10px);
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+        background: var(--gradient);
         transform: translateY(0);
+    }
+}
+
+@media(max-width:1549px) {
+    .tile-title {
+        font-size: 20px;
+    }
+
+    .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:1399px) {
+    .tile-title {
+        font-size: 24px;
+    }
+
+    .tile-desc {
+        font-size: 20px;
+    }
+}
+
+@media(max-width:1249px) {
+    .tile-title {
+        font-size: 20px;
+    }
+
+    .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:1099px) {
+    .tile-title {
+        font-size: 24px;
+    }
+
+    .tile-desc {
+        font-size: 20px;
+    }
+}
+
+@media(max-width:949px) {
+    .tile-title {
+        font-size: 20px;
+    }
+
+    .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:799px) {
+    .tile-title {
+        font-size: 24px;
+    }
+
+    .tile-desc {
+        font-size: 20px;
+    }
+}
+
+@media(max-width:649px) {
+    .tile-title {
+        font-size: 20px;
+    }
+
+    .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:549px) {
+    .tile-title {
+        font-size: 24px;
+    }
+
+    .tile-desc {
+        font-size: 20px;
+    }
+}
+
+@media(max-width:449px) {
+    .tile-title {
+        font-size: 20px;
+    }
+
+    .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:1549px) {
+    .carousel-item .tile-title {
+        font-size: 20px;
+    }
+
+    .carousel-item .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:1199px) {
+    .carousel-item .tile-title {
+        font-size: 24px;
+    }
+
+    .carousel-item .tile-desc {
+        font-size: 20px;
+    }
+}
+
+@media(max-width:1049px) {
+    .carousel-item .tile-title {
+        font-size: 20px;
+    }
+
+    .carousel-item .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:749px) {
+    .carousel-item .tile-title {
+        font-size: 24px;
+    }
+
+    .carousel-item .tile-desc {
+        font-size: 20px;
+    }
+}
+
+@media(max-width:650px) {
+    .carousel-item .tile-title {
+        font-size: 20px;
+    }
+
+    .carousel-item .tile-desc {
+        font-size: 18px;
+    }
+}
+
+@media(max-width:549px) {
+    .carousel-item .tile-title {
+        font-size: 24px;
+    }
+
+    .carousel-item .tile-desc {
+        font-size: 20px;
+    }
+}
+
+@media(max-width:449px) {
+    .carousel-item .tile-title {
+        font-size: 20px;
+    }
+
+    .carousel-item .tile-desc {
+        font-size: 18px;
     }
 }

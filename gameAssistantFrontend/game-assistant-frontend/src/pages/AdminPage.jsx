@@ -4,8 +4,11 @@ import useAuth from "../hooks/useAuth";
 import { userApi } from "../api/users";
 import { gameApi } from "../api/game";
 import { fileApi } from "../api/file";
+import { modelApi } from "../api/model";
+import { categoryApi } from "../api/category";
 import UsersTable from "../components/UsersTable";
 import GamesTable from "../components/GamesTable";
+import CategoriesTable from "../components/CategoriesTable";
 import FileViewer from "../components/FileViewer";
 import Modal from "../components/Modal";
 import GameForm from "../components/GameForm";
@@ -13,6 +16,7 @@ import PromptEditor from "../components/PromptEditor";
 import SelectDropdown from "../components/SelectDropdown";
 import "../css/AdminPage.css";
 import { downloadBlob } from "../utils/blobUtils";
+import { backendToFrontendModel } from "../utils/model";
 
 export default function AdminPage() {
   const { logout } = useAuth();
@@ -21,6 +25,7 @@ export default function AdminPage() {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [games, setGames] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,8 +33,7 @@ export default function AdminPage() {
   const [usersSearch, setUsersSearch] = useState("");
   const [gamesSearch, setGamesSearch] = useState("");
 
-  const [models, setModels] = useState(['Yandex-GPT', 'Chat-GPT', 'Gemini']);
-  const [selectedModel, setSelectedModel] = useState('Yandex-GPT');
+  const [selectedModel, setSelectedModel] = useState(null);
 
   const [viewerState, setViewerState] = useState({ open: false, fileType: null, fileTitle: null });
   const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null });
@@ -52,8 +56,14 @@ export default function AdminPage() {
 
         setCurrentUser(authUser);
 
-        const [allUsers, allGames] = await Promise.all([userApi.getAll(), gameApi.getAll()]);
+        const currentModel = await modelApi.getMain();
         if (!mounted) return;
+        setSelectedModel(currentModel || 'Yandex-GPT');
+
+        const [allUsers, allGames, allCategories] = await Promise.all([userApi.getAll(), gameApi.getAll(), categoryApi.getAll()]);
+        if (!mounted) return;
+
+        setCategories(allCategories.sort((a, b) => a?.id - b?.id) || []);
 
         if (allGames && allGames.length > 0) {
           const gamesResults = (await Promise.all(
@@ -84,11 +94,14 @@ export default function AdminPage() {
     return () => {
       mounted = false;
     };
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const refreshData = async () => {
     try {
-      const [allUsers, allGames] = await Promise.all([userApi.getAll(), gameApi.getAll()]);
+      const [allUsers, allGames, allCategories] = await Promise.all([userApi.getAll(), gameApi.getAll(), categoryApi.getAll()]);
+
+      setCategories(allCategories.sort((a, b) => a?.id - b?.id) || []);
 
       if (allGames && allGames.length > 0) {
         const gamesResults = (await Promise.all(
@@ -216,6 +229,45 @@ export default function AdminPage() {
     }
   };
 
+  const handleAddCategory = async (name) => {
+    try {
+      const nm = (name || "").trim();
+      if (!nm) return;
+      await categoryApi.create(nm);
+      await refreshData();
+    } catch (err) {
+      alert("Не удалось добавить категорию.");
+    }
+  };
+
+  const handleDeleteCategory = (cat) => {
+    const id = cat && (cat.id ?? cat);
+    setConfirmState({
+      open: true,
+      text: `Вы действительно хотите удалить категорию "${typeof cat === "string" ? cat : (cat.name ?? "")}"? Это действие нельзя отменить.`,
+      onConfirm: async () => {
+        try {
+          await categoryApi.delete(id);
+          setConfirmState({ open: false });
+          await refreshData();
+        } catch (err) {
+          alert("Не удалось удалить категорию.");
+          setConfirmState({ open: false });
+        }
+      },
+    });
+  };
+
+  const handleChangeModel = async (newModel) => {
+    try {
+      if (!newModel) return;
+      await modelApi.updateMain(newModel);
+      setSelectedModel(newModel);
+    } catch (err) {
+      alert("Не удалось изменить модель.");
+    }
+  }
+
   if (loading) {
     return (
       <div className="admin-root">
@@ -290,15 +342,17 @@ export default function AdminPage() {
           <>
             <section className="admin-section">
               <div className="admin-table-header">
-                <h2 className="admin-table-title">Модель</h2>
+                <h2 className="admin-table-title">Модель по умолчанию</h2>
               </div>
               <SelectDropdown
-                items={models}
+                fetchItems={() => modelApi.getAll()}
+                cacheKey="models"
                 value={selectedModel}
-                onChange={(m) => { setSelectedModel(m); }}
+                onChange={handleChangeModel}
                 allowNull={false}
                 placeholder="Выберите модель"
                 ariaLabel="Модель нейросети"
+                labelFunc={(m) => backendToFrontendModel(m)}
               />
             </section>
             <section className="admin-section">
@@ -335,30 +389,42 @@ export default function AdminPage() {
         )}
 
         {activeTab === "games" && (
-          <section className="admin-section">
-            <div className="admin-table-header">
-              <h2 className="admin-table-title">Игры</h2>
-              <div className="admin-table-controls">
-                <input
-                  type="text"
-                  className="admin-table-search games-search"
-                  placeholder="Поиск игр..."
-                  value={gamesSearch}
-                  onChange={(e) => setGamesSearch(e.target.value)}
-                />
-                <button className="btn admin-btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
+          <>
+            <section className="admin-section">
+              <div className="admin-table-header">
+                <h2 className="admin-table-title">Игры</h2>
+                <div className="admin-table-controls">
+                  <input
+                    type="text"
+                    className="admin-table-search games-search"
+                    placeholder="Поиск игр..."
+                    value={gamesSearch}
+                    onChange={(e) => setGamesSearch(e.target.value)}
+                  />
+                  <button className="btn admin-btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
+                </div>
               </div>
-            </div>
 
-            <GamesTable
-              games={games}
-              onEdit={handleOpenEditGame}
-              onDelete={handleDeleteGame}
-              onDownloadFile={handleDownloadFile}
-              onOpenFile={handleOpenViewer}
-              search={gamesSearch}
-            />
-          </section>
+              <GamesTable
+                games={games}
+                onEdit={handleOpenEditGame}
+                onDelete={handleDeleteGame}
+                onDownloadFile={handleDownloadFile}
+                onOpenFile={handleOpenViewer}
+                search={gamesSearch}
+              />
+            </section>
+            <section className="admin-section">
+              <div className="admin-table-header">
+                <h2 className="admin-table-title">Категории</h2>
+              </div>
+              <CategoriesTable
+                categories={categories}
+                onAdd={handleAddCategory}
+                onDelete={handleDeleteCategory}
+              />
+            </section>
+          </>
         )}
       </main>
 

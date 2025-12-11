@@ -79,7 +79,7 @@
 .gm-btn-row .gm-circle-btn svg {
   width: 50px;
   height: 50px;
-  color: black;
+  color: var(--bg);
   transition: color var(--transition);
 }
 
@@ -88,7 +88,7 @@
 }
 
 .gm-btn-row .gm-circle-btn:disabled:active svg {
-  color: black;
+  color: var(--bg);
 }
 
 .gm-tooltip {
