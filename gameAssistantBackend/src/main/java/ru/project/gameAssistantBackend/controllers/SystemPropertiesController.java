@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.chat.SystemPropertiesDTO;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.SystemPropertiesNotFoundException;
 import ru.project.gameAssistantBackend.models.Model;
 import ru.project.gameAssistantBackend.models.SystemProperties;
 import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
@@ -21,33 +22,33 @@ public class SystemPropertiesController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
-    public SystemPropertiesDTO getSystemProperties(){
-        SystemProperties systemProperties = systemPropertiesServiceImpl.get();
+    public SystemPropertiesDTO getSystemProperties() throws SystemPropertiesNotFoundException {
+        SystemProperties systemProperties = systemPropertiesServiceImpl.getSystemProperties();
         return mapToDTO(systemProperties);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/prompt")
-    public String getPrompt(){
-        return systemPropertiesServiceImpl.get().getPrompt();
+    public String getPrompt() throws SystemPropertiesNotFoundException {
+        return systemPropertiesServiceImpl.getSystemProperties().getPrompt();
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/model")
-    public Model getModel(){
-        return systemPropertiesServiceImpl.get().getModel();
+    public Model getModel() throws SystemPropertiesNotFoundException {
+        return systemPropertiesServiceImpl.getSystemProperties().getModel();
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/prompt")
-    public SystemPropertiesDTO updatePrompt(@RequestBody SystemPropertiesDTO systemPropertiesDTO){
+    public SystemPropertiesDTO updatePrompt(@RequestBody SystemPropertiesDTO systemPropertiesDTO) throws SystemPropertiesNotFoundException {
         SystemProperties systemProperties = systemPropertiesServiceImpl.updatePrompt(systemPropertiesDTO);
         return mapToDTO(systemProperties);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/model")
-    public SystemPropertiesDTO updateModel(@RequestBody SystemPropertiesDTO systemPropertiesDTO){
+    public SystemPropertiesDTO updateModel(@RequestBody SystemPropertiesDTO systemPropertiesDTO) throws SystemPropertiesNotFoundException {
         SystemProperties systemProperties = systemPropertiesServiceImpl.updateModel(systemPropertiesDTO);
         return mapToDTO(systemProperties);
     }

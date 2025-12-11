@@ -1,7 +1,6 @@
 package ru.project.gameAssistantBackend.service.impl;
 
 import io.jsonwebtoken.Claims;
-import jakarta.security.auth.message.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,6 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
 import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
+import ru.project.gameAssistantBackend.exception.customEx.conflict.UserConflictException;
+import ru.project.gameAssistantBackend.exception.customEx.invalid.PasswordInvalidException;
+import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidException;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.models.Role;
 import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.Token;
@@ -46,9 +50,8 @@ public class AuthServiceImpl implements AuthServiceI {
 
     @Transactional
     @Override
-    public JwtResponse login(JwtRequest authRequest) throws AuthException {
-        final User user = userServiceImpl.getByEmail(authRequest.email())
-                .orElseThrow(() -> new AuthException("Пользователь не найден"));
+    public JwtResponse login(JwtRequest authRequest) throws UserNotFoundException, PasswordInvalidException {
+        User user = userServiceImpl.getByEmail(authRequest.email());
 
         if (passwordEncoder.matches(authRequest.password(), user.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
@@ -64,16 +67,16 @@ public class AuthServiceImpl implements AuthServiceI {
 
             return new JwtResponse(accessToken, refreshToken);
         } else {
-            throw new AuthException("Неправильный пароль");
+            throw new PasswordInvalidException("Неправильный пароль");
         }
     }
 
     @Transactional
     @Override
-    public User register(UserRequestDTO userRequestDTO) {
+    public User register(UserRequestDTO userRequestDTO) throws UserConflictException {
         var email = userRequestDTO.email();
         if(userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Пользователь с таким email уже существует!");
+            throw new UserConflictException("Пользователь с таким email уже существует!");
         }
 
         var newUser = new User();
@@ -90,12 +93,11 @@ public class AuthServiceImpl implements AuthServiceI {
     }
 
     @Override
-    public JwtResponse getAccessToken(String refreshToken) throws AuthException {
+    public JwtResponse getAccessToken(String refreshToken) throws UserNotFoundException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
-            var user = userServiceImpl.getByEmail(email)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+            User user = userServiceImpl.getByEmail(email);
             var saveRefreshToken = tokenRepository.findByUser(user).get().getBody();
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final String accessToken = jwtProvider.generateAccessToken(user);
@@ -107,31 +109,31 @@ public class AuthServiceImpl implements AuthServiceI {
 
     @Transactional
     @Override
-    public JwtResponse refresh(String refreshToken) throws AuthException {
+    public JwtResponse refresh(String refreshToken)
+            throws UserNotFoundException, TokenNotFoundException, TokenInvalidException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
-            final User user = userServiceImpl.getByEmail(email)
-                    .orElseThrow(() -> new AuthException("Пользователь не найден"));
+            User user = userServiceImpl.getByEmail(email);
             var saveRefreshToken = tokenRepository.findByUser(user);
             if (saveRefreshToken.isPresent() && saveRefreshToken.get().getBody().equals(refreshToken)) {
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
                 var existingToken = tokenRepository.findByUser(user)
-                        .orElseThrow(() -> new AuthException("Токен не найден"));
+                        .orElseThrow(() -> new TokenNotFoundException("Токен не найден"));
                 existingToken.setBody(newRefreshToken);
                 tokenRepository.save(existingToken);
                 return new JwtResponse(accessToken, newRefreshToken);
             }
         }
-        throw new AuthException("Невалидный JWT токен");
+        throw new TokenInvalidException("Невалидный JWT токен");
     }
 
     @Transactional
     @Override
-    public void logout(String refreshToken) throws AuthException {
+    public void logout(String refreshToken) throws TokenNotFoundException {
         var token = tokenRepository.findByBody(refreshToken)
-                .orElseThrow(() -> new AuthException("Токен не найден"));
+                .orElseThrow(() -> new TokenNotFoundException("Токен не найден"));
 
         var user = token.getUser();
         user.setRefreshToken(null);
@@ -148,9 +150,9 @@ public class AuthServiceImpl implements AuthServiceI {
         return getAuthInfo().getPrincipal().toString();
     }
 
-    public User getAuthenticatedUser(){
+    public User getAuthenticatedUser()
+            throws UserNotFoundException {
         String email = getAuthenticatedUserEmail();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Авторизованный пользователь не найден"));
+        return userServiceImpl.getByEmail(email);
     }
 }

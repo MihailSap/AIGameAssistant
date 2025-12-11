@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
 import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFoundException;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.mapper.GameMapper;
 import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
@@ -32,33 +34,38 @@ public class GameController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
-    public GameResponseDTO create(@ModelAttribute GameRequestDTO gameRequestDTO){
+    public GameResponseDTO create(@ModelAttribute GameRequestDTO gameRequestDTO)
+            throws CategoryNotFoundException {
         Game game = gameServiceImpl.create(gameRequestDTO);
         return gameMapper.mapToGameResponseDTO(game);
     }
 
     @GetMapping("/{gameId}")
-    public GameResponseDTO read(@PathVariable("gameId") Long gameId){
-        Game game = gameServiceImpl.getById(gameId);
+    public GameResponseDTO read(@PathVariable("gameId") Long gameId)
+            throws GameNotFoundException {
+        Game game = gameServiceImpl.getGameById(gameId);
         return gameMapper.mapToGameResponseDTO(game);
     }
 
     @GetMapping
     public List<GamePreviewDTO> readAll(){
-        List<Game> games = gameServiceImpl.getAll();
+        List<Game> games = gameServiceImpl.getAllGames();
         return gameMapper.mapToGamePreviewDTOs(games);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping(value = "/{gameId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public GameResponseDTO update(@PathVariable("gameId") Long gameId, @ModelAttribute GameRequestDTO gameDTO){
+    public GameResponseDTO update(
+            @PathVariable("gameId") Long gameId, @ModelAttribute GameRequestDTO gameDTO)
+            throws GameNotFoundException, CategoryNotFoundException {
         Game game = gameServiceImpl.update(gameId, gameDTO);
         return gameMapper.mapToGameResponseDTO(game);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{gameId}")
-    public void delete(@PathVariable("gameId") Long gameId){
+    public void delete(@PathVariable("gameId") Long gameId)
+            throws GameNotFoundException {
         gameServiceImpl.delete(gameId);
     }
 }

@@ -1,23 +1,27 @@
 package ru.project.gameAssistantBackend.service;
 
-import jakarta.security.auth.message.AuthException;
 import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
 import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
+import ru.project.gameAssistantBackend.exception.customEx.conflict.UserConflictException;
+import ru.project.gameAssistantBackend.exception.customEx.invalid.PasswordInvalidException;
+import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidException;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.User;
 
 public interface AuthServiceI {
 
-    JwtResponse login(JwtRequest authRequest) throws AuthException;
+    JwtResponse login(JwtRequest authRequest) throws UserNotFoundException, PasswordInvalidException;
 
-    User register(UserRequestDTO userRequestDTO);
+    User register(UserRequestDTO userRequestDTO) throws UserConflictException;
 
-    JwtResponse getAccessToken(String refreshToken) throws AuthException;
+    JwtResponse getAccessToken(String refreshToken) throws UserNotFoundException;
 
-    JwtResponse refresh(String refreshToken) throws AuthException;
+    JwtResponse refresh(String refreshToken) throws UserNotFoundException, TokenNotFoundException, TokenInvalidException;
 
-    void logout(String refreshToken) throws AuthException;
+    void logout(String refreshToken) throws TokenNotFoundException;
 
     JwtAuthentication getAuthInfo();
 

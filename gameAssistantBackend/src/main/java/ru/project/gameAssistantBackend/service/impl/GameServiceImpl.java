@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFoundException;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.models.Category;
 import ru.project.gameAssistantBackend.models.Game;
 import ru.project.gameAssistantBackend.repository.GameRepository;
@@ -36,19 +38,19 @@ public class GameServiceImpl implements GameServiceI {
     }
 
     @Override
-    public List<Game> getAll(){
+    public List<Game> getAllGames(){
         return gameRepository.findAll();
     }
 
     @Override
-    public Game getById(Long id){
+    public Game getGameById(Long id) throws GameNotFoundException {
         return gameRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Игра с таким id не найдена"));
+                .orElseThrow(() -> new GameNotFoundException("Игра с таким id не найдена"));
     }
 
     @Transactional
     @Override
-    public Game create(GameRequestDTO gameRequestDTO){
+    public Game create(GameRequestDTO gameRequestDTO) throws CategoryNotFoundException {
         var game = new Game();
         game.setTitle(gameRequestDTO.title());
         game.setDescription(gameRequestDTO.description());
@@ -70,8 +72,8 @@ public class GameServiceImpl implements GameServiceI {
 
     @Transactional
     @Override
-    public Game update(Long id, GameRequestDTO gameRequestDTO){
-        var game = getById(id);
+    public Game update(Long id, GameRequestDTO gameRequestDTO) throws GameNotFoundException, CategoryNotFoundException {
+        var game = getGameById(id);
         game.setTitle(gameRequestDTO.title());
         game.setDescription(gameRequestDTO.description());
 
@@ -100,8 +102,8 @@ public class GameServiceImpl implements GameServiceI {
 
     @Transactional
     @Override
-    public void delete(Long id){
-        var game = getById(id);
+    public void delete(Long id) throws GameNotFoundException {
+        var game = getGameById(id);
         var imageFileTitle = game.getImageFileTitle();
         var rulesFileTitle = game.getRulesFileTitle();
         fileServiceImpl.delete(imageFileTitle);

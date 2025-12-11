@@ -3,6 +3,7 @@ package ru.project.gameAssistantBackend.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFoundException;
 import ru.project.gameAssistantBackend.models.Category;
 import ru.project.gameAssistantBackend.repository.CategoryRepository;
 
@@ -20,7 +21,7 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Set<Category> getCategories(List<String> names) {
+    public Set<Category> getCategories(List<String> names) throws CategoryNotFoundException {
         Set<Category> categories = new HashSet<>();
         for (String name : names) {
             categories.add(getByName(name));
@@ -28,18 +29,18 @@ public class CategoryService {
         return categories;
     }
 
-    public Category getByName(String name) {
+    public Category getByName(String name) throws CategoryNotFoundException {
         return categoryRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Категория не найдена"));
+                .orElseThrow(() -> new CategoryNotFoundException("Категория не найдена"));
     }
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
-    public Category getById(Long id) {
+    public Category getById(Long id) throws CategoryNotFoundException {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Категория не найдена"));
+                .orElseThrow(() -> new CategoryNotFoundException("Категория не найдена"));
     }
 
     @Transactional

@@ -7,6 +7,7 @@ import ru.project.gameAssistantBackend.dto.ResponseDTO;
 import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.mapper.UserMapper;
 import ru.project.gameAssistantBackend.models.Model;
 import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
@@ -38,35 +39,39 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserResponseDTO getUser(@PathVariable("userId") Long userId){
+    public UserResponseDTO getUser(@PathVariable("userId") Long userId)
+            throws UserNotFoundException {
         var user = userServiceImpl.getById(userId);
         return userMapper.mapToResponseDTO(user);
     }
 
     @PatchMapping("/{userId}/password")
     public void updatePassword(
-            @PathVariable("userId") Long userId, @RequestBody UpdatePasswordDTO updatePasswordDTO){
+            @PathVariable("userId") Long userId, @RequestBody UpdatePasswordDTO updatePasswordDTO)
+            throws UserNotFoundException {
         userServiceImpl.updatePassword(userId, updatePasswordDTO);
     }
 
     @PatchMapping("/{userId}/model")
-    public void updateModel(@PathVariable("userId") Long userId, @RequestParam Model model){
+    public void updateModel(@PathVariable("userId") Long userId, @RequestParam Model model)
+            throws UserNotFoundException {
         userServiceImpl.updateModel(userId, model);
     }
 
     @PatchMapping("/{userId}/image")
     public UserResponseDTO updateImage(
-            @PathVariable("userId") Long userId, @ModelAttribute UserRequestDTO userRequestDTO){
+            @PathVariable("userId") Long userId, @ModelAttribute UserRequestDTO userRequestDTO)
+            throws UserNotFoundException {
         User user = userServiceImpl.updateImage(userId, userRequestDTO.imageFile());
         return userMapper.mapToResponseDTO(user);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/authenticated")
-    public UserResponseDTO getAuthenticatedUser() {
+    public UserResponseDTO getAuthenticatedUser() throws UserNotFoundException {
         final JwtAuthentication authInfo = authServiceImpl.getAuthInfo();
         var personEmail = authInfo.getPrincipal().toString();
-        User user = userServiceImpl.getResponseDTOByEmail(personEmail);
+        User user = userServiceImpl.getByEmail(personEmail);
         return userMapper.mapToResponseDTO(user);
     }
 
@@ -79,22 +84,22 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable("userId") Long userId){
+    public void delete(@PathVariable("userId") Long userId) throws UserNotFoundException {
         userServiceImpl.deleteUser(userId);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/{userId}/make-admin")
-    public ResponseDTO makeAdmin(@PathVariable("userId") Long userId){
-        userServiceImpl.changeRole(userId);
+    public ResponseDTO makeAdmin(@PathVariable("userId") Long userId) throws UserNotFoundException {
+        userServiceImpl.updateRole(userId);
         return new ResponseDTO(String.format(
                 "Пользователь с id = %d теперь имеет роль ADMIN", userId));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/{userId}/make-not-admin")
-    public ResponseDTO makeNotAdmin(@PathVariable("userId") Long userId){
-        userServiceImpl.changeRole(userId);
+    public ResponseDTO makeNotAdmin(@PathVariable("userId") Long userId) throws UserNotFoundException {
+        userServiceImpl.updateRole(userId);
         return new ResponseDTO(String.format(
                 "Пользователь с id = %d теперь имеет роль USER", userId));
     }

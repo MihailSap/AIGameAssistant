@@ -6,14 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
-import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.models.Model;
 import ru.project.gameAssistantBackend.models.Role;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.UserRepository;
 import ru.project.gameAssistantBackend.service.UserServiceI;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,25 +33,20 @@ public class UserServiceImpl implements UserServiceI {
     }
 
     @Override
-    public Optional<User> getByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User getByEmail(String email) throws UserNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
     }
 
     @Override
-    public User getResponseDTOByEmail(String email) {
-        return getByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-    }
-
-    @Override
-    public User getById(Long id){
+    public User getById(Long id) throws UserNotFoundException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь с таким id не найден"));
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким id не найден"));
     }
 
     @Transactional
     @Override
-    public void updatePassword(Long userId, UpdatePasswordDTO updatePasswordDTO){
+    public void updatePassword(Long userId, UpdatePasswordDTO updatePasswordDTO) throws UserNotFoundException {
         var user = getById(userId);
         var newEncodedPassword = passwordEncoder.encode(updatePasswordDTO.newPassword());
         user.setPassword(newEncodedPassword);
@@ -60,7 +54,7 @@ public class UserServiceImpl implements UserServiceI {
     }
 
     @Transactional
-    public void updateModel(Long userId, Model model){
+    public void updateModel(Long userId, Model model) throws UserNotFoundException {
         User user = getById(userId);
         user.setModel(model);
         userRepository.save(user);
@@ -68,7 +62,7 @@ public class UserServiceImpl implements UserServiceI {
 
     @Transactional
     @Override
-    public User updateImage(Long userId, MultipartFile imageFile){
+    public User updateImage(Long userId, MultipartFile imageFile) throws UserNotFoundException {
         User user = getById(userId);
 
         var oldUserImageTitle = user.getImageFileTitle();
@@ -88,14 +82,14 @@ public class UserServiceImpl implements UserServiceI {
 
     @Transactional
     @Override
-    public void deleteUser(Long userId){
+    public void deleteUser(Long userId) throws UserNotFoundException {
         var user = getById(userId);
         userRepository.delete(user);
     }
 
     @Transactional
     @Override
-    public void changeRole(Long id){
+    public void updateRole(Long id) throws UserNotFoundException {
         var user = getById(id);
         if(user.getRole().equals(Role.ADMIN)){
             user.setRole(Role.USER);

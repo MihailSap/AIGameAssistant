@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.category.CategoryRequestDTO;
 import ru.project.gameAssistantBackend.dto.category.CategoryResponseDTO;
+import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFoundException;
 import ru.project.gameAssistantBackend.mapper.CategoryMapper;
 import ru.project.gameAssistantBackend.models.Category;
 import ru.project.gameAssistantBackend.service.impl.CategoryService;
@@ -35,7 +36,8 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public CategoryResponseDTO getCategoryById(@PathVariable("categoryId") Long categoryId){
+    public CategoryResponseDTO getCategoryById(@PathVariable("categoryId") Long categoryId)
+            throws CategoryNotFoundException {
         Category category = categoryService.getById(categoryId);
         return categoryMapper.mapToCategoryResponseDTO(category);
     }
@@ -54,9 +56,10 @@ public class CategoryController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{categoryId}")
-    public String deleteCategoryById(@PathVariable("categoryId") Long categoryId){
+    public String deleteCategoryById(@PathVariable("categoryId") Long categoryId)
+            throws CategoryNotFoundException {
         Category category = categoryService.getById(categoryId);
         categoryService.delete(category);
-        return "Категория с id = " + categoryId + " была удалена";
+        return String.format("Категория с id = %d была удалена", categoryId);
     }
 }
