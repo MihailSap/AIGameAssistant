@@ -7,11 +7,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "uzer")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class User extends BaseEntity{
 
     private String email;
 
@@ -82,10 +78,6 @@ public class User {
         this.role = roles;
     }
 
-    public long getId() {
-        return id;
-    }
-
     public Token getRefreshToken() {
         return refreshToken;
     }
@@ -130,19 +122,4 @@ public class User {
             token.setUser(this);
         }
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        User user = (User) o;
-//        return id == user.id && Objects.equals(email, user.email) && Objects.equals(login, user.login)
-//                && Objects.equals(password, user.password) && role == user.role && Objects.equals(refreshToken, user.refreshToken)
-//                && Objects.equals(imageFileTitle, user.imageFileTitle) && Objects.equals(games, user.games) && Objects.equals(chats, user.chats);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id, email, login, password, role, refreshToken, imageFileTitle, games, chats);
-//    }
 }

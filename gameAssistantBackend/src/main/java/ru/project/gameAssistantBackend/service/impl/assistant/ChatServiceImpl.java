@@ -24,10 +24,15 @@ import java.util.List;
 public class ChatServiceImpl implements ChatServiceI {
 
     private final GameServiceImpl gameServiceImpl;
+
     private final SystemPropertiesServiceImpl systemPropertiesServiceImpl;
+
     private final AuthServiceImpl authServiceImpl;
+
     private final ChatRepository chatRepository;
+
     private final FileServiceImpl fileServiceImpl;
+
     private final AssistantServiceImpl assistantServiceImpl;
 
     @Autowired

@@ -3,16 +3,11 @@ package ru.project.gameAssistantBackend.models;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "game")
-public class Game {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Game extends BaseEntity{
 
     private String title;
 
@@ -37,7 +32,7 @@ public class Game {
     private Set<Chat> chats;
 
     public Game(Long id, String title, String description, Set<Category> categories, String imageFileTitle, String rulesFileTitle) {
-        this.id = id;
+        this.setId(id);
         this.title = title;
         this.description = description;
         this.categories = categories;
@@ -46,14 +41,6 @@ public class Game {
     }
 
     public Game() {}
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -116,28 +103,9 @@ public class Game {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Game game = (Game) o;
-        return Objects.equals(id, game.id) && Objects.equals(title, game.title)
-                && Objects.equals(description, game.description)
-                && categories == game.categories
-                && Objects.equals(imageFileTitle, game.imageFileTitle)
-                && Objects.equals(rulesFileTitle, game.rulesFileTitle)
-                && Objects.equals(users, game.users)
-                && Objects.equals(chats, game.chats);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, description, categories, imageFileTitle, rulesFileTitle, users, chats);
-    }
-
-    @Override
     public String toString() {
         return "Game{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", gameCategory=" + categories +

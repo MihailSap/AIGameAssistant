@@ -8,11 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "message")
-public class Message {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Message extends BaseEntity {
 
     private ChatRole role;
 
@@ -26,7 +22,7 @@ public class Message {
     private Chat chat;
 
     public Message(Long id, ChatRole role, String text, Chat chat, Instant timestamp) {
-        this.id = id;
+        this.setId(id);
         this.role = role;
         this.text = text;
         this.chat = chat;
@@ -34,14 +30,6 @@ public class Message {
     }
 
     public Message() {}
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public ChatRole getRole() {
         return role;
@@ -73,19 +61,6 @@ public class Message {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Message message = (Message) o;
-        return Objects.equals(id, message.id) && role == message.role && Objects.equals(text, message.text) && Objects.equals(chat, message.chat);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, role, text, chat);
     }
 
     @Override

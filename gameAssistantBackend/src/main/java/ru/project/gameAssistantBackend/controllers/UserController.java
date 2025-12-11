@@ -20,6 +20,7 @@ import java.util.List;
 public class UserController {
 
     private final UserServiceImpl userServiceImpl;
+
     private final AuthServiceImpl authServiceImpl;
 
     @Autowired

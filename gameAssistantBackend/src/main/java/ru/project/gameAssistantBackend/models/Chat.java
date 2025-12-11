@@ -5,15 +5,10 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "chat")
-public class Chat {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Chat extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name = "uzer_id", nullable = false)
@@ -31,7 +26,7 @@ public class Chat {
     private List<Message> messages = new ArrayList<>();
 
     public Chat(Long id, String title, Instant lastUsedTime, User uzer, List<Message> messages) {
-        this.id = id;
+        this.setId(id);
         this.title = title;
         this.lastUseTime = lastUsedTime;
         this.uzer = uzer;
@@ -39,14 +34,6 @@ public class Chat {
     }
 
     public Chat() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public User getUzer() {
@@ -101,18 +88,5 @@ public class Chat {
         message.setChat(this);
         this.messages.add(message);
         return message;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Chat chat = (Chat) o;
-        return Objects.equals(id, chat.id) && Objects.equals(uzer, chat.uzer) && Objects.equals(messages, chat.messages);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, uzer, messages);
     }
 }

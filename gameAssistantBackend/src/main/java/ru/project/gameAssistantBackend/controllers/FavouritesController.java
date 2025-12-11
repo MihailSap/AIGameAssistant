@@ -19,8 +19,11 @@ import java.util.Set;
 public class FavouritesController {
 
     private final FavouritesServiceImpl favouritesServiceImpl;
+
     private final AuthServiceImpl authServiceImpl;
+
     private final UserServiceImpl userServiceImpl;
+
     private final GameMapper gameMapper;
 
     @Autowired

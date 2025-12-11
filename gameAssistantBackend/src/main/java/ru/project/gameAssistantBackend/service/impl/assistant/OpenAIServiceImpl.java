@@ -22,6 +22,7 @@ public class OpenAIServiceImpl implements AssistantService {
     private String apiKey;
 
     private final WebClient webClient;
+
     private final ObjectMapper objectMapper;
 
     @Autowired

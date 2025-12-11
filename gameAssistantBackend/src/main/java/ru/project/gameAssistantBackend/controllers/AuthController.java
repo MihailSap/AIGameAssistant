@@ -18,6 +18,7 @@ import ru.project.gameAssistantBackend.service.impl.UserServiceImpl;
 public class AuthController {
 
     private final AuthServiceImpl authServiceImpl;
+
     private final UserServiceImpl userServiceImpl;
 
     @Autowired
