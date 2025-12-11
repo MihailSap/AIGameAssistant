@@ -41,3 +41,5 @@ databaseChangeLog:
       file: db/changelog/020-add-model-to-user.yaml
   - include:
       file: db/changelog/021-add-default-model.yaml
+  - include:
+      file: db/changelog/022-insert-admin.yaml

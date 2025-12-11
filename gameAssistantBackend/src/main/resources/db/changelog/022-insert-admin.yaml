@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 34
+      author: mihail
+      changes:
+        - insert:
+            tableName: uzer
+            columns:
+              - column:
+                  name: login
+                  value: "123admin123"
+              - column:
+                  name: email
+                  value: "123admin123@mail.com"
+              - column:
+                  name: password
+                  value: "12345678"
+              - column:
+                  name: role
+                  value: "1"

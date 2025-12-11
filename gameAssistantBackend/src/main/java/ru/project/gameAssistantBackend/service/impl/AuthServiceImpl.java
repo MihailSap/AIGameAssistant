@@ -86,10 +86,6 @@ public class AuthServiceImpl implements AuthServiceI {
         String imageFileTitle = fileServiceImpl.save(imageFile);
         newUser.setImageFileTitle(imageFileTitle);
 
-        if(userRequestDTO.isAdmin()){
-            newUser.setRole(Role.ADMIN);
-        }
-
         return userRepository.save(newUser);
     }
 
