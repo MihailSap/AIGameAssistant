@@ -28,15 +28,16 @@ public class UserController {
         this.authServiceImpl = authServiceImpl;
     }
 
-    @GetMapping("/{id}")
-    public UserResponseDTO getUser(@PathVariable("id") Long id){
-        var user = userServiceImpl.getById(id);
+    @GetMapping("/{userId}")
+    public UserResponseDTO getUser(@PathVariable("userId") Long userId){
+        var user = userServiceImpl.getById(userId);
         return userServiceImpl.mapToResponseDTO(user);
     }
 
-    @PatchMapping("/{id}/update/password")
-    public void updatePassword(@PathVariable("id") Long id, @RequestBody UpdatePasswordDTO updatePasswordDTO){
-        userServiceImpl.updatePassword(id, updatePasswordDTO);
+    @PatchMapping("/{userId}/password")
+    public void updatePassword(
+            @PathVariable("userId") Long userId, @RequestBody UpdatePasswordDTO updatePasswordDTO){
+        userServiceImpl.updatePassword(userId, updatePasswordDTO);
     }
 
     @PatchMapping("/{userId}/model")
@@ -44,9 +45,10 @@ public class UserController {
         userServiceImpl.updateModel(userId, model);
     }
 
-    @PatchMapping("/{id}/update/image")
-    public UserResponseDTO updateImage(@PathVariable("id") Long id, @ModelAttribute UserRequestDTO userRequestDTO){
-        User user = userServiceImpl.updateImage(id, userRequestDTO.imageFile());
+    @PatchMapping("/{userId}/image")
+    public UserResponseDTO updateImage(
+            @PathVariable("userId") Long userId, @ModelAttribute UserRequestDTO userRequestDTO){
+        User user = userServiceImpl.updateImage(userId, userRequestDTO.imageFile());
         return userServiceImpl.mapToResponseDTO(user);
     }
 
@@ -66,24 +68,24 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id){
-        userServiceImpl.deleteUser(id);
+    @DeleteMapping("/{userId}")
+    public void delete(@PathVariable("userId") Long userId){
+        userServiceImpl.deleteUser(userId);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PatchMapping("/{id}/make-admin")
-    public ResponseDTO makeAdmin(@PathVariable("id") Long id){
-        userServiceImpl.changeRole(id);
-        String message = String.format("Пользователь с id = %d теперь имеет роль ADMIN", id);
-        return new ResponseDTO(message);
+    @PatchMapping("/{userId}/make-admin")
+    public ResponseDTO makeAdmin(@PathVariable("userId") Long userId){
+        userServiceImpl.changeRole(userId);
+        return new ResponseDTO(String.format(
+                "Пользователь с id = %d теперь имеет роль ADMIN", userId));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PatchMapping("/{id}/make-not-admin")
-    public ResponseDTO makeNotAdmin(@PathVariable("id") Long id){
-        userServiceImpl.changeRole(id);
-        String message = String.format("Пользователь с id = %d теперь имеет роль USER", id);
-        return new ResponseDTO(message);
+    @PatchMapping("/{userId}/make-not-admin")
+    public ResponseDTO makeNotAdmin(@PathVariable("userId") Long userId){
+        userServiceImpl.changeRole(userId);
+        return new ResponseDTO(String.format(
+                "Пользователь с id = %d теперь имеет роль USER", userId));
     }
 }

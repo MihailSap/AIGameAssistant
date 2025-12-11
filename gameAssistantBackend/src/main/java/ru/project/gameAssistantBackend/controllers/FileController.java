@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.project.gameAssistantBackend.service.impl.FileServiceImpl;
 
-import java.io.IOException;
-
 @RestController
-@RequestMapping("/api/file")
+@RequestMapping("/api/files")
 public class FileController {
 
     private final FileServiceImpl fileServiceImpl;
@@ -40,7 +38,7 @@ public class FileController {
     }
 
     @GetMapping("/rules/text/{rulesFileTitle}")
-    public String getTextFromFile(@PathVariable("rulesFileTitle") String rulesFileTitle) throws IOException {
+    public String getTextFromFile(@PathVariable("rulesFileTitle") String rulesFileTitle)  {
         return fileServiceImpl.extractTextFromMarkdown(rulesFileTitle);
     }
 }

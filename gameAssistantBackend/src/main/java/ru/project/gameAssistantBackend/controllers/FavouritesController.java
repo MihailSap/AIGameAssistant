@@ -31,7 +31,7 @@ public class FavouritesController {
         this.gameMapper = gameMapper;
     }
 
-    @PostMapping("/{gameId}/add")
+    @PostMapping("/{gameId}")
     public ResponseDTO addGameToFavourites(@PathVariable("gameId") Long gameId){
         String userEmail = authServiceImpl.getAuthenticatedUserEmail();
         Long userId = userServiceImpl.getByEmail(userEmail).get().getId();
@@ -40,13 +40,13 @@ public class FavouritesController {
         return new ResponseDTO(message);
     }
 
-    @DeleteMapping("/{gameId}/remove")
+    @DeleteMapping("/{gameId}")
     public ResponseDTO removeGameFromFavourites(@PathVariable("gameId") Long gameId){
         String userEmail = authServiceImpl.getAuthenticatedUserEmail();
         Long userId = userServiceImpl.getByEmail(userEmail).get().getId();
         favouritesServiceImpl.removeGameFromUserFavourites(userId, gameId);
-        String message = String.format("Игра с id=%d удалена из избранных текущего пользователя", gameId);
-        return new ResponseDTO(message);
+        return new ResponseDTO(String.format(
+                "Игра с id=%d удалена из избранных текущего пользователя", gameId));
     }
 
     @GetMapping

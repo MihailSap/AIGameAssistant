@@ -28,6 +28,7 @@ public class ChatController {
     private final ChatModelFactory chatModelFactory;
 
     private final AuthServiceImpl authServiceImpl;
+
     private final SystemPropertiesServiceImpl systemPropertiesServiceImpl;
 
     @Autowired
@@ -42,9 +43,9 @@ public class ChatController {
         this.systemPropertiesServiceImpl = systemPropertiesServiceImpl;
     }
 
-    @GetMapping("/{id}")
-    public ChatDTO getChat(@PathVariable("id") Long id){
-        Chat chat = chatServiceImpl.getChatById(id);
+    @GetMapping("/{chatId}")
+    public ChatDTO getChat(@PathVariable("chatId") Long chatId){
+        Chat chat = chatServiceImpl.getChatById(chatId);
         return chatMapper.mapToChatDTO(chat);
     }
 
@@ -54,9 +55,9 @@ public class ChatController {
         return chatMapper.mapToChatDTO(chat);
     }
 
-    @PutMapping("/{id}")
-    public ChatDTO continueChat(@PathVariable("id") Long id, @RequestBody SystemPropertiesDTO systemPropertiesDTO) {
-        Chat chat = chatServiceImpl.continueChat(id, systemPropertiesDTO);
+    @PutMapping("/{chatId}")
+    public ChatDTO continueChat(@PathVariable("chatId") Long chatId, @RequestBody SystemPropertiesDTO systemPropertiesDTO) {
+        Chat chat = chatServiceImpl.continueChat(chatId, systemPropertiesDTO);
         return chatMapper.mapToChatDTO(chat);
     }
 
@@ -79,14 +80,14 @@ public class ChatController {
         );
     }
 
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") Long id) {
-        return chatServiceImpl.delete(id);
+    @DeleteMapping("/{chatId}")
+    public String delete(@PathVariable("chatId") Long chatId) {
+        return chatServiceImpl.delete(chatId);
     }
 
-    @GetMapping("/md/{id}")
-    public String getMarkdownParsed(@PathVariable("id") Long id) {
-        return chatServiceImpl.getSystemMessageTextMd(id);
+    @GetMapping("/md/{chatId}")
+    public String getMarkdownParsed(@PathVariable("chatId") Long chatId) {
+        return chatServiceImpl.getSystemMessageTextMd(chatId);
     }
 
     @GetMapping("/by-game/{gameId}")

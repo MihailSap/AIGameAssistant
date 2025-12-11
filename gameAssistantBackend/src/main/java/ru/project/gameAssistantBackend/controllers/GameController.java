@@ -14,7 +14,7 @@ import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/game")
+@RequestMapping("/api/games")
 public class GameController {
 
     private final GameServiceImpl gameServiceImpl;
@@ -28,34 +28,34 @@ public class GameController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/create")
+    @PostMapping
     public GameResponseDTO create(@ModelAttribute GameRequestDTO gameRequestDTO){
         Game game = gameServiceImpl.create(gameRequestDTO);
         return gameMapper.mapToGameResponseDTO(game);
     }
 
-    @GetMapping("/{id}")
-    public GameResponseDTO read(@PathVariable("id") Long id){
-        Game game = gameServiceImpl.getById(id);
+    @GetMapping("/{gameId}")
+    public GameResponseDTO read(@PathVariable("gameId") Long gameId){
+        Game game = gameServiceImpl.getById(gameId);
         return gameMapper.mapToGameResponseDTO(game);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<GamePreviewDTO> readAll(){
         List<Game> games = gameServiceImpl.getAll();
         return gameMapper.mapToGamePreviewDTOs(games);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping(value = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public GameResponseDTO update(@PathVariable("id") Long id, @ModelAttribute GameRequestDTO gameDTO){
-        Game game = gameServiceImpl.update(id, gameDTO);
+    @PutMapping(value = "/{gameId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public GameResponseDTO update(@PathVariable("gameId") Long gameId, @ModelAttribute GameRequestDTO gameDTO){
+        Game game = gameServiceImpl.update(gameId, gameDTO);
         return gameMapper.mapToGameResponseDTO(game);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("/{id}/delete")
-    public void delete(@PathVariable("id") Long id){
-        gameServiceImpl.delete(id);
+    @DeleteMapping("/{gameId}")
+    public void delete(@PathVariable("gameId") Long gameId){
+        gameServiceImpl.delete(gameId);
     }
 }
