@@ -20,7 +20,6 @@ import ru.project.gameAssistantBackend.service.impl.FileServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 

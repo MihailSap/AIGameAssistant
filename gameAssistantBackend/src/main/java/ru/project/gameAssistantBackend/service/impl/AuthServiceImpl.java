@@ -24,6 +24,8 @@ import ru.project.gameAssistantBackend.repository.UserRepository;
 import ru.project.gameAssistantBackend.service.AuthServiceI;
 import ru.project.gameAssistantBackend.jwt.JwtProvider;
 
+import java.util.Optional;
+
 @Service
 public class AuthServiceImpl implements AuthServiceI {
 
@@ -74,12 +76,12 @@ public class AuthServiceImpl implements AuthServiceI {
     @Transactional
     @Override
     public User register(UserRequestDTO userRequestDTO) throws UserConflictException {
-        var email = userRequestDTO.email();
+        String email = userRequestDTO.email();
         if(userRepository.findByEmail(email).isPresent()) {
             throw new UserConflictException("Пользователь с таким email уже существует!");
         }
 
-        var newUser = new User();
+        User newUser = new User();
         newUser.setEmail(userRequestDTO.email());
         newUser.setLogin(userRequestDTO.login());
         newUser.setPassword(passwordEncoder.encode(userRequestDTO.password()));
@@ -98,7 +100,7 @@ public class AuthServiceImpl implements AuthServiceI {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
             User user = userServiceImpl.getByEmail(email);
-            var saveRefreshToken = tokenRepository.findByUser(user).get().getBody();
+            String saveRefreshToken = tokenRepository.findByUser(user).get().getBody();
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 return new JwtResponse(accessToken, null);
@@ -115,11 +117,11 @@ public class AuthServiceImpl implements AuthServiceI {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String email = claims.getSubject();
             User user = userServiceImpl.getByEmail(email);
-            var saveRefreshToken = tokenRepository.findByUser(user);
+            Optional<Token> saveRefreshToken = tokenRepository.findByUser(user);
             if (saveRefreshToken.isPresent() && saveRefreshToken.get().getBody().equals(refreshToken)) {
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
-                var existingToken = tokenRepository.findByUser(user)
+                Token existingToken = tokenRepository.findByUser(user)
                         .orElseThrow(() -> new TokenNotFoundException("Токен не найден"));
                 existingToken.setBody(newRefreshToken);
                 tokenRepository.save(existingToken);
@@ -132,10 +134,10 @@ public class AuthServiceImpl implements AuthServiceI {
     @Transactional
     @Override
     public void logout(String refreshToken) throws TokenNotFoundException {
-        var token = tokenRepository.findByBody(refreshToken)
+        Token token = tokenRepository.findByBody(refreshToken)
                 .orElseThrow(() -> new TokenNotFoundException("Токен не найден"));
 
-        var user = token.getUser();
+        User user = token.getUser();
         user.setRefreshToken(null);
         userRepository.save(user);
     }

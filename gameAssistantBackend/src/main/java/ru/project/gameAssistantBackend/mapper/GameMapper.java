@@ -14,14 +14,6 @@ import java.util.Set;
 @Component
 public class GameMapper {
 
-    public List<GameResponseDTO> mapToGameResponseDTOs(List<Game> games){
-        List<GameResponseDTO> gameDTOs = new ArrayList<>();
-        for (var game : games){
-            gameDTOs.add(mapToGameResponseDTO(game));
-        }
-        return gameDTOs;
-    }
-
     public GameResponseDTO mapToGameResponseDTO(Game game){
         Set<Category> categories = game.getCategories();
         return new GameResponseDTO(

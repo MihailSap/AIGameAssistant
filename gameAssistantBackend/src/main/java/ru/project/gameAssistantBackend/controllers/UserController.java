@@ -41,7 +41,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserResponseDTO getUser(@PathVariable("userId") Long userId)
             throws UserNotFoundException {
-        var user = userServiceImpl.getById(userId);
+        User user = userServiceImpl.getById(userId);
         return userMapper.mapToResponseDTO(user);
     }
 

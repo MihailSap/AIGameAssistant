@@ -23,7 +23,7 @@ public class FileController {
 
     @GetMapping("/image/{imageFileTitle}")
     public ResponseEntity<Resource> getImageFile(@PathVariable("imageFileTitle") String imageFileTitle) throws Exception {
-        var resource = fileServiceImpl.getFileResource(imageFileTitle);
+        Resource resource = fileServiceImpl.getFileResource(imageFileTitle);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(resource);
@@ -31,7 +31,7 @@ public class FileController {
 
     @GetMapping("/rules/{rulesFileTitle}")
     public ResponseEntity<Resource> getRulesFile(@PathVariable("rulesFileTitle") String rulesFileTitle) throws Exception {
-        var resource = fileServiceImpl.getFileResource(rulesFileTitle);
+        Resource resource = fileServiceImpl.getFileResource(rulesFileTitle);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);

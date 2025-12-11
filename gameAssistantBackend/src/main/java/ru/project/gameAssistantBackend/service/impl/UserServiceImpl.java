@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserServiceI {
     @Transactional
     @Override
     public void updatePassword(Long userId, UpdatePasswordDTO updatePasswordDTO) throws UserNotFoundException {
-        var user = getById(userId);
+        User user = getById(userId);
         var newEncodedPassword = passwordEncoder.encode(updatePasswordDTO.newPassword());
         user.setPassword(newEncodedPassword);
         userRepository.save(user);

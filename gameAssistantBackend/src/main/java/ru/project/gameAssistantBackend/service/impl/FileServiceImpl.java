@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
@@ -33,8 +34,8 @@ public class FileServiceImpl implements FileServiceI {
         }
         try {
             Files.createDirectories(Paths.get(uploadDir));
-            var fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            var targetFile = new File(uploadDir, fileName);
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            File targetFile = new File(uploadDir, fileName);
             file.transferTo(targetFile);
             System.out.println("Saving file to: " + targetFile.getAbsolutePath());
             return fileName;
@@ -49,7 +50,7 @@ public class FileServiceImpl implements FileServiceI {
             return;
         }
         try {
-            var filePath = Paths.get(uploadDir, fileName);
+            Path filePath = Paths.get(uploadDir, fileName);
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             throw new RuntimeException("Ошибка при удалении файла", e);
@@ -58,7 +59,7 @@ public class FileServiceImpl implements FileServiceI {
 
     @Override
     public Resource getFileResource(String fileTitle) throws MalformedURLException {
-        var path = Paths.get(String.format("uploads/%s", fileTitle));
+        Path path = Paths.get(String.format("uploads/%s", fileTitle));
         return new UrlResource(path.toUri());
     }
 

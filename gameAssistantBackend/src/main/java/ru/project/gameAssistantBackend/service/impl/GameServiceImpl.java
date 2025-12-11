@@ -3,6 +3,7 @@ package ru.project.gameAssistantBackend.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
@@ -51,7 +52,7 @@ public class GameServiceImpl implements GameServiceI {
     @Transactional
     @Override
     public Game create(GameRequestDTO gameRequestDTO) throws CategoryNotFoundException {
-        var game = new Game();
+        Game game = new Game();
         game.setTitle(gameRequestDTO.title());
         game.setDescription(gameRequestDTO.description());
 
@@ -59,12 +60,12 @@ public class GameServiceImpl implements GameServiceI {
         Set<Category> categories = categoryService.getCategories(categoryNames);
         game.setCategories(categories);
 
-        var imageFile = gameRequestDTO.imageFile();
-        var imageFileTitle = fileServiceImpl.save(imageFile);
+        MultipartFile imageFile = gameRequestDTO.imageFile();
+        String imageFileTitle = fileServiceImpl.save(imageFile);
         game.setImageFileTitle(imageFileTitle);
 
-        var rulesFile = gameRequestDTO.rulesFile();
-        var rulesFileTitle = fileServiceImpl.save(rulesFile);
+        MultipartFile rulesFile = gameRequestDTO.rulesFile();
+        String rulesFileTitle = fileServiceImpl.save(rulesFile);
         game.setRulesFileTitle(rulesFileTitle);
         converter.convertPdfToMdAsync(rulesFileTitle);
         return gameRepository.save(game);
@@ -73,7 +74,7 @@ public class GameServiceImpl implements GameServiceI {
     @Transactional
     @Override
     public Game update(Long id, GameRequestDTO gameRequestDTO) throws GameNotFoundException, CategoryNotFoundException {
-        var game = getGameById(id);
+        Game game = getGameById(id);
         game.setTitle(gameRequestDTO.title());
         game.setDescription(gameRequestDTO.description());
 
@@ -81,19 +82,19 @@ public class GameServiceImpl implements GameServiceI {
         Set<Category> categories = categoryService.getCategories(categoryNames);
         game.setCategories(categories);
 
-        var newImageFile = gameRequestDTO.imageFile();
+        MultipartFile newImageFile = gameRequestDTO.imageFile();
         if(!newImageFile.isEmpty()){
-            var oldImageFileTitle = game.getImageFileTitle();
+            String oldImageFileTitle = game.getImageFileTitle();
             fileServiceImpl.delete(oldImageFileTitle);
-            var newImageFileTitle = fileServiceImpl.save(newImageFile);
+            String newImageFileTitle = fileServiceImpl.save(newImageFile);
             game.setImageFileTitle(newImageFileTitle);
         }
 
-        var newRulesFile = gameRequestDTO.rulesFile();
+        MultipartFile newRulesFile = gameRequestDTO.rulesFile();
         if(!newRulesFile.isEmpty()){
-            var oldRulesFileTitle = game.getRulesFileTitle();
+            String oldRulesFileTitle = game.getRulesFileTitle();
             fileServiceImpl.delete(oldRulesFileTitle);
-            var newRulesFileTitle = fileServiceImpl.save(newRulesFile);
+            String newRulesFileTitle = fileServiceImpl.save(newRulesFile);
             game.setRulesFileTitle(newRulesFileTitle);
         }
 
@@ -103,9 +104,9 @@ public class GameServiceImpl implements GameServiceI {
     @Transactional
     @Override
     public void delete(Long id) throws GameNotFoundException {
-        var game = getGameById(id);
-        var imageFileTitle = game.getImageFileTitle();
-        var rulesFileTitle = game.getRulesFileTitle();
+        Game game = getGameById(id);
+        String imageFileTitle = game.getImageFileTitle();
+        String rulesFileTitle = game.getRulesFileTitle();
         fileServiceImpl.delete(imageFileTitle);
         fileServiceImpl.delete(rulesFileTitle);
         gameRepository.delete(game);
