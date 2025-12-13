@@ -70,10 +70,8 @@ public class OpenAIServiceImpl implements AssistantService {
     public Map<String, Object> buildRequestBody(List<Message> messages) {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-4o-mini");
-        body.put("temperature", 0.7);
-        body.put("max_tokens", 2000);
-        body.put("stream", true);
 
+        body.put("stream", true);
         List<Map<String, String>> openAiMessages = new ArrayList<>();
         for (Message message : messages) {
             openAiMessages.add(Map.of(
@@ -82,7 +80,8 @@ public class OpenAIServiceImpl implements AssistantService {
             ));
         }
         body.put("messages", openAiMessages);
-
+        body.put("temperature", 0.7);
+        body.put("max_tokens", 2000);
         return body;
     }
 }

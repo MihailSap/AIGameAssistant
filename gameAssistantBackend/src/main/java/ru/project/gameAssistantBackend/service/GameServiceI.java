@@ -1,15 +1,15 @@
 package ru.project.gameAssistantBackend.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.models.Game;
 
-import java.util.List;
-
 public interface GameServiceI {
 
-    List<Game> getAllGames();
+    Page<Game> getAllGames(Pageable pageable);
 
     Game getGameById(Long id) throws GameNotFoundException;
 

@@ -1,6 +1,8 @@
 package ru.project.gameAssistantBackend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -48,9 +50,12 @@ public class GameController {
     }
 
     @GetMapping
-    public List<GamePreviewDTO> readAll(){
-        List<Game> games = gameServiceImpl.getAllGames();
-        return gameMapper.mapToGamePreviewDTOs(games);
+    public List<GamePreviewDTO> readAll(
+            @RequestParam("offset") Integer offset,
+            @RequestParam("limit") Integer limit
+    ){
+        Page<Game> games = gameServiceImpl.getAllGames(PageRequest.of(offset, limit));
+        return gameMapper.mapToGamePreviewDTOs(games.getContent());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

@@ -1,6 +1,8 @@
 package ru.project.gameAssistantBackend.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,8 +41,8 @@ public class GameServiceImpl implements GameServiceI {
     }
 
     @Override
-    public List<Game> getAllGames(){
-        return gameRepository.findAll();
+    public Page<Game> getAllGames(Pageable pageable){
+        return gameRepository.findAll(pageable);
     }
 
     @Override
