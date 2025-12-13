@@ -50,6 +50,12 @@ public class GameController {
     }
 
     @GetMapping
+    public List<GamePreviewDTO> readAll() {
+        List<Game> games = gameServiceImpl.getAllGames();
+        return gameMapper.mapToGamePreviewDTOs(games);
+    }
+
+    @GetMapping("/page")
     public List<GamePreviewDTO> readAll(
             @RequestParam("offset") Integer offset,
             @RequestParam("limit") Integer limit

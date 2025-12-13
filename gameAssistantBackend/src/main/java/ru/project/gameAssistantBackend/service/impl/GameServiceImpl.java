@@ -45,6 +45,10 @@ public class GameServiceImpl implements GameServiceI {
         return gameRepository.findAll(pageable);
     }
 
+    public List<Game> getAllGames(){
+        return gameRepository.findAll();
+    }
+
     @Override
     public Game getGameById(Long id) throws GameNotFoundException {
         return gameRepository.findById(id)
