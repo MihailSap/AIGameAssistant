@@ -17,7 +17,6 @@ import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotE
 import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.models.Role;
-import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.Token;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.TokenRepository;
@@ -114,6 +113,27 @@ public class AuthServiceImpl implements AuthServiceI {
         return userRepository.save(user);
     }
 
+    public void setNullPasswordResetToken(User user){
+        user.setPasswordResetToken(null);
+        userRepository.save(user);
+    }
+
+    public String setPasswordResetToken(User user) {
+        String token = UUID.randomUUID().toString();
+        user.setPasswordResetToken(token);
+        userRepository.save(user);
+        return token;
+    }
+
+    public void sendPasswordResetEmail(String email, String token) {
+        String passwordResetUrl = "http://localhost:3000/reset-password?token=" + token;
+        emailService.sendEmail(
+                email,
+                "AI Game Assistant: Сброс пароля",
+                "Для сброса пароля перейдите по ссылке: " + passwordResetUrl
+        );
+    }
+
     public boolean validateVerificationToken(String token) {
         User user = userRepository.findByVerificationToken(token).orElse(null);
         if (user == null) {
@@ -174,13 +194,8 @@ public class AuthServiceImpl implements AuthServiceI {
     }
 
     @Override
-    public JwtAuthentication getAuthInfo() {
-        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
-    }
-
-    @Override
     public String getAuthenticatedUserEmail(){
-        return getAuthInfo().getPrincipal().toString();
+        return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
     }
 
     public User getAuthenticatedUser()

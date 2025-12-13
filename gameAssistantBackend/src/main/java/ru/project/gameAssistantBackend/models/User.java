@@ -29,6 +29,8 @@ public class User extends BaseEntity{
 
     private String verificationToken;
 
+    private String passwordResetToken;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "uzer_favourites",
@@ -124,6 +126,14 @@ public class User extends BaseEntity{
 
     public void setVerificationToken(String verificationToken) {
         this.verificationToken = verificationToken;
+    }
+
+    public String getPasswordResetToken() {
+        return passwordResetToken;
+    }
+
+    public void setPasswordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
     }
 
     public void addGame(Game game) {

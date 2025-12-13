@@ -15,9 +15,9 @@ public interface UserServiceI {
 
     User getById(Long id) throws UserNotFoundException;
 
-    void updatePassword(Long userId, UpdatePasswordDTO updatePasswordDTO) throws UserNotFoundException;
+    void updatePassword(User user, String password);
 
-    User updateImage(Long userId, MultipartFile imageFile) throws UserNotFoundException;
+    User updateImage(User user, MultipartFile imageFile);
 
     void updateRole(Long id) throws UserNotFoundException;
 

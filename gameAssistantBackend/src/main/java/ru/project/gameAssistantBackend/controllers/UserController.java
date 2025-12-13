@@ -50,7 +50,8 @@ public class UserController {
             @PathVariable("userId") Long userId,
             @RequestBody UpdatePasswordDTO updatePasswordDTO)
             throws UserNotFoundException {
-        userServiceImpl.updatePassword(userId, updatePasswordDTO);
+        User user = userServiceImpl.getById(userId);
+        userServiceImpl.updatePassword(user, updatePasswordDTO.newPassword());
     }
 
     @PatchMapping("/{userId}/model")
@@ -58,7 +59,8 @@ public class UserController {
             @PathVariable("userId") Long userId,
             @RequestParam Model model)
             throws UserNotFoundException {
-        userServiceImpl.updateModel(userId, model);
+        User user = userServiceImpl.getById(userId);
+        userServiceImpl.updateModel(user, model);
     }
 
     @PatchMapping("/{userId}/image")
@@ -66,15 +68,14 @@ public class UserController {
             @PathVariable("userId") Long userId,
             @ModelAttribute UserRequestDTO userRequestDTO)
             throws UserNotFoundException {
-        User user = userServiceImpl.updateImage(userId, userRequestDTO.imageFile());
-        return userMapper.mapToResponseDTO(user);
+        User user = userServiceImpl.getById(userId);
+        User updatedUser = userServiceImpl.updateImage(user, userRequestDTO.imageFile());
+        return userMapper.mapToResponseDTO(updatedUser);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/authenticated")
     public UserResponseDTO getAuthenticatedUser() throws UserNotFoundException {
-        final JwtAuthentication authInfo = authServiceImpl.getAuthInfo();
-        String personEmail = authInfo.getPrincipal().toString();
+        String personEmail = authServiceImpl.getAuthenticatedUserEmail();
         User user = userServiceImpl.getByEmail(personEmail);
         return userMapper.mapToResponseDTO(user);
     }

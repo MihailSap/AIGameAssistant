@@ -24,7 +24,5 @@ public interface AuthServiceI {
 
     void logout(String refreshToken) throws TokenNotFoundException;
 
-    JwtAuthentication getAuthInfo();
-
     String getAuthenticatedUserEmail();
 }

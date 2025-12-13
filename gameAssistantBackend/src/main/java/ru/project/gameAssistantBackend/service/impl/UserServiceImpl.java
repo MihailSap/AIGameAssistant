@@ -26,10 +26,19 @@ public class UserServiceImpl implements UserServiceI {
     private final FileServiceImpl fileServiceImpl;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, FileServiceImpl fileServiceImpl) {
+    public UserServiceImpl(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            FileServiceImpl fileServiceImpl
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileServiceImpl = fileServiceImpl;
+    }
+
+    @Override
+    public List<User> getAllUsers(){
+        return userRepository.findAll();
     }
 
     @Override
@@ -46,56 +55,52 @@ public class UserServiceImpl implements UserServiceI {
 
     @Transactional
     @Override
-    public void updatePassword(Long userId, UpdatePasswordDTO updatePasswordDTO) throws UserNotFoundException {
-        User user = getById(userId);
-        var newEncodedPassword = passwordEncoder.encode(updatePasswordDTO.newPassword());
+    public void updatePassword(User user, String password) {
+        String newEncodedPassword = passwordEncoder.encode(password);
         user.setPassword(newEncodedPassword);
         userRepository.save(user);
     }
 
     @Transactional
-    public void updateModel(Long userId, Model model) throws UserNotFoundException {
-        User user = getById(userId);
+    public void updateModel(User user, Model model) {
         user.setModel(model);
         userRepository.save(user);
     }
 
     @Transactional
     @Override
-    public User updateImage(Long userId, MultipartFile imageFile) throws UserNotFoundException {
-        User user = getById(userId);
-
-        var oldUserImageTitle = user.getImageFileTitle();
+    public User updateImage(User user, MultipartFile imageFile) {
+        String oldUserImageTitle = user.getImageFileTitle();
         fileServiceImpl.delete(oldUserImageTitle);
 
-        var newUserImageTitle = fileServiceImpl.save(imageFile);
+        String newUserImageTitle = fileServiceImpl.save(imageFile);
         user.setImageFileTitle(newUserImageTitle);
         userRepository.save(user);
 
         return user;
     }
 
-    @Override
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
-    }
-
-    @Transactional
-    @Override
-    public void deleteUser(Long userId) throws UserNotFoundException {
-        var user = getById(userId);
-        userRepository.delete(user);
-    }
-
     @Transactional
     @Override
     public void updateRole(Long id) throws UserNotFoundException {
-        var user = getById(id);
+        User user = getById(id);
         if(user.getRole().equals(Role.ADMIN)){
             user.setRole(Role.USER);
         } else {
             user.setRole(Role.ADMIN);
         }
         userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public void deleteUser(Long userId) throws UserNotFoundException {
+        User user = getById(userId);
+        userRepository.delete(user);
+    }
+
+    public User getUserByPasswordResetToken(String token) {
+        return userRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
 }
