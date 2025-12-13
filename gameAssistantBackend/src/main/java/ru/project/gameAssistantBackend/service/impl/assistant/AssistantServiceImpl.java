@@ -18,13 +18,13 @@ import java.util.Map;
 @Service
 public class AssistantServiceImpl implements AssistantServiceI {
 
-    @Value("${yandex-cloud.gpt.api-key}")
+    @Value("${ai.yandex.key}")
     private String apiKey;
 
-    @Value("${yandex-cloud.gpt.api-url}")
+    @Value("${ai.yandex.url}")
     private String apiUrl;
 
-    @Value("${yandex-cloud.gpt.catalog-id}")
+    @Value("${ai.yandex.catalog-id}")
     private String catalogId;
 
     private final RestTemplate restTemplate;

@@ -40,13 +40,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
-                                "/api/file/**",
+                                "/api/files/**",
                                 "/api/auth/login",
                                 "/api/auth/logout",
                                 "/api/auth/token",
                                 "/api/auth/register",
+                                "/api/auth/refresh",
                                 "/api/hello/some-user",
-                                "/api/games"
+                                "/api/games/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

@@ -20,13 +20,13 @@ import java.util.function.Consumer;
 @Service("YANDEX_GPT")
 public class YandexGptServiceImpl implements AssistantService {
 
-    @Value("${yandex-cloud.gpt.api-key}")
+    @Value("${ai.yandex.key}")
     private String apiKey;
 
-    @Value("${yandex-cloud.gpt.api-url}")
+    @Value("${ai.yandex.url}")
     private String apiUrl;
 
-    @Value("${yandex-cloud.gpt.catalog-id}")
+    @Value("${ai.yandex.catalog-id}")
     private String catalogId;
 
     private final ObjectMapper objectMapper;

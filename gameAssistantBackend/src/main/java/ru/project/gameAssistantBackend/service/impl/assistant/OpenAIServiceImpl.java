@@ -18,8 +18,11 @@ import java.util.function.Consumer;
 @Service("OPENAI")
 public class OpenAIServiceImpl implements AssistantService {
 
-    @Value("${openai.key}")
+    @Value("${ai.openai.key}")
     private String apiKey;
+
+    @Value("${ai.openai.url}")
+    private String apiUrl;
 
     private final WebClient webClient;
 
@@ -38,7 +41,7 @@ public class OpenAIServiceImpl implements AssistantService {
     ) {
         StringBuilder fullAnswer = new StringBuilder();
         return webClient.post()
-                .uri("https://api.openai.com/v1/chat/completions")
+                .uri(apiUrl)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .bodyValue(buildRequestBody(messages))

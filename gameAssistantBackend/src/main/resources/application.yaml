@@ -31,11 +31,14 @@ jwt:
     access: ${JWT_SECRET_ACCESS:qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==}
     refresh: ${JWT_SECRET_REFRESH:zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==}
 
-yandex-cloud:
-  gpt:
-    api-key: ${YANDEX_API_KEY}
-    api-url: https://llm.api.cloud.yandex.net/foundationModels/v1/completion
-    catalog-id: ${CATALOG_ID}
-
-openai:
-  key: ${OPENAI_KEY}
+ai:
+  openai:
+    key: ${OPENAI_KEY}
+    url: ${OPENAI_URL}
+  yandex:
+    key: ${YANDEX_KEY}
+    url: ${YANDEX_URL}
+    catalog-id: ${YANDEX_CATALOG_ID}
+  mistral:
+    key: ${MISTRAL_KEY}
+    url: ${MISTRAL_URL}
