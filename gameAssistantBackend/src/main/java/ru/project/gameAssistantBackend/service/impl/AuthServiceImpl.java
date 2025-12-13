@@ -13,6 +13,7 @@ import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.exception.customEx.conflict.UserConflictException;
 import ru.project.gameAssistantBackend.exception.customEx.invalid.PasswordInvalidException;
 import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidException;
+import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotEnabledException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.models.Role;
@@ -25,6 +26,7 @@ import ru.project.gameAssistantBackend.service.AuthServiceI;
 import ru.project.gameAssistantBackend.jwt.JwtProvider;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthServiceI {
@@ -35,25 +37,33 @@ public class AuthServiceImpl implements AuthServiceI {
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileServiceImpl fileServiceImpl;
+    private final EmailService emailService;
 
     @Autowired
     public AuthServiceImpl(UserServiceImpl userServiceImpl,
                            JwtProvider jwtProvider,
                            UserRepository userRepository,
                            TokenRepository tokenRepository,
-                           PasswordEncoder passwordEncoder, FileServiceImpl fileServiceImpl) {
+                           PasswordEncoder passwordEncoder,
+                           FileServiceImpl fileServiceImpl,
+                           EmailService emailService) {
         this.userServiceImpl = userServiceImpl;
         this.jwtProvider = jwtProvider;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileServiceImpl = fileServiceImpl;
+        this.emailService = emailService;
     }
 
     @Transactional
     @Override
-    public JwtResponse login(JwtRequest authRequest) throws UserNotFoundException, PasswordInvalidException {
+    public JwtResponse login(JwtRequest authRequest)
+            throws UserNotFoundException, PasswordInvalidException, AccountNotEnabledException {
         User user = userServiceImpl.getByEmail(authRequest.email());
+        if(!user.isEnabled()){
+            throw new AccountNotEnabledException("Ваш аккаунт не подтвержден!");
+        }
 
         if (passwordEncoder.matches(authRequest.password(), user.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
@@ -81,17 +91,38 @@ public class AuthServiceImpl implements AuthServiceI {
             throw new UserConflictException("Пользователь с таким email уже существует!");
         }
 
-        User newUser = new User();
-        newUser.setEmail(userRequestDTO.email());
-        newUser.setLogin(userRequestDTO.login());
-        newUser.setPassword(passwordEncoder.encode(userRequestDTO.password()));
-        newUser.setRole(Role.USER);
+        User user = new User();
+        user.setEmail(userRequestDTO.email());
+        user.setLogin(userRequestDTO.login());
+        user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
+        user.setRole(Role.USER);
+        user.setEnabled(false);
+
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        String confirmationUrl = "http://localhost:8080/api/auth/verify-email?token=" + token;
+        emailService.sendEmail(
+                user.getEmail(),
+                "AI Game Assistant: Подтверждение почты",
+                "Для подтверждения почты перейдите по ссылке: " + confirmationUrl
+        );
 
         MultipartFile imageFile = userRequestDTO.imageFile();
         String imageFileTitle = fileServiceImpl.save(imageFile);
-        newUser.setImageFileTitle(imageFileTitle);
+        user.setImageFileTitle(imageFileTitle);
 
-        return userRepository.save(newUser);
+        return userRepository.save(user);
+    }
+
+    public boolean validateVerificationToken(String token) {
+        User user = userRepository.findByVerificationToken(token).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setEnabled(true);
+        userRepository.save(user);
+        return true;
     }
 
     @Override

@@ -43,3 +43,7 @@ databaseChangeLog:
       file: db/changelog/021-add-default-model.yaml
   - include:
       file: db/changelog/022-insert-admin.yaml
+  - include:
+      file: db/changelog/023-add-confirmation-to-user.yaml
+  - include:
+      file: db/changelog/024-enable-old-users.yaml

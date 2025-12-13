@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.project.gameAssistantBackend.dto.ResponseDTO;
+import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotEnabledException;
 import ru.project.gameAssistantBackend.exception.globalEx.GameAssistantConflictException;
 import ru.project.gameAssistantBackend.exception.globalEx.GameAssistantInvalidException;
 import ru.project.gameAssistantBackend.exception.globalEx.GameAssistantNotFoundException;
@@ -32,5 +33,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseDTO> handleInvalidException(GameAssistantInvalidException ex) {
         logger.error("InvalidException: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(ex.getMessage()));
+    }
+
+    @ExceptionHandler(AccountNotEnabledException.class)
+    public ResponseEntity<ResponseDTO> handleNotEnabledException(AccountNotEnabledException ex) {
+        logger.error("AccountNotEnabledException: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseDTO(ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ResponseDTO> handleException(Exception ex) {
+        logger.error("Exception: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO(ex.getMessage()));
     }
 }

@@ -25,6 +25,10 @@ public class User extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Model model;
 
+    private boolean enabled;
+
+    private String verificationToken;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "uzer_favourites",
@@ -104,6 +108,22 @@ public class User extends BaseEntity{
 
     public void setModel(Model model) {
         this.model = model;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
     }
 
     public void addGame(Game game) {

@@ -26,6 +26,18 @@ spring:
   liquibase:
     enabled: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_ADDRESS}
+    password: ${EMAIL_APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 jwt:
   secret:
     access: ${JWT_SECRET_ACCESS:qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==}

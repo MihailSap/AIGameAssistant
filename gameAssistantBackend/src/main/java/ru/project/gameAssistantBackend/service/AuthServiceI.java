@@ -6,6 +6,7 @@ import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.exception.customEx.conflict.UserConflictException;
 import ru.project.gameAssistantBackend.exception.customEx.invalid.PasswordInvalidException;
 import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidException;
+import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotEnabledException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
@@ -13,7 +14,7 @@ import ru.project.gameAssistantBackend.models.User;
 
 public interface AuthServiceI {
 
-    JwtResponse login(JwtRequest authRequest) throws UserNotFoundException, PasswordInvalidException;
+    JwtResponse login(JwtRequest authRequest) throws UserNotFoundException, PasswordInvalidException, AccountNotEnabledException;
 
     User register(UserRequestDTO userRequestDTO) throws UserConflictException;
 

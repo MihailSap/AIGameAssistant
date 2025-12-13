@@ -11,6 +11,7 @@ import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
 import ru.project.gameAssistantBackend.exception.customEx.conflict.UserConflictException;
 import ru.project.gameAssistantBackend.exception.customEx.invalid.PasswordInvalidException;
 import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidException;
+import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotEnabledException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.mapper.UserMapper;
@@ -36,7 +37,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest)
-            throws UserNotFoundException, PasswordInvalidException {
+            throws UserNotFoundException, PasswordInvalidException, AccountNotEnabledException {
         final JwtResponse token = authServiceImpl.login(authRequest);
         return ResponseEntity.ok(token);
     }
@@ -67,5 +68,11 @@ public class AuthController {
             throws UserNotFoundException, TokenNotFoundException, TokenInvalidException {
         final JwtResponse token = authServiceImpl.refresh(request.refreshToken());
         return ResponseEntity.ok(token);
+    }
+
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam("token") String token) {
+        boolean result = authServiceImpl.validateVerificationToken(token);
+        return result ? "verified" : "not-verified";
     }
 }
