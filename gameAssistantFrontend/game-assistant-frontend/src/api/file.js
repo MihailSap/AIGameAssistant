@@ -4,7 +4,7 @@ export const fileApi = {
   getImageBlob: async (imageFileTitle) => {
     try {
       if (!imageFileTitle) throw new Error("imageFileTitle is required");
-      const resp = await apiClient.get(`/api/file/image/${encodeURIComponent(imageFileTitle)}`, {
+      const resp = await apiClient.get(`/api/files/image/${encodeURIComponent(imageFileTitle)}`, {
         responseType: "blob",
       });
       return resp.data;
@@ -17,7 +17,7 @@ export const fileApi = {
   getRulesBlob: async (rulesFileTitle) => {
     try {
       if (!rulesFileTitle) throw new Error("rulesFileTitle is required");
-      const resp = await apiClient.get(`/api/file/rules/${encodeURIComponent(rulesFileTitle)}`, {
+      const resp = await apiClient.get(`/api/files/rules/${encodeURIComponent(rulesFileTitle)}`, {
         responseType: "blob",
       });
       return resp.data;

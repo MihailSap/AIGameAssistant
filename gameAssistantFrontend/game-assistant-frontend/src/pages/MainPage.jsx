@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, /*useRef*/ } from "react";
+import { useNavigate } from "react-router-dom";
 import { gameApi } from "../api/game";
 import { categoryApi } from "../api/category";
 import { favouriteApi } from "../api/favourite";
@@ -14,6 +15,7 @@ import useAuth from "../hooks/useAuth";
 import "../css/MainPage.css";
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [games, setGames] = useState([]);
   const [favourites, setFavourites] = useState([]);
@@ -105,6 +107,14 @@ export default function MainPage() {
     };
   }, [debouncedSearch, showFavourites]);
 
+  const handleSelectFavourites = (isShowFavourites) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    setShowFavourites(isShowFavourites);
+  }
+
   const handleFavouriteChange = (gameObj, isNowFavourite) => {
     if (!gameObj || !gameObj.id) return;
     setFavourites(prev => {
@@ -195,7 +205,7 @@ export default function MainPage() {
                     leftLabel="Избранное"
                     rightLabel="Все игры"
                     value={showFavourites}
-                    onChange={(v) => setShowFavourites(v)}
+                    onChange={handleSelectFavourites}
                   />
                 </div>
               </div>

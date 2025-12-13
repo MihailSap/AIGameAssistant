@@ -58,13 +58,12 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
     transform-origin: top right;
     visibility: hidden;
-    opacity: 0;
     pointer-events: none;
+    z-index: 700;
 }
 
 .user-popup.is-open {
     visibility: visible;
-    opacity: 1;
     pointer-events: auto;
     animation: popup-in var(--transition-cb) forwards;
 }
@@ -185,6 +184,13 @@
     color: var(--bg);
     border-color: var(--yellow);
 }
+
+@media (max-width: 599px) {
+    .user-popup {
+        top: calc(100% + 10px);
+    }
+}
+
 
 @media (max-width: 549px) {
     .user-popup-btn {

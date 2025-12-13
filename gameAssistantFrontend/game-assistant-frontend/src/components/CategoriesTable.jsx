@@ -79,6 +79,7 @@ export default function CategoriesTable({ categories = [], onAdd, onDelete }) {
                         <tr>
                             <th>Id</th>
                             <th>Название</th>
+                            <th>Количество игр</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -88,6 +89,7 @@ export default function CategoriesTable({ categories = [], onAdd, onDelete }) {
                                 <tr key={idx}>
                                     <td>{c.id}</td>
                                     <td>{c.name.length > 40 ? c.name.slice(0, 40) + "…" : c.name}</td>
+                                    <td>{c.gamesCount}</td>
                                     <td>
                                         <button
                                             className="icon-btn danger"

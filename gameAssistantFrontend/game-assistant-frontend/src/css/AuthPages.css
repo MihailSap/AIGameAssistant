@@ -33,6 +33,10 @@
   z-index: 5;
 }
 
+[data-theme="light"] .auth-logo img  {
+  filter: brightness(100) saturate(0%) invert(1);
+}
+
 .auth-container {
   width: 100%;
   display: flex;
@@ -69,7 +73,7 @@
   border: 1px solid var(--section-border);
   border-radius: var(--radius);
   padding: 30px 20px;
-  box-shadow: 0 6px 30px rgba(2, 4, 10, 0.6);
+  box-shadow: 0 3px 15px rgba(2, 4, 10, 0.6);
   box-sizing: border-box;
 }
 

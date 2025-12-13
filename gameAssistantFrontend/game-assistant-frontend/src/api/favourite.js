@@ -13,7 +13,7 @@ export const favouriteApi = {
 
   add: async (gameId) => {
     try {
-      const resp = await apiClient.post(`/api/favourites/${gameId}/add`);
+      const resp = await apiClient.post(`/api/favourites/${gameId}`);
       return resp.data;
     } catch (error) {
       console.error("Error add favourite:", error);
@@ -23,7 +23,7 @@ export const favouriteApi = {
 
   remove: async (gameId) => {
     try {
-      const resp = await apiClient.delete(`/api/favourites/${gameId}/remove`);
+      const resp = await apiClient.delete(`/api/favourites/${gameId}`);
       return resp.data;
     } catch (error) {
       console.error("Error remove favourite:", error);

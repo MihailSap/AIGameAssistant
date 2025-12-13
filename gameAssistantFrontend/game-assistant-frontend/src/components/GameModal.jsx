@@ -152,7 +152,7 @@ export default function GameModal({ game, onClose, onFavouriteChange }) {
                         <div className="gm-btn-row">
                             <button
                                 className="btn gm-circle-btn"
-                                onClick={() => { window.open(`${BASE_URL}/api/file/rules/${gameData?.rulesFileTitle}`, "_blank", "noopener,noreferrer"); }}
+                                onClick={() => { window.open(`${BASE_URL}/api/files/rules/${gameData?.rulesFileTitle}`, "_blank", "noopener,noreferrer"); }}
                                 disabled={loadingGame || !gameData}
                                 title="Смотреть правила игры"
                                 aria-label="Смотреть правила игры"
