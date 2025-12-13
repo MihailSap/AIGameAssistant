@@ -94,9 +94,15 @@ apiClient.interceptors.response.use(
 
       isRefreshing = true;
       try {
-        const resp = await refreshClient.post("/api/auth/refresh", { refreshToken });
-        const newAccessToken = resp?.data?.accessToken;
-        const newRefreshToken = resp?.data?.refreshToken;
+        let resp = await refreshClient.post("/api/auth/token", { refreshToken });
+        let newAccessToken = resp?.data?.accessToken;
+        let newRefreshToken;
+
+        if (!newAccessToken) {
+          resp = await refreshClient.post("/api/auth/refresh", { refreshToken });
+          newAccessToken = resp?.data?.accessToken;
+          newRefreshToken = resp?.data?.refreshToken;
+        }
 
         if (!newAccessToken) {
           clearTokens();

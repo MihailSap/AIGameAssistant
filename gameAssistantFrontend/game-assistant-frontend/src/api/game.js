@@ -22,7 +22,7 @@ export const gameApi = {
   create: async (gameDTO) => {
     try {
       const fd = buildFormData(gameDTO);
-      const resp = await apiClient.post("/api/game/create", fd);
+      const resp = await apiClient.post("/api/games", fd);
       return resp.data;
     } catch (error) {
       console.error("Error creating game:", error);
@@ -32,7 +32,7 @@ export const gameApi = {
 
   read: async (id) => {
     try {
-      const resp = await apiClient.get(`/api/game/${encodeURIComponent(id)}`);
+      const resp = await apiClient.get(`/api/games/${encodeURIComponent(id)}`);
       return resp.data;
     } catch (error) {
       console.error("Error reading game:", error);
@@ -43,7 +43,7 @@ export const gameApi = {
   update: async (id, gameDTO) => {
     try {
       const fd = buildFormData(gameDTO);
-      const resp = await apiClient.put(`/api/game/${encodeURIComponent(id)}/update`, fd);
+      const resp = await apiClient.patch(`/api/games/${encodeURIComponent(id)}`, fd);
       return resp.data;
     } catch (error) {
       console.error("Error updating game:", error);
@@ -53,7 +53,7 @@ export const gameApi = {
 
   delete: async (id) => {
     try {
-      await apiClient.delete(`/api/game/${encodeURIComponent(id)}/delete`);
+      await apiClient.delete(`/api/games/${encodeURIComponent(id)}`);
     } catch (error) {
       console.error("Error deleting game:", error);
       throw error;
@@ -62,7 +62,7 @@ export const gameApi = {
 
   getAll: async () => {
     try {
-      const resp = await apiClient.get("/api/game/all");
+      const resp = await apiClient.get("/api/games");
       return resp.data;
     } catch (error) {
       console.error("Error get all games:", error);
@@ -72,7 +72,7 @@ export const gameApi = {
 
   getCategories: async () => {
     try {
-      const resp = await apiClient.get("/api/game/categories");
+      const resp = await apiClient.get("/api/games/categories");
       return resp.data;
     } catch (error) {
       console.error("Error get games categories:", error);

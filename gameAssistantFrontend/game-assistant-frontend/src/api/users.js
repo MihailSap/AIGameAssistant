@@ -23,7 +23,7 @@ export const userApi = {
 
   updatePassword: async (id, updatePassword) => {
     try {
-      await apiClient.patch(`/api/users/${encodeURIComponent(id)}/update/password`, updatePassword);
+      await apiClient.patch(`/api/users/${encodeURIComponent(id)}/password`, updatePassword);
     } catch (error) {
       console.error("Error updating user password:", error);
       throw error;
@@ -80,7 +80,7 @@ export const userApi = {
   updateImage: async (id, userRequestDTO) => {
     try {
       const fd = buildFormData(userRequestDTO);
-      const resp = await apiClient.patch(`/api/users/${encodeURIComponent(id)}/update/image`, fd);
+      const resp = await apiClient.patch(`/api/users/${encodeURIComponent(id)}/image`, fd);
       return resp.data;
     } catch (error) {
       console.error("Error updating user image:", error);
