@@ -6,7 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
 import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
@@ -16,7 +15,6 @@ import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidEx
 import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotEnabledException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
-import ru.project.gameAssistantBackend.models.Role;
 import ru.project.gameAssistantBackend.models.Token;
 import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.TokenRepository;
@@ -25,61 +23,58 @@ import ru.project.gameAssistantBackend.service.AuthServiceI;
 import ru.project.gameAssistantBackend.jwt.JwtProvider;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthServiceI {
 
     private final UserServiceImpl userServiceImpl;
+
     private final JwtProvider jwtProvider;
+
     private final UserRepository userRepository;
+
     private final TokenRepository tokenRepository;
+
     private final PasswordEncoder passwordEncoder;
-    private final FileServiceImpl fileServiceImpl;
-    private final EmailService emailService;
 
     @Autowired
     public AuthServiceImpl(UserServiceImpl userServiceImpl,
                            JwtProvider jwtProvider,
                            UserRepository userRepository,
                            TokenRepository tokenRepository,
-                           PasswordEncoder passwordEncoder,
-                           FileServiceImpl fileServiceImpl,
-                           EmailService emailService) {
+                           PasswordEncoder passwordEncoder
+    ) {
         this.userServiceImpl = userServiceImpl;
         this.jwtProvider = jwtProvider;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
-        this.fileServiceImpl = fileServiceImpl;
-        this.emailService = emailService;
     }
 
     @Transactional
     @Override
-    public JwtResponse login(JwtRequest authRequest)
-            throws UserNotFoundException, PasswordInvalidException, AccountNotEnabledException {
+    public boolean isCredentialsCorrect(JwtRequest authRequest)
+            throws UserNotFoundException, AccountNotEnabledException {
         User user = userServiceImpl.getByEmail(authRequest.email());
         if(!user.isEnabled()){
             throw new AccountNotEnabledException("Ваш аккаунт не подтвержден!");
         }
+        return passwordEncoder.matches(authRequest.password(), user.getPassword());
+    }
 
-        if (passwordEncoder.matches(authRequest.password(), user.getPassword())) {
-            final String accessToken = jwtProvider.generateAccessToken(user);
-            final String refreshToken = jwtProvider.generateRefreshToken(user);
+    @Transactional
+    public JwtResponse login(User user){
+        String accessToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
 
-            if (user.getRefreshToken() != null) {
-                user.getRefreshToken().setBody(refreshToken);
-            } else {
-                user.setRefreshToken(new Token(user, refreshToken));
-            }
-
-            userRepository.save(user);
-
-            return new JwtResponse(accessToken, refreshToken);
+        if (user.getRefreshToken() != null) {
+            user.getRefreshToken().setBody(refreshToken);
         } else {
-            throw new PasswordInvalidException("Неправильный пароль");
+            user.setRefreshToken(new Token(user, refreshToken));
         }
+
+        userRepository.save(user);
+        return new JwtResponse(accessToken, refreshToken);
     }
 
     @Transactional
@@ -89,60 +84,17 @@ public class AuthServiceImpl implements AuthServiceI {
         if(userRepository.findByEmail(email).isPresent()) {
             throw new UserConflictException("Пользователь с таким email уже существует!");
         }
-
-        User user = new User();
-        user.setEmail(userRequestDTO.email());
-        user.setLogin(userRequestDTO.login());
-        user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
-        user.setRole(Role.USER);
-        user.setEnabled(false);
-
-        String token = UUID.randomUUID().toString();
-        user.setVerificationToken(token);
-        String confirmationUrl = "http://localhost:8080/api/auth/verify-email?token=" + token;
-        emailService.sendEmail(
-                user.getEmail(),
-                "AI Game Assistant: Подтверждение почты",
-                "Для подтверждения почты перейдите по ссылке: " + confirmationUrl
-        );
-
-        MultipartFile imageFile = userRequestDTO.imageFile();
-        String imageFileTitle = fileServiceImpl.save(imageFile);
-        user.setImageFileTitle(imageFileTitle);
-
-        return userRepository.save(user);
+        return userServiceImpl.create(userRequestDTO);
     }
 
-    public void setNullPasswordResetToken(User user){
-        user.setPasswordResetToken(null);
-        userRepository.save(user);
-    }
-
-    public String setPasswordResetToken(User user) {
-        String token = UUID.randomUUID().toString();
-        user.setPasswordResetToken(token);
-        userRepository.save(user);
-        return token;
-    }
-
-    public void sendPasswordResetEmail(String email, String token) {
-        String passwordResetUrl = "http://localhost:3000/reset-password?token=" + token;
-        emailService.sendEmail(
-                email,
-                "AI Game Assistant: Сброс пароля",
-                "Для сброса пароля перейдите по ссылке: " + passwordResetUrl
-        );
-    }
-
-    public boolean validateVerificationToken(String token) {
+    public User validateVerificationToken(String token) throws UserNotFoundException {
         User user = userRepository.findByVerificationToken(token).orElse(null);
         if (user == null) {
-            return false;
+            throw new UserNotFoundException("Пользователь не найден");
         }
 
         user.setEnabled(true);
-        userRepository.save(user);
-        return true;
+        return userRepository.save(user);
     }
 
     @Override

@@ -10,9 +10,7 @@ import ru.project.gameAssistantBackend.dto.user.UserResponseDTO;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
 import ru.project.gameAssistantBackend.mapper.UserMapper;
 import ru.project.gameAssistantBackend.models.Model;
-import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.User;
-import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.UserServiceImpl;
 
 import java.util.List;
@@ -23,18 +21,14 @@ public class UserController {
 
     private final UserServiceImpl userServiceImpl;
 
-    private final AuthServiceImpl authServiceImpl;
-
     private final UserMapper userMapper;
 
     @Autowired
     public UserController(
             UserServiceImpl userServiceImpl,
-            AuthServiceImpl authServiceImpl,
             UserMapper userMapper
     ) {
         this.userServiceImpl = userServiceImpl;
-        this.authServiceImpl = authServiceImpl;
         this.userMapper = userMapper;
     }
 
@@ -71,13 +65,6 @@ public class UserController {
         User user = userServiceImpl.getById(userId);
         User updatedUser = userServiceImpl.updateImage(user, userRequestDTO.imageFile());
         return userMapper.mapToResponseDTO(updatedUser);
-    }
-
-    @GetMapping("/authenticated")
-    public UserResponseDTO getAuthenticatedUser() throws UserNotFoundException {
-        String personEmail = authServiceImpl.getAuthenticatedUserEmail();
-        User user = userServiceImpl.getByEmail(personEmail);
-        return userMapper.mapToResponseDTO(user);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

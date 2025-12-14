@@ -22,4 +22,22 @@ public class EmailService {
         message.setText(text);
         mailSender.send(message);
     }
+
+    public void sendPasswordResetEmail(String email, String token) {
+        String passwordResetUrl = "http://localhost:3000/reset-password?token=" + token;
+        sendEmail(
+                email,
+                "AI Game Assistant: Сброс пароля",
+                "Для сброса пароля перейдите по ссылке: " + passwordResetUrl
+        );
+    }
+
+    public void sendEmailConfirmEmail(String email, String token) {
+        String confirmationUrl = "http://localhost:3000/verify-email?token=" + token;
+        sendEmail(
+                email,
+                "AI Game Assistant: Подтверждение почты",
+                "Для подтверждения почты перейдите по ссылке: " + confirmationUrl
+        );
+    }
 }

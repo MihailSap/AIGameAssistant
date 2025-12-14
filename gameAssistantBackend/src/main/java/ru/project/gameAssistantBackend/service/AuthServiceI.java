@@ -9,20 +9,24 @@ import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidEx
 import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotEnabledException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
-import ru.project.gameAssistantBackend.jwt.JwtAuthentication;
 import ru.project.gameAssistantBackend.models.User;
 
 public interface AuthServiceI {
 
-    JwtResponse login(JwtRequest authRequest) throws UserNotFoundException, PasswordInvalidException, AccountNotEnabledException;
+    boolean isCredentialsCorrect(JwtRequest authRequest)
+            throws UserNotFoundException, PasswordInvalidException, AccountNotEnabledException;
 
-    User register(UserRequestDTO userRequestDTO) throws UserConflictException;
+    User register(UserRequestDTO userRequestDTO)
+            throws UserConflictException;
 
-    JwtResponse getAccessToken(String refreshToken) throws UserNotFoundException;
+    JwtResponse getAccessToken(String refreshToken)
+            throws UserNotFoundException;
 
-    JwtResponse refresh(String refreshToken) throws UserNotFoundException, TokenNotFoundException, TokenInvalidException;
+    JwtResponse refresh(String refreshToken)
+            throws UserNotFoundException, TokenNotFoundException, TokenInvalidException;
 
-    void logout(String refreshToken) throws TokenNotFoundException;
+    void logout(String refreshToken)
+            throws TokenNotFoundException;
 
     String getAuthenticatedUserEmail();
 }
