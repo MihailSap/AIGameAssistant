@@ -8,6 +8,7 @@ public record UserResponseDTO(
         String login,
         boolean isAdmin,
         String imageFileTitle,
-        Model model
+        Model model,
+        boolean isEnabled
 ) {
 }

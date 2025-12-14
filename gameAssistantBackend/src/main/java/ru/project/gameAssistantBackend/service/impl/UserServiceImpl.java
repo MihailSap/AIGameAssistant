@@ -113,6 +113,11 @@ public class UserServiceImpl implements UserServiceI {
         userRepository.save(user);
     }
 
+    public void enableUser(User user){
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
     public void setNullPasswordResetToken(User user){
         user.setPasswordResetToken(null);
         userRepository.save(user);

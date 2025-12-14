@@ -18,7 +18,8 @@ public class UserMapper {
                 user.getLogin(),
                 user.getRole().equals(Role.ADMIN),
                 user.getImageFileTitle(),
-                user.getModel()
+                user.getModel(),
+                user.isEnabled()
         );
     }
 

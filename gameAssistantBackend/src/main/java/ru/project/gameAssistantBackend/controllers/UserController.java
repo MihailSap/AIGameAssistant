@@ -98,4 +98,15 @@ public class UserController {
         return new ResponseDTO(String.format(
                 "Пользователь с id = %d теперь имеет роль USER", userId));
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PatchMapping("/{userId}/enable")
+    public ResponseDTO enableUser(@PathVariable("userId") Long userId)
+            throws UserNotFoundException {
+        User user = userServiceImpl.getById(userId);
+        userServiceImpl.enableUser(user);
+        return new ResponseDTO(String.format(
+                "Пользователь с id = %d подтверждён", userId));
+
+    }
 }
