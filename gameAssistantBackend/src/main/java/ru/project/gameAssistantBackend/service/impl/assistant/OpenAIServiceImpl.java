@@ -3,6 +3,7 @@ package ru.project.gameAssistantBackend.service.impl.assistant;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,7 +30,10 @@ public class OpenAIServiceImpl implements AssistantService {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public OpenAIServiceImpl(WebClient webClient, ObjectMapper objectMapper) {
+    public OpenAIServiceImpl(
+            @Qualifier("proxyWebClient") WebClient webClient,
+            ObjectMapper objectMapper
+    ) {
         this.webClient = webClient;
         this.objectMapper = objectMapper;
     }

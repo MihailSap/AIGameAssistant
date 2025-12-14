@@ -29,16 +29,18 @@ public class YandexGptServiceImpl implements AssistantService {
     @Value("${ai.yandex.catalog-id}")
     private String catalogId;
 
-    private final ObjectMapper objectMapper;
-
     private final WebClient webClient;
+
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public YandexGptServiceImpl(
-            ObjectMapper objectMapper,
-            WebClient webClient) {
-        this.objectMapper = objectMapper;
+            WebClient webClient,
+            ObjectMapper objectMapper
+    ) {
         this.webClient = webClient;
+        this.objectMapper = objectMapper;
+
     }
 
     @Override

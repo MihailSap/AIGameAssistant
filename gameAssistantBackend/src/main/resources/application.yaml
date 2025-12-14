@@ -54,3 +54,9 @@ ai:
   mistral:
     key: ${MISTRAL_KEY}
     url: ${MISTRAL_URL}
+
+proxy:
+  host: ${PROXY_HOST}
+  port: ${PROXY_PORT}
+  login: ${PROXY_LOGIN}
+  password: ${PROXY_PASSWORD}

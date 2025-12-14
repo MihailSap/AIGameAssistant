@@ -29,7 +29,10 @@ public class MistralAssistantServiceImpl implements AssistantService {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public MistralAssistantServiceImpl(WebClient webClient, ObjectMapper objectMapper) {
+    public MistralAssistantServiceImpl(
+            WebClient webClient,
+            ObjectMapper objectMapper
+    ) {
         this.webClient = webClient;
         this.objectMapper = objectMapper;
     }
