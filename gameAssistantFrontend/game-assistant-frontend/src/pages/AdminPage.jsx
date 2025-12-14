@@ -36,7 +36,7 @@ export default function AdminPage() {
   const [selectedModel, setSelectedModel] = useState(null);
 
   const [viewerState, setViewerState] = useState({ open: false, fileType: null, fileTitle: null });
-  const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null });
+  const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null, type: "delete" });
   const [gameFormState, setGameFormState] = useState({ open: false, mode: "create", initial: null });
 
   const [activeTab, setActiveTab] = useState("users");
@@ -146,14 +146,29 @@ export default function AdminPage() {
           setConfirmState({ open: false });
         }
       },
+      type: "delete",
     });
   };
 
-  const handleToggleAdmin = async (user, checked) => {
-    if (!user || user.id == null) return;
-    const current = Boolean(user.isAdmin);
-    if (checked === current) return;
+  const handleEnableUser = async (user) => {
+    setConfirmState({
+      open: true,
+      text: `Вы уверены, что хотите подтвердить пользователя "${user.login}" с email "${user.email}"? Это действие нельзя отменить.`,
+      onConfirm: async () => {
+        try {
+          await userApi.forciblyConfirmUserEmail(user.id);
+          setConfirmState({ open: false });
+          await refreshData();
+        } catch (err) {
+          alert("Не удалось подтвердить пользователя.");
+          setConfirmState({ open: false });
+        }
+      },
+      type: "confirm",
+    });
+  }
 
+  const applyAdminChange = async (user, checked) => {
     try {
       if (checked) {
         await userApi.makeAdmin(user.id);
@@ -167,6 +182,26 @@ export default function AdminPage() {
       await refreshData();
     } catch (err) {
       console.error("Ошибка при смене роли:", err);
+    }
+  };
+
+  const handleToggleAdmin = (user, checked) => {
+    if (!user || user.id == null) return;
+    const current = Boolean(user.isAdmin);
+    if (checked === current) return;
+
+    if (checked) {
+      setConfirmState({
+        open: true,
+        text: `Вы действительно хотите сделать пользователя "${user.login}" (${user.email}) админом? Он получит доступ ко всему функционалу админ-панели.`,
+        onConfirm: async () => {
+          await applyAdminChange(user, true);
+          setConfirmState({ open: false });
+        },
+        type: "confirm",
+      });
+    } else {
+      applyAdminChange(user, false);
     }
   };
 
@@ -197,6 +232,7 @@ export default function AdminPage() {
           setConfirmState({ open: false });
         }
       },
+      type: "delete",
     });
   };
 
@@ -255,6 +291,7 @@ export default function AdminPage() {
           setConfirmState({ open: false });
         }
       },
+      type: "delete",
     });
   };
 
@@ -381,6 +418,7 @@ export default function AdminPage() {
             <UsersTable
               users={users}
               currentUser={currentUser}
+              onEnabled={handleEnableUser}
               onDelete={handleDeleteUser}
               onToggleAdmin={handleToggleAdmin}
               search={usersSearch}
@@ -433,7 +471,7 @@ export default function AdminPage() {
           <p>{confirmState.text}</p>
           <div className="admin-modal-actions">
             <button className="btn btn-ghost" onClick={() => setConfirmState({ open: false })}>Отмена</button>
-            <button className="btn btn-danger" onClick={confirmState.onConfirm}>Удалить</button>
+            <button className={`btn ${confirmState.type === "delete" ? "btn-danger" : ""}`} onClick={confirmState.onConfirm}>{confirmState.type === "delete" ? "Удалить" : "Да"}</button>
           </div>
         </Modal>
       )}

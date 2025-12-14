@@ -9,6 +9,7 @@ import "../css/AuthPages.css";
 export default function AuthPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [afterRegister, setAfterRegister] = useState(false);
 
   const initialMode = useMemo(() => {
     const p = (location.pathname || "").toLowerCase();
@@ -31,6 +32,14 @@ export default function AuthPage() {
     navigate(target, { replace: false });
   };
 
+  const handleRegister = () => {
+    setAfterRegister(true);
+    setTimeout(() => {
+      switchMode("login");
+      setAfterRegister(false);
+    }, 5000);
+  }
+
   return (
     <div className="auth-root">
       <div className="auth-bg" role="presentation" aria-hidden="true" />
@@ -47,12 +56,16 @@ export default function AuthPage() {
         <div className="auth-right-container" aria-hidden="true">
           <h1 className="auth-hello">Добро пожаловать!</h1>
           <div className="auth-card" role="region" aria-labelledby="auth-title">
-            <ToggleSlider leftLabel="Вход" rightLabel="Регистрация" value={mode === "login"} onChange={(s) => switchMode(s)} />
-            <div className="auth-form-wrap">
-              {mode === "login" ? (
-                <LoginForm onSuccess={() => navigate("/")} />
+            {!afterRegister && <ToggleSlider leftLabel="Вход" rightLabel="Регистрация" value={mode === "login"} onChange={(s) => switchMode(s)} />}
+            <div className={`auth-form-wrap ${afterRegister ? "after-register" : ""}`}>
+              {!afterRegister ? (
+                mode === "login" ? (
+                  <LoginForm onSuccess={() => navigate("/")} />
+                ) : (
+                  <RegisterForm onSuccess={handleRegister} />
+                )
               ) : (
-                <RegisterForm onSuccess={() => navigate("/")} />
+                <div className="auth-success-message">Для завершения регистрации необходимо перейти по ссылке из письма, которое было отправлено на указанный email.</div>
               )}
             </div>
           </div>
@@ -118,15 +131,20 @@ function LoginForm({ onSuccess }) {
         />
       </div>
 
-      {error && <div className="auth-form-error" role="alert">{error}</div>}
+      {error && <div className="auth-form-error" role="alert">{error.slice(0, 100)}</div>}
 
       <div className="auth-form-actions">
         <button type="submit" className="btn" disabled={!isFormValid || submitting} aria-disabled={!isFormValid || submitting}>
           {submitting ? "Вход..." : "Войти"}
         </button>
         <div className="auth-footer">
-          <span>Нет аккаунта?</span>
-          <Link to="/register" className="link">Зарегистрироваться</Link>
+          <div className="auth-forgot-password">
+            <Link to="/reset-password" className="link">Забыли пароль?</Link>
+          </div>
+          <div className="auth-switch-link">
+            <span>Нет аккаунта?</span>
+            <Link to="/register" className="link">Зарегистрироваться</Link>
+          </div>
         </div>
       </div>
     </form>
@@ -134,7 +152,7 @@ function LoginForm({ onSuccess }) {
 }
 
 function RegisterForm({ onSuccess }) {
-  const { register, login } = useAuth();
+  const { register } = useAuth();
 
   const [email, setEmail] = useState("");
   const [userLogin, setUserLogin] = useState("");
@@ -196,15 +214,7 @@ function RegisterForm({ onSuccess }) {
 
     try {
       await register({ email, login: userLogin, password });
-      try {
-        await login({ email, password });
-        onSuccess && onSuccess();
-      } catch (loginErr) {
-        const loginMessage =
-          loginErr?.response?.data?.message ||
-          "Регистрация прошла, но автоматический вход не удался. Введите данные для входа.";
-        setError(loginMessage);
-      }
+      onSuccess && onSuccess();
     } catch (regErr) {
       setError(regErr?.response?.data?.message || "Ошибка регистрации. Возможно, пользователь с таким email уже существует.");
     } finally {
@@ -287,16 +297,18 @@ function RegisterForm({ onSuccess }) {
           {passwordAgainError && <div id="reg-password-again-error" className="field-error" role="alert">{passwordAgainError}</div>}
         </div>
       </div>
-      
-      {error && <div className="auth-form-error" role="alert">{error}</div>}
+
+      {error && <div className="auth-form-error" role="alert">{error.slice(0, 100)}</div>}
 
       <div className="auth-form-actions">
         <button type="submit" className="btn" disabled={!isFormValid || loading} aria-disabled={!isFormValid || loading}>
           {loading ? "Обработка..." : "Зарегистрироваться"}
         </button>
         <div className="auth-footer">
-          <span>Есть аккаунт?</span>
-          <Link to="/login" className="link">Войти</Link>
+          <div className="auth-switch-link">
+            <span>Есть аккаунт?</span>
+            <Link to="/login" className="link">Войти</Link>
+          </div>
         </div>
       </div>
     </form>

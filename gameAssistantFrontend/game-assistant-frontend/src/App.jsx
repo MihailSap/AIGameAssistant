@@ -8,6 +8,8 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import PrivateRoute from "./components/PrivateRoute";
 import ChatPage from "./pages/ChatPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 export default function App() {
   return (
@@ -18,6 +20,8 @@ export default function App() {
             <Route path="/" element={<MainPage />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<AuthPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route
               path="/admin"
               element={

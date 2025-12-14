@@ -62,7 +62,7 @@ export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFil
                                     {g.rulesFileTitle ? (
                                         <button
                                             className="link-btn"
-                                            onClick={() => onOpenFile ? onOpenFile("rules", g.rulesFileTitle) : onDownloadFile("rules", g.rulesFileTitle)}
+                                            onClick={() => onOpenFile ? onOpenFile("pdf", g.rulesFileTitle) : onDownloadFile("pdf", g.rulesFileTitle)}
                                         >
                                             {g.rulesFileTitle.slice(14).length > 30 ? g.rulesFileTitle.slice(14).slice(0, 30) + "…" : g.rulesFileTitle.slice(14)}
                                         </button>

@@ -27,6 +27,7 @@
 .avatar-placeholder {
     display: flex;
     height: 100%;
+    margin: 0 auto;
     place-items: center;
     color: var(--muted-text);
     font-weight: 600;

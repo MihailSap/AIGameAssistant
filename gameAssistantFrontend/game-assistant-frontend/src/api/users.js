@@ -32,7 +32,7 @@ export const userApi = {
 
   getAuthenticated: async () => {
     try {
-      const resp = await apiClient.get("/api/users/authenticated");
+      const resp = await apiClient.get("/api/auth/me");
       return resp.data;
     } catch (error) {
       console.error("Error getting authenticated user:", error);
@@ -87,4 +87,14 @@ export const userApi = {
       throw error;
     }
   },
+
+  forciblyConfirmUserEmail: async (id) => {
+    try {
+      const resp = await apiClient.patch(`/api/users/${encodeURIComponent(id)}/enable`);
+      return resp.data;
+    } catch (error) {
+      console.error("Error forcibly confirming user email:", error);
+      throw error;
+    }
+  }
 };

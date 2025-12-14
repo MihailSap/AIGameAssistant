@@ -8,13 +8,7 @@ import { downloadBlob } from "../utils/blobUtils";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-pdfjs.GlobalWorkerOptions.workerSrc = (() => {
-    try {
-        return new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url).toString();
-    } catch {
-        return `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-    }
-})();
+pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.min.mjs`;
 
 export default function FileViewer({ fileType, fileTitle, isPrintTitle = true }) {
     const [numPages, setNumPages] = useState(null);

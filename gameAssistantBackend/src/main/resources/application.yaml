@@ -2,6 +2,9 @@ spring:
   application:
     name: gameAssistantBackend
 
+  app:
+    public-url: ${APP_PUBLIC_URL:http://localhost:80}
+
   servlet:
     multipart:
       enabled: true

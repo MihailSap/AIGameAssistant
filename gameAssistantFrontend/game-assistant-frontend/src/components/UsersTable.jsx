@@ -4,7 +4,7 @@ import "../css/AdminTable.css";
 
 const PAGE_SIZE = 10;
 
-export default function UsersTable({ users = [], currentUser = null, onDelete, onToggleAdmin, search = "" }) {
+export default function UsersTable({ users = [], currentUser = null, onDelete, onEnabled, onToggleAdmin, search = "" }) {
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -56,6 +56,9 @@ export default function UsersTable({ users = [], currentUser = null, onDelete, o
                     />
                   </td>
                   <td>
+                    {!u.isEnabled &&
+                      <button className="icon-btn" onClick={() => onEnabled(u)} title="Подтвердить почту">✔</button>
+                    }
                     <button className="icon-btn danger" onClick={() => onDelete(u)} title="Удалить пользователя">X</button>
                   </td>
                 </tr>

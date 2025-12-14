@@ -1,4 +1,4 @@
-import { apiClient, BASE_URL } from "./axios";
+import { apiClient, API_BASE_URL } from "./axios";
 import { escapeText } from "../utils/utils";
 import { getAccessToken } from "../utils/storage";
 
@@ -77,7 +77,7 @@ export const chatApi = {
   streamAnswer: (chatId, { onChunk, onComplete, onError } = {}) => {
     const controller = new AbortController();
     const token = getAccessToken();
-    const url = `${BASE_URL.replace(/\/$/, "")}/api/chat/${chatId}/answer`;
+    const url = `${API_BASE_URL.replace(/\/$/, "")}/api/chat/${chatId}/answer`;
     fetch(url, {
       method: "POST",
       headers: {

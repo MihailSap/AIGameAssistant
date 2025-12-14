@@ -15,9 +15,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const tokens = await authApi.login(credentials);
+      await authApi.login(credentials);
       setIsAuthenticated(true);
-      return tokens;
     } finally {
       setLoading(false);
     }
@@ -26,26 +25,37 @@ export const AuthProvider = ({ children }) => {
   const register = async (userDTO) => {
     setLoading(true);
     try {
-      const resp = await authApi.register(userDTO);
-      return resp;
+      return await authApi.register(userDTO);
     } finally {
       setLoading(false);
     }
   };
 
-const logout = async () => {
-  setLoading(true);
-  try {
-    await authApi.logout();
-  } finally {
-    setIsAuthenticated(false);
-    window.location.href = "/login";
-    setLoading(false);
-  }
-};
+  const confirmEmail = async (token) => {
+    setLoading(true);
+    try {
+      await authApi.confirmUserEmail(token);
+      setIsAuthenticated(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await authApi.logout();
+    } finally {
+      setIsAuthenticated(false);
+      window.location.href = "/login";
+      setLoading(false);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, loading, login, register, confirmEmail, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
