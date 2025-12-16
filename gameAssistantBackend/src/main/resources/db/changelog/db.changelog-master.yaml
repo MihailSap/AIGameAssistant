@@ -49,3 +49,5 @@ databaseChangeLog:
       file: db/changelog/024-enable-old-users.yaml
   - include:
       file: db/changelog/025-add-password-reset-token.yaml
+  - include:
+      file: db/changelog/026-add-admin.yaml
