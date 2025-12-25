@@ -103,7 +103,7 @@
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 120ms ease, transform 120ms ease;
+  transition: opacity var(--transition), transform var(--transition);
   z-index: 5;
 }
 
@@ -217,12 +217,13 @@
   }
 
   .gm-btn-row .gm-circle-btn:disabled:hover svg {
-    color: black;
+    color: var(--bg);
   }
 
   .gm-circle-btn:hover .gm-tooltip,
   .gm-circle-btn:focus .gm-tooltip {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+    color: var(--yellow);
   }
 }
