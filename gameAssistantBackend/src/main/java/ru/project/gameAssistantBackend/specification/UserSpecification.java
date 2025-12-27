@@ -12,9 +12,9 @@ public class UserSpecification {
         return (root, query, cb) -> {
             if (filter == null || filter.isBlank()) return null;
             String pattern = "%" + filter.trim().toLowerCase() + "%";
-            Expression<String> title = cb.lower(root.get("login"));
-            Expression<String> desc = cb.lower(root.get("email"));
-            return cb.or(cb.like(title, pattern), cb.like(desc, pattern));
+            Expression<String> login = cb.lower(root.get("login"));
+            Expression<String> email = cb.lower(root.get("email"));
+            return cb.or(cb.like(login, pattern), cb.like(email, pattern));
         };
     }
 }

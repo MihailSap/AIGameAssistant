@@ -29,4 +29,6 @@ public interface AuthServiceI {
             throws TokenNotFoundException;
 
     String getAuthenticatedUserEmail();
+
+    User getAuthenticatedUser() throws UserNotFoundException;
 }

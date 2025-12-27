@@ -1,6 +1,9 @@
 package ru.project.gameAssistantBackend.service.impl.assistant;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.project.gameAssistantBackend.dto.chat.*;
@@ -134,15 +137,22 @@ public class ChatServiceImpl implements ChatServiceI {
     }
 
     @Override
-    public List<Chat> getChatsByGameAndUser(Long gameId)
-            throws UserNotFoundException {
-        User user = authServiceImpl.getAuthenticatedUser();
-        return chatRepository.findByUzerIdAndGameId(user.getId(), gameId);
+    public List<Chat> getChatsByAuthUserAndGame(Long authUserId, Long gameId){
+        return chatRepository.findByUzerIdAndGameId(authUserId, gameId);
     }
 
-    public List<Chat> getChatsByAuthUser() throws UserNotFoundException {
-        User user = authServiceImpl.getAuthenticatedUser();
-        return chatRepository.findByUzerId(user.getId());
+    @Override
+    public List<Chat> getChatsByAuthUser(Long authUserId) {
+        return chatRepository.findByUzerId(authUserId);
+    }
+
+    public Page<Chat> getAllPagedChats(int page, int size, Long gameId, Long authUserId){
+        Sort sort = Sort.by("lastUseTime").descending();
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        if (gameId != null) {
+            return chatRepository.findByUzerIdAndGameId(authUserId, gameId, pageRequest);
+        }
+        return chatRepository.findByUzerId(authUserId, pageRequest);
     }
 
     @Transactional

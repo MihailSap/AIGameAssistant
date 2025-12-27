@@ -29,6 +29,7 @@ public interface ChatServiceI {
 
     String getPromptForTitle(List<Message> messages);
 
-    List<Chat> getChatsByGameAndUser(Long gameId) throws UserNotFoundException;
+    List<Chat> getChatsByAuthUserAndGame(Long authUserId, Long gameId);
 
+    List<Chat> getChatsByAuthUser(Long authUserId);
 }

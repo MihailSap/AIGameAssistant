@@ -1,6 +1,7 @@
 package ru.project.gameAssistantBackend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -13,7 +14,7 @@ import ru.project.gameAssistantBackend.models.Model;
 import ru.project.gameAssistantBackend.mapper.ChatMapper;
 import ru.project.gameAssistantBackend.models.Chat;
 import ru.project.gameAssistantBackend.service.AssistantService;
-import ru.project.gameAssistantBackend.service.impl.AuthServiceImpl;
+import ru.project.gameAssistantBackend.service.AuthServiceI;
 import ru.project.gameAssistantBackend.service.impl.SystemPropertiesServiceImpl;
 import ru.project.gameAssistantBackend.service.impl.assistant.ChatModelFactory;
 import ru.project.gameAssistantBackend.service.impl.assistant.ChatServiceImpl;
@@ -30,7 +31,7 @@ public class ChatController {
 
     private final ChatModelFactory chatModelFactory;
 
-    private final AuthServiceImpl authServiceImpl;
+    private final AuthServiceI authService;
 
     private final SystemPropertiesServiceImpl systemPropertiesServiceImpl;
 
@@ -39,13 +40,13 @@ public class ChatController {
             ChatServiceImpl chatServiceImpl,
             ChatMapper chatMapper,
             ChatModelFactory chatModelFactory,
-            AuthServiceImpl authServiceImpl,
+            AuthServiceI authService,
             SystemPropertiesServiceImpl systemPropertiesServiceImpl
     ) {
         this.chatServiceImpl = chatServiceImpl;
         this.chatMapper = chatMapper;
         this.chatModelFactory = chatModelFactory;
-        this.authServiceImpl = authServiceImpl;
+        this.authService = authService;
         this.systemPropertiesServiceImpl = systemPropertiesServiceImpl;
     }
 
@@ -75,7 +76,7 @@ public class ChatController {
     @PostMapping(value = "/{chatId}/answer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> getStreamedAnswer(@PathVariable Long chatId)
             throws SystemPropertiesNotFoundException, ChatNotFoundException, UserNotFoundException {
-        Model userModel = authServiceImpl.getAuthenticatedUser().getModel();
+        Model userModel = authService.getAuthenticatedUser().getModel();
         Model model = systemPropertiesServiceImpl.getSystemProperties().getModel();
 
         AssistantService service = null;
@@ -113,15 +114,28 @@ public class ChatController {
     @GetMapping("/by-game/{gameId}")
     public List<ChatPreviewDTO> getChatPreviews(@PathVariable("gameId") Long gameId)
             throws UserNotFoundException {
-        List<Chat> chats = chatServiceImpl.getChatsByGameAndUser(gameId);
+        Long authUserId = authService.getAuthenticatedUser().getId();
+        List<Chat> chats = chatServiceImpl.getChatsByAuthUserAndGame(authUserId, gameId);
         return chatMapper.mapToPreviewDTOs(chats);
     }
 
     @GetMapping("/by-user")
     public List<ChatPreviewDTO> getChatPreviews()
             throws UserNotFoundException {
-        List<Chat> chats = chatServiceImpl.getChatsByAuthUser();
+        Long authUserId = authService.getAuthenticatedUser().getId();
+        List<Chat> chats = chatServiceImpl.getChatsByAuthUser(authUserId);
         return chatMapper.mapToPreviewDTOs(chats);
+    }
+
+    @GetMapping("/paged")
+    public List<ChatPreviewDTO> getPagedChatPreviews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long gameId
+    ) throws UserNotFoundException {
+        Long authUserId = authService.getAuthenticatedUser().getId();
+        Page<Chat> chats = chatServiceImpl.getAllPagedChats(page, size, gameId, authUserId);
+        return chatMapper.mapToPreviewDTOs(chats.getContent());
     }
 
     @GetMapping("/models")

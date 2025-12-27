@@ -10,7 +10,6 @@ import ru.project.gameAssistantBackend.dto.jwt.JwtRequest;
 import ru.project.gameAssistantBackend.dto.jwt.JwtResponse;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.exception.customEx.conflict.UserConflictException;
-import ru.project.gameAssistantBackend.exception.customEx.invalid.PasswordInvalidException;
 import ru.project.gameAssistantBackend.exception.customEx.invalid.TokenInvalidException;
 import ru.project.gameAssistantBackend.exception.customEx.notEnabled.AccountNotEnabledException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.TokenNotFoundException;
@@ -150,6 +149,7 @@ public class AuthServiceImpl implements AuthServiceI {
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
     }
 
+    @Override
     public User getAuthenticatedUser()
             throws UserNotFoundException {
         String email = getAuthenticatedUserEmail();
