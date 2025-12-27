@@ -2,7 +2,10 @@ package ru.project.gameAssistantBackend.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,8 +14,10 @@ import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFo
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.models.Category;
 import ru.project.gameAssistantBackend.models.Game;
+import ru.project.gameAssistantBackend.models.SortDirection;
 import ru.project.gameAssistantBackend.repository.GameRepository;
 import ru.project.gameAssistantBackend.service.GameServiceI;
+import ru.project.gameAssistantBackend.specification.GameSpecification;
 
 import java.util.List;
 import java.util.Set;
@@ -28,21 +33,36 @@ public class GameServiceImpl implements GameServiceI {
 
     private final CategoryService categoryService;
 
+    private final GameSpecification gameSpecification;
+
     @Autowired
     public GameServiceImpl(
             GameRepository gameRepository,
             FileServiceImpl fileServiceImpl,
             Converter converter,
-            CategoryService categoryService) {
+            CategoryService categoryService,
+            GameSpecification gameSpecification) {
         this.gameRepository = gameRepository;
         this.fileServiceImpl = fileServiceImpl;
         this.converter = converter;
         this.categoryService = categoryService;
+        this.gameSpecification = gameSpecification;
     }
 
-    @Override
-    public Page<Game> getAllGames(Pageable pageable){
-        return gameRepository.findAll(pageable);
+    public Page<Game> getPagedGames(
+            int page, int size, String filter, String category, String sortBy, SortDirection direction) {
+        Set<String> allowed = Set.of("id", "title");
+        if (!allowed.contains(sortBy)) sortBy = "title";
+
+        Sort sort = direction.equals(SortDirection.ASCENDING)
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<Game> spec = gameSpecification.titleOrDescriptionContains(filter)
+                .and(gameSpecification.hasCategory(category));
+
+        return gameRepository.findAll(spec, pageable);
     }
 
     public List<Game> getAllGames(){

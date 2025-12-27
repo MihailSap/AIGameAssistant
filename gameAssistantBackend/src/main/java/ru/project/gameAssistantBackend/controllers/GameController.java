@@ -2,7 +2,6 @@ package ru.project.gameAssistantBackend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +12,7 @@ import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFo
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.mapper.GameMapper;
 import ru.project.gameAssistantBackend.models.Game;
+import ru.project.gameAssistantBackend.models.SortDirection;
 import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
 
 import java.util.List;
@@ -55,13 +55,18 @@ public class GameController {
         return gameMapper.mapToGamePreviewDTOs(games);
     }
 
-    @GetMapping("/page")
-    public List<GamePreviewDTO> readAll(
-            @RequestParam("offset") Integer offset,
-            @RequestParam("limit") Integer limit
+    @GetMapping("/paged")
+    public List<GamePreviewDTO> readAllPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "ASCENDING") SortDirection direction
     ){
-        Page<Game> games = gameServiceImpl.getAllGames(PageRequest.of(offset, limit));
-        return gameMapper.mapToGamePreviewDTOs(games.getContent());
+        Page<Game> pagedGames = gameServiceImpl.getPagedGames(
+                page, size, filter, category, sortBy, direction);
+        return gameMapper.mapToGamePreviewDTOs(pagedGames.getContent());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

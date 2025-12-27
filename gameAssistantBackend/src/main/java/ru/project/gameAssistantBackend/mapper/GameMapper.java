@@ -19,7 +19,7 @@ public class GameMapper {
         return new GameResponseDTO(
                 game.getId(),
                 game.getTitle(),
-                game.getDescription(),
+                trimDesc(game.getDescription()),
                 mapToCategories(categories),
                 game.getImageFileTitle(),
                 game.getRulesFileTitle());
@@ -50,5 +50,10 @@ public class GameMapper {
             categoriesList.add(category.getName());
         }
         return categoriesList;
+    }
+
+    private String trimDesc(String desc){
+        if (desc == null) return "";
+        return desc.length() > 200 ? desc.substring(0,200) + "..." : desc;
     }
 }
