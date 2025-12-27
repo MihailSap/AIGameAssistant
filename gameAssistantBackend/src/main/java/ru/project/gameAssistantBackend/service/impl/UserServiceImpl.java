@@ -1,21 +1,23 @@
 package ru.project.gameAssistantBackend.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.UserNotFoundException;
-import ru.project.gameAssistantBackend.models.Model;
-import ru.project.gameAssistantBackend.models.Role;
-import ru.project.gameAssistantBackend.models.User;
+import ru.project.gameAssistantBackend.models.*;
 import ru.project.gameAssistantBackend.repository.UserRepository;
 import ru.project.gameAssistantBackend.service.UserServiceI;
+import ru.project.gameAssistantBackend.specification.UserSpecification;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,21 +28,33 @@ public class UserServiceImpl implements UserServiceI {
     private final PasswordEncoder passwordEncoder;
 
     private final FileServiceImpl fileServiceImpl;
+    private final UserSpecification userSpecification;
 
     @Autowired
     public UserServiceImpl(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            FileServiceImpl fileServiceImpl
-    ) {
+            FileServiceImpl fileServiceImpl,
+            UserSpecification userSpecification) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileServiceImpl = fileServiceImpl;
+        this.userSpecification = userSpecification;
     }
 
     @Override
     public List<User> getAllUsers(){
         return userRepository.findAll();
+    }
+
+    public Page<User> getPagedUsers(int page, int size, String filter) {
+        Sort sort = Sort.by(
+                Sort.Order.by("role").with(Sort.Direction.DESC),
+                Sort.Order.by("id").with(Sort.Direction.ASC));
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<User> spec = userSpecification.loginOrEmailContains(filter);
+        return userRepository.findAll(spec, pageable);
     }
 
     @Override

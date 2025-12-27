@@ -2,6 +2,7 @@ package ru.project.gameAssistantBackend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,6 @@ import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFo
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.mapper.GameMapper;
 import ru.project.gameAssistantBackend.models.Game;
-import ru.project.gameAssistantBackend.models.SortDirection;
 import ru.project.gameAssistantBackend.service.impl.GameServiceImpl;
 
 import java.util.List;
@@ -62,7 +62,7 @@ public class GameController {
             @RequestParam(required = false) String filter,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "title") String sortBy,
-            @RequestParam(defaultValue = "ASCENDING") SortDirection direction
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction
     ){
         Page<Game> pagedGames = gameServiceImpl.getPagedGames(
                 page, size, filter, category, sortBy, direction);

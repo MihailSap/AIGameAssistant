@@ -14,7 +14,6 @@ import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFo
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.models.Category;
 import ru.project.gameAssistantBackend.models.Game;
-import ru.project.gameAssistantBackend.models.SortDirection;
 import ru.project.gameAssistantBackend.repository.GameRepository;
 import ru.project.gameAssistantBackend.service.GameServiceI;
 import ru.project.gameAssistantBackend.specification.GameSpecification;
@@ -50,14 +49,11 @@ public class GameServiceImpl implements GameServiceI {
     }
 
     public Page<Game> getPagedGames(
-            int page, int size, String filter, String category, String sortBy, SortDirection direction) {
+            int page, int size, String filter, String category, String sortBy, Sort.Direction direction) {
         Set<String> allowed = Set.of("id", "title");
         if (!allowed.contains(sortBy)) sortBy = "title";
 
-        Sort sort = direction.equals(SortDirection.ASCENDING)
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-
+        Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Specification<Game> spec = gameSpecification.titleOrDescriptionContains(filter)
                 .and(gameSpecification.hasCategory(category));

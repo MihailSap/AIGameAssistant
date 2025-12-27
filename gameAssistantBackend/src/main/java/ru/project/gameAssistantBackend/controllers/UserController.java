@@ -1,6 +1,7 @@
 package ru.project.gameAssistantBackend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.project.gameAssistantBackend.dto.ResponseDTO;
@@ -72,6 +73,17 @@ public class UserController {
     public List<UserResponseDTO> getAllUsers() {
         List<User> usersData = userServiceImpl.getAllUsers();
         return userMapper.mapAllUsersDTO(usersData);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/paged")
+    public List<UserResponseDTO> getPagedAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String filter
+    ) {
+        Page<User> users = userServiceImpl.getPagedUsers(page, size, filter);
+        return userMapper.mapAllUsersDTO(users.getContent());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
