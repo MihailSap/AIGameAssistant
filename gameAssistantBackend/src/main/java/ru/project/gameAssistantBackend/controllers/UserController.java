@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.project.gameAssistantBackend.dto.PagedResponseDTO;
 import ru.project.gameAssistantBackend.dto.ResponseDTO;
 import ru.project.gameAssistantBackend.dto.user.UpdatePasswordDTO;
 import ru.project.gameAssistantBackend.dto.user.UserRequestDTO;
@@ -77,13 +78,19 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/paged")
-    public List<UserResponseDTO> getPagedAllUsers(
+    public PagedResponseDTO<UserResponseDTO> getPagedAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String filter
     ) {
         Page<User> users = userServiceImpl.getPagedUsers(page, size, filter);
-        return userMapper.mapAllUsersDTO(users.getContent());
+        return new PagedResponseDTO<>(
+                userMapper.mapAllUsersDTO(users.getContent()),
+                users.getTotalElements(),
+                users.getTotalPages(),
+                users.getNumber(),
+                users.getSize()
+        );
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

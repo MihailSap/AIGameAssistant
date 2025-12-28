@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import ru.project.gameAssistantBackend.dto.PagedResponseDTO;
 import ru.project.gameAssistantBackend.dto.chat.*;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.ChatNotFoundException;
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
@@ -128,14 +129,20 @@ public class ChatController {
     }
 
     @GetMapping("/paged")
-    public List<ChatPreviewDTO> getPagedChatPreviews(
+    public PagedResponseDTO<ChatPreviewDTO> getPagedChatPreviews(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) Long gameId
     ) throws UserNotFoundException {
         Long authUserId = authService.getAuthenticatedUser().getId();
         Page<Chat> chats = chatServiceImpl.getAllPagedChats(page, size, gameId, authUserId);
-        return chatMapper.mapToPreviewDTOs(chats.getContent());
+        return new PagedResponseDTO<>(
+                chatMapper.mapToPreviewDTOs(chats.getContent()),
+                chats.getTotalElements(),
+                chats.getTotalPages(),
+                chats.getNumber(),
+                chats.getSize()
+        );
     }
 
     @GetMapping("/models")

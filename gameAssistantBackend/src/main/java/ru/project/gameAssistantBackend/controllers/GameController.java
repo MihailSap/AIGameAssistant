@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.project.gameAssistantBackend.dto.PagedResponseDTO;
 import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
 import ru.project.gameAssistantBackend.dto.game.GameRequestDTO;
 import ru.project.gameAssistantBackend.dto.game.GameResponseDTO;
@@ -56,7 +57,7 @@ public class GameController {
     }
 
     @GetMapping("/paged")
-    public List<GamePreviewDTO> readAllPaged(
+    public PagedResponseDTO<GamePreviewDTO> readAllPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String filter,
@@ -66,7 +67,13 @@ public class GameController {
     ){
         Page<Game> pagedGames = gameServiceImpl.getPagedGames(
                 page, size, filter, category, sortBy, direction);
-        return gameMapper.mapToGamePreviewDTOs(pagedGames.getContent());
+        return new PagedResponseDTO<>(
+                gameMapper.mapToGamePreviewDTOs(pagedGames.getContent()),
+                pagedGames.getTotalElements(),
+                pagedGames.getTotalPages(),
+                pagedGames.getNumber(),
+                pagedGames.getSize()
+        );
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import ru.project.gameAssistantBackend.dto.PagedResponseDTO;
 import ru.project.gameAssistantBackend.dto.ResponseDTO;
 import ru.project.gameAssistantBackend.dto.game.GamePreviewDTO;
 import ru.project.gameAssistantBackend.exception.customEx.conflict.FavouritesConflictException;
@@ -76,7 +77,7 @@ public class FavouritesController {
     }
 
     @GetMapping("/paged")
-    public List<GamePreviewDTO> getPagedFavourites(
+    public PagedResponseDTO<GamePreviewDTO> getPagedFavourites(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String filter,
@@ -91,6 +92,12 @@ public class FavouritesController {
                 user, page, size, filter, category, sortBy, direction
         );
 
-        return gameMapper.mapToGamePreviewDTOs(pagedGames.getContent());
+        return new PagedResponseDTO<>(
+                gameMapper.mapToGamePreviewDTOs(pagedGames.getContent()),
+                pagedGames.getTotalElements(),
+                pagedGames.getTotalPages(),
+                pagedGames.getNumber(),
+                pagedGames.getSize()
+        );
     }
 }
