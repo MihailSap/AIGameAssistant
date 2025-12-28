@@ -14,6 +14,7 @@ import ru.project.gameAssistantBackend.exception.customEx.notFound.CategoryNotFo
 import ru.project.gameAssistantBackend.exception.customEx.notFound.GameNotFoundException;
 import ru.project.gameAssistantBackend.models.Category;
 import ru.project.gameAssistantBackend.models.Game;
+import ru.project.gameAssistantBackend.models.User;
 import ru.project.gameAssistantBackend.repository.GameRepository;
 import ru.project.gameAssistantBackend.service.GameServiceI;
 import ru.project.gameAssistantBackend.specification.GameSpecification;
@@ -60,6 +61,24 @@ public class GameServiceImpl implements GameServiceI {
 
         return gameRepository.findAll(spec, pageable);
     }
+
+    public Page<Game> getPagedFavouriteGames(
+            User user, int page, int size, String filter, String category, String sortBy, Sort.Direction direction) {
+        Set<String> allowed = Set.of("id", "title");
+        if (!allowed.contains(sortBy)) {
+            sortBy = "title";
+        }
+
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Game> spec = gameSpecification.titleOrDescriptionContains(filter)
+                .and(gameSpecification.hasCategory(category))
+                .and(gameSpecification.isFavouriteOf(user));
+
+        return gameRepository.findAll(spec, pageable);
+    }
+
 
     public List<Game> getAllGames(){
         return gameRepository.findAll();

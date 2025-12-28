@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import ru.project.gameAssistantBackend.models.Game;
+import ru.project.gameAssistantBackend.models.User;
 
 @Component
 public class GameSpecification {
@@ -30,6 +31,13 @@ public class GameSpecification {
                     cb.lower(categories.get("name")),
                     categoryName.trim().toLowerCase()
             );
+        };
+    }
+
+    public Specification<Game> isFavouriteOf(User user) {
+        return (root, query, cb) -> {
+            Join<Game, User> users = root.join("users"); // имя поля в Game
+            return cb.equal(users.get("id"), user.getId());
         };
     }
 }
