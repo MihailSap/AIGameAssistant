@@ -495,13 +495,11 @@ export default function AdminPage() {
               <div className="admin-table-header">
                 <h2 className="admin-table-title">Категории</h2>
               </div>
-              {itemsLoading ? <div className="games-grid-loading"><div className="spinner grid" /></div> :
-                <CategoriesTable
-                  categories={categories}
-                  onAdd={handleAddCategory}
-                  onDelete={handleDeleteCategory}
-                />
-              }
+              <CategoriesTable
+                categories={categories}
+                onAdd={handleAddCategory}
+                onDelete={handleDeleteCategory}
+              />
             </section>
           </>
         )}
