@@ -46,7 +46,7 @@ export default function FileViewer({ fileType, fileTitle, isPrintTitle = true })
             </div>
 
             <div className="file-viewer-body">
-                {loading && <div className="fv-center">Загрузка...</div>}
+                {loading && <div className="fv-center"><div className="spinner chat" /></div>}
                 {error && <div className="fv-error">{error}</div>}
 
                 {!loading && !error && fileType === "image" && fileUrl && (

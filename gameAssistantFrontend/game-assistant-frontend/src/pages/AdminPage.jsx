@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { userApi } from "../api/users";
@@ -17,115 +17,141 @@ import SelectDropdown from "../components/SelectDropdown";
 import "../css/AdminPage.css";
 import { downloadBlob } from "../utils/blobUtils";
 import { backendToFrontendModel } from "../utils/model";
+import useDebounce from "../hooks/useDebounce";
 
 export default function AdminPage() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
+  const skipNextPageEffect = useRef(false);
+  const skipNextSearchEffect = useRef(false);
+
   const [currentUser, setCurrentUser] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [games, setGames] = useState([]);
+  const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
-
+  const [page, setPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [itemsLoading, setItemsLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const [usersSearch, setUsersSearch] = useState("");
-  const [gamesSearch, setGamesSearch] = useState("");
-
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 280);
   const [selectedModel, setSelectedModel] = useState(null);
-
   const [viewerState, setViewerState] = useState({ open: false, fileType: null, fileTitle: null });
   const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null, type: "delete" });
   const [gameFormState, setGameFormState] = useState({ open: false, mode: "create", initial: null });
-
   const [activeTab, setActiveTab] = useState("users");
+
+  const loadData = async ({ tabToUse = "users", pageToUse = 1, searchToUse = "" } = {}) => {
+    setItemsLoading(true);
+    try {
+      let data = null;
+      if (tabToUse === "users") {
+        data = await userApi.getAllPaged(pageToUse - 1, 10, (searchToUse || "").trim() || null);
+        setItems(Array.isArray(data?.content) ? data.content : []);
+      } else if (tabToUse === "games") {
+        data = await gameApi.getAllPaged(pageToUse - 1, 10, (searchToUse || "").trim() || null, null, "id");
+        const games = await Promise.all((data?.content || []).map(item => gameApi.read(item.id)));
+        setItems(Array.isArray(games) ? games : []);
+
+        const allCategories = await categoryApi.getAll();
+        setCategories(allCategories.sort((a, b) => a?.id - b?.id) || []);
+      } else if (tabToUse === "settings") {
+        const currentModel = await modelApi.getMain();
+        setSelectedModel(currentModel || "Yandex-GPT");
+      }
+      setPageCount(data?.totalPages || 1);
+      setError(null);
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || "Ошибка при загрузке данных");
+    } finally {
+      setItemsLoading(false);
+    }
+  };
+
+  const refreshData = async (resetPage = false, overrideTab = undefined, overrideSearch = undefined) => {
+    const tabToUse = overrideTab !== undefined ? overrideTab : activeTab;
+    const searchToUse = overrideSearch !== undefined ? overrideSearch : debouncedSearch;
+    const pageToUse = resetPage ? 1 : page;
+    await loadData({ tabToUse, pageToUse, searchToUse });
+  };
 
   useEffect(() => {
     let mounted = true;
-    const loadData = async () => {
+    (async () => {
+      await refreshData(false, activeTab, debouncedSearch);
+      if (!mounted) return;
+    })();
+    return () => (mounted = false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (skipNextPageEffect.current) {
+        skipNextPageEffect.current = false;
+        return;
+      }
+      await refreshData(false);
+      if (!mounted) return;
+    })();
+    return () => (mounted = false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (skipNextSearchEffect.current) {
+        skipNextSearchEffect.current = false;
+        return;
+      }
+      setPage(1);
+      setPageCount(1);
+      await refreshData(true, undefined, debouncedSearch);
+      if (!mounted) return;
+    })();
+    return () => (mounted = false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
+  const switchTab = async (tab) => {
+    setActiveTab(tab);
+    setItems([]);
+    if (search !== "") {
+      setSearch("");
+      skipNextSearchEffect.current = true;
+    }
+    if (page !== 1) {
+      setPage(1);
+      skipNextPageEffect.current = true;
+    }
+    setPageCount(1);
+    await refreshData(true, tab, "");
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
       setLoading(true);
       try {
         const authUser = await userApi.getAuthenticated();
         if (!mounted) return;
-
         if (!authUser?.isAdmin) {
           navigate("/", { replace: true });
           return;
         }
-
         setCurrentUser(authUser);
-
-        const currentModel = await modelApi.getMain();
-        if (!mounted) return;
-        setSelectedModel(currentModel || 'Yandex-GPT');
-
-        const [allUsers, allGames, allCategories] = await Promise.all([userApi.getAll(), gameApi.getAll(), categoryApi.getAll()]);
-        if (!mounted) return;
-
-        setCategories(allCategories.sort((a, b) => a?.id - b?.id) || []);
-
-        if (allGames && allGames.length > 0) {
-          const gamesResults = (await Promise.all(
-            allGames.map(item => gameApi.read(item.id))
-          )).sort((a, b) => a?.id - b?.id);
-          setGames(gamesResults);
-        } else {
-          setGames(allGames || []);
-        }
-
-        const others = (allUsers || []).filter(u => u.id !== authUser.id);
-        const admins = others
-          .filter(u => u.isAdmin)
-          .sort((a, b) => a?.id - b?.id);
-        const regulars = others
-          .filter(u => !u.isAdmin)
-          .sort((a, b) => a?.id - b?.id);
-        setUsers([authUser, ...admins, ...regulars]);
-        setError(null);
-      } catch (err) {
-        setError(err?.response?.data?.message || err?.message || "Ошибка при загрузке данных");
-        if (err?.response?.status === 401) navigate("/login", { replace: true });
       } finally {
         if (mounted) setLoading(false);
       }
-    };
-    loadData();
+    })();
     return () => {
       mounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const refreshData = async () => {
-    try {
-      const [allUsers, allGames, allCategories] = await Promise.all([userApi.getAll(), gameApi.getAll(), categoryApi.getAll()]);
-
-      setCategories(allCategories.sort((a, b) => a?.id - b?.id) || []);
-
-      if (allGames && allGames.length > 0) {
-        const gamesResults = (await Promise.all(
-          allGames.map(item => gameApi.read(item.id))
-        )).sort((a, b) => a?.id - b?.id);
-        setGames(gamesResults);
-      } else {
-        setGames(allGames || []);
-      }
-
-      const authUser = await userApi.getAuthenticated();
-      const others = (allUsers || []).filter(u => u.id !== authUser.id);
-      const admins = others
-        .filter(u => u.isAdmin)
-        .sort((a, b) => a?.id - b?.id);
-      const regulars = others
-        .filter(u => !u.isAdmin)
-        .sort((a, b) => a?.id - b?.id);
-      setUsers([authUser, ...admins, ...regulars]);
-      setCurrentUser(authUser);
-    } catch (err) {
-      console.error("refresh error", err);
-    }
-  };
 
   const handleDeleteUser = (user) => {
     setConfirmState({
@@ -140,8 +166,13 @@ export default function AdminPage() {
             navigate("/login", { replace: true });
             return;
           }
-          await refreshData();
-        } catch (err) {
+          setItems([]);
+          if (page !== 1) {
+            setPage(1);
+            skipNextPageEffect.current = true;
+          }
+          await refreshData(true);
+        } catch {
           alert("Не удалось удалить пользователя.");
           setConfirmState({ open: false });
         }
@@ -159,14 +190,14 @@ export default function AdminPage() {
           await userApi.forciblyConfirmUserEmail(user.id);
           setConfirmState({ open: false });
           await refreshData();
-        } catch (err) {
+        } catch {
           alert("Не удалось подтвердить пользователя.");
           setConfirmState({ open: false });
         }
       },
       type: "confirm",
     });
-  }
+  };
 
   const applyAdminChange = async (user, checked) => {
     try {
@@ -180,9 +211,7 @@ export default function AdminPage() {
         return;
       }
       await refreshData();
-    } catch (err) {
-      console.error("Ошибка при смене роли:", err);
-    }
+    } catch { }
   };
 
   const handleToggleAdmin = (user, checked) => {
@@ -193,7 +222,7 @@ export default function AdminPage() {
     if (checked) {
       setConfirmState({
         open: true,
-        text: `Вы действительно хотите сделать пользователя "${user.login}" (${user.email}) админом? Он получит доступ ко всему функционалу админ-панели.`,
+        text: `Вы действительно хотите сделать пользователя "${user.login}" (${user.email}) админом?`,
         onConfirm: async () => {
           await applyAdminChange(user, true);
           setConfirmState({ open: false });
@@ -221,13 +250,18 @@ export default function AdminPage() {
   const handleDeleteGame = (game) => {
     setConfirmState({
       open: true,
-      text: `Вы действительно хотите удалить игру "${game.title}"? Это действие нельзя отменить.`,
+      text: `Вы действительно хотите удалить игру "${game.title}"?`,
       onConfirm: async () => {
         try {
           await gameApi.delete(game.id);
           setConfirmState({ open: false });
-          await refreshData();
-        } catch (err) {
+          setItems([]);
+          if (page !== 1) {
+            setPage(1);
+            skipNextPageEffect.current = true;
+          }
+          await refreshData(true);
+        } catch {
           alert("Не удалось удалить игру.");
           setConfirmState({ open: false });
         }
@@ -246,7 +280,7 @@ export default function AdminPage() {
         blob = await fileApi.getRulesBlob(fileTitle);
       }
       await downloadBlob(blob, fileTitle);
-    } catch (err) {
+    } catch {
       alert("Не удалось скачать файл.");
     }
   };
@@ -260,7 +294,7 @@ export default function AdminPage() {
       }
       setGameFormState({ open: false, mode: "create", initial: null });
       await refreshData();
-    } catch (err) {
+    } catch {
       alert("Ошибка при сохранении игры.");
     }
   };
@@ -271,7 +305,7 @@ export default function AdminPage() {
       if (!nm) return;
       await categoryApi.create(nm);
       await refreshData();
-    } catch (err) {
+    } catch {
       alert("Не удалось добавить категорию.");
     }
   };
@@ -280,13 +314,13 @@ export default function AdminPage() {
     const id = cat && (cat.id ?? cat);
     setConfirmState({
       open: true,
-      text: `Вы действительно хотите удалить категорию "${typeof cat === "string" ? cat : (cat.name ?? "")}"? Это действие нельзя отменить.`,
+      text: `Вы действительно хотите удалить категорию "${typeof cat === "string" ? cat : cat.name ?? ""}"?`,
       onConfirm: async () => {
         try {
           await categoryApi.delete(id);
           setConfirmState({ open: false });
           await refreshData();
-        } catch (err) {
+        } catch {
           alert("Не удалось удалить категорию.");
           setConfirmState({ open: false });
         }
@@ -300,10 +334,10 @@ export default function AdminPage() {
       if (!newModel) return;
       await modelApi.updateMain(newModel);
       setSelectedModel(newModel);
-    } catch (err) {
+    } catch {
       alert("Не удалось изменить модель.");
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -311,11 +345,9 @@ export default function AdminPage() {
         <div className="admin-header">
           <h1>Админская панель</h1>
         </div>
-        {loading && (
-          <div className="full-loader">
-            <div className="spinner" />
-          </div>
-        )}
+        <div className="full-loader">
+          <div className="spinner" />
+        </div>
       </div>
     );
   }
@@ -341,7 +373,7 @@ export default function AdminPage() {
             <button
               type="button"
               className={`admin-tab ${activeTab === "users" ? "active" : ""}`}
-              onClick={() => setActiveTab("users")}
+              onClick={() => switchTab("users")}
               role="tab"
               aria-selected={activeTab === "users"}
             >
@@ -350,7 +382,7 @@ export default function AdminPage() {
             <button
               type="button"
               className={`admin-tab ${activeTab === "games" ? "active" : ""}`}
-              onClick={() => setActiveTab("games")}
+              onClick={() => switchTab("games")}
               role="tab"
               aria-selected={activeTab === "games"}
             >
@@ -359,7 +391,7 @@ export default function AdminPage() {
             <button
               type="button"
               className={`admin-tab ${activeTab === "settings" ? "active" : ""}`}
-              onClick={() => setActiveTab("settings")}
+              onClick={() => switchTab("settings")}
               role="tab"
               aria-selected={activeTab === "settings"}
             >
@@ -410,19 +442,23 @@ export default function AdminPage() {
                   type="text"
                   className="admin-table-search users-search"
                   placeholder="Поиск пользователей..."
-                  value={usersSearch}
-                  onChange={(e) => setUsersSearch(e.target.value)}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
             </div>
-            <UsersTable
-              users={users}
-              currentUser={currentUser}
-              onEnabled={handleEnableUser}
-              onDelete={handleDeleteUser}
-              onToggleAdmin={handleToggleAdmin}
-              search={usersSearch}
-            />
+            {itemsLoading ? <div className="games-grid-loading"><div className="spinner grid" /></div> :
+              <UsersTable
+                users={items}
+                currentUser={currentUser}
+                onEnabled={handleEnableUser}
+                onDelete={handleDeleteUser}
+                onToggleAdmin={handleToggleAdmin}
+                currentPage={page}
+                pageCount={pageCount}
+                setPage={setPage}
+              />
+            }
           </section>
         )}
 
@@ -436,31 +472,36 @@ export default function AdminPage() {
                     type="text"
                     className="admin-table-search games-search"
                     placeholder="Поиск игр..."
-                    value={gamesSearch}
-                    onChange={(e) => setGamesSearch(e.target.value)}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                   />
                   <button className="btn admin-btn-add" onClick={handleOpenCreateGame} title="Добавить игру">＋</button>
                 </div>
               </div>
-
-              <GamesTable
-                games={games}
-                onEdit={handleOpenEditGame}
-                onDelete={handleDeleteGame}
-                onDownloadFile={handleDownloadFile}
-                onOpenFile={handleOpenViewer}
-                search={gamesSearch}
-              />
+              {itemsLoading ? <div className="games-grid-loading"><div className="spinner grid" /></div> :
+                <GamesTable
+                  games={items}
+                  onEdit={handleOpenEditGame}
+                  onDelete={handleDeleteGame}
+                  onDownloadFile={handleDownloadFile}
+                  onOpenFile={handleOpenViewer}
+                  currentPage={page}
+                  pageCount={pageCount}
+                  setPage={setPage}
+                />
+              }
             </section>
             <section className="admin-section">
               <div className="admin-table-header">
                 <h2 className="admin-table-title">Категории</h2>
               </div>
-              <CategoriesTable
-                categories={categories}
-                onAdd={handleAddCategory}
-                onDelete={handleDeleteCategory}
-              />
+              {itemsLoading ? <div className="games-grid-loading"><div className="spinner grid" /></div> :
+                <CategoriesTable
+                  categories={categories}
+                  onAdd={handleAddCategory}
+                  onDelete={handleDeleteCategory}
+                />
+              }
             </section>
           </>
         )}

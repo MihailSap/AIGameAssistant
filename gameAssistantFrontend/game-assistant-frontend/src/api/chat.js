@@ -26,7 +26,7 @@ export const chatApi = {
 
   continueChat: async (id, prompt, model) => {
     try {
-      const resp = await apiClient.put(`/api/chat/${id}`, {prompt, model});
+      const resp = await apiClient.put(`/api/chat/${id}`, { prompt, model });
       return resp?.data;
     } catch (error) {
       console.error("Error continuing chat:", error);
@@ -57,6 +57,21 @@ export const chatApi = {
   getChatPreviewsByGame: async (gameId) => {
     try {
       const resp = await apiClient.get(`/api/chat/by-game/${gameId}`);
+      return resp?.data;
+    } catch (error) {
+      console.error("Error get chat previews by game:", error);
+      throw error;
+    }
+  },
+
+  getAllChatPaged: async (page, size, gameId = null) => {
+    try {
+      const params = {};
+
+      if (page != null) params.page = page;
+      if (size != null) params.size = size;
+      if (gameId != null) params.gameId = gameId;
+      const resp = await apiClient.get("/api/chat/paged", { params });
       return resp?.data;
     } catch (error) {
       console.error("Error get chat previews by game:", error);

@@ -155,6 +155,25 @@
     text-align: center;
 }
 
+.sidebar-spinner-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner.chat {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+}
+
+.load-more-container {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
 .not-found-container {
     height: 85vh;
     width: 100%;

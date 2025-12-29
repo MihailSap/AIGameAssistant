@@ -91,6 +91,14 @@
     font-size: 16px;
 }
 
+[data-theme="light"] .site-header .search-input {
+    color: var(--card-text);
+}
+
+[data-theme="light"] .site-header.scrolled-past-hero .search-input {
+    color: var(--text);
+}
+
 .search-input:focus {
     border-color: var(--muted-yellow);
 }

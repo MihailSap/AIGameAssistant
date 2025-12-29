@@ -36,7 +36,9 @@ export default function ProfilePage() {
 
   const [chats, setChats] = useState([]);
   const [chatsLoading, setChatsLoading] = useState(true);
-  const [chatsGames, setChatsGames] = useState([]);
+
+  const [games, setGames] = useState([]);
+  const [gamesLoading, setGamesLoading] = useState(true);
   const [selectedGame, setSelectedGame] = useState(null);
 
   const mountedRef = useRef(true);
@@ -66,6 +68,23 @@ export default function ProfilePage() {
       revokeAvatar();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setGamesLoading(true);
+      try {
+        let games = await gameApi.getAllPaged();
+        if (!mounted) return;
+        games = games.content.map(g => ({ id: g.id, title: g.title }));
+        setGames(games);
+      } catch (err) {
+        setGames([]);
+      } finally {
+        if (mounted) setGamesLoading(false);
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -111,10 +130,9 @@ export default function ProfilePage() {
     (async () => {
       setChatsLoading(true);
       try {
-        const resp = await chatApi.getChatPreviewsByUser();
+        const resp = await chatApi.getAllChatPaged(0, visibleCount, selectedGame?.id || null);
         if (!mounted) return;
-        const arr = Array.isArray(resp) ? resp : [];
-        arr.sort((a, b) => (b.lastUseTime ? new Date(b.lastUseTime) : new Date()) - (a.lastUseTime ? new Date(a.lastUseTime) : new Date()));
+        const arr = Array.isArray(resp?.content) ? resp.content : [];
         const chats = await Promise.all(arr.map(async chat => {
           if (chat.gameId) {
             const game = await gameApi.read(chat.gameId);
@@ -123,8 +141,6 @@ export default function ProfilePage() {
           return chat;
         }));
         setChats(chats);
-        const chatsGames = [...(new Set(chats.map(c => c.gameTitle)))]
-        setChatsGames(chatsGames);
       } catch (err) {
         setChats([]);
       } finally {
@@ -132,7 +148,7 @@ export default function ProfilePage() {
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [visibleCount, selectedGame]);
 
   const handleAvatarChange = async (file) => {
     if (!file) return;
@@ -245,8 +261,6 @@ export default function ProfilePage() {
     navigate(`/games/ai/${chat.gameId}/${chat.id}`);
   };
 
-  const visibleChats = chats.filter(c => !selectedGame || c.gameTitle === selectedGame).slice(0, visibleCount);
-
   const avatarUrl = avatarPreviewUrl || avatarBlobUrl;
   const avatarLoading = avatarLoadingFetch || avatarUploading;
   const avatarErrorGetText = avatarPreviewUrl || avatarUploading ? "" : (avatarGetError ? (avatarGetError?.response?.data?.message || avatarGetError?.message || "Ошибка при получении") : "");
@@ -277,7 +291,7 @@ export default function ProfilePage() {
                   <AvatarControl
                     url={avatarUrl}
                     loading={avatarLoading}
-                    loadingText={avatarUploading ? "Отправка на сервер..." : "Загрузка изображения..."}
+                    loadingText={avatarUploading ? "Отправка на сервер..." : <div className="spinner profile" />}
                     onSelectFile={handleAvatarChange}
                     onDelete={handleAvatarDelete}
                     showDelete={!!currentUser?.imageFileTitle}
@@ -333,20 +347,37 @@ export default function ProfilePage() {
           <aside className="profile-right-column">
             <section className="profile-panel chats-panel">
               <div className="profile-panel-inner">
-                <div className="profile-chats-header">
-                  <SelectDropdown fetchItems={() => chatsGames} value={selectedGame} onChange={(v) => setSelectedGame(v)} allowNull={true} placeholder="Все игры" />
+                {!gamesLoading ? (
+                  <div className="profile-chats-header">
+                    <SelectDropdown
+                      fetchItems={() => games}
+                      value={selectedGame}
+                      labelFunc={(g) => g.title || "Ошибка"}
+                      onChange={(g) => setSelectedGame(g)}
+                      allowNull={true}
+                      placeholder="Все игры"
+                    />
+                    <h3 className="profile-panel-title">Последние чаты</h3>
+                  </div>
+                ) : (
                   <h3 className="profile-panel-title">Последние чаты</h3>
-                </div>
+                )}
                 {chatsLoading ? (
-                  <div className="profile-message">Загрузка...</div>
+                  <div className="profile-message">
+                    <div className="spinner profile" />
+                  </div>
                 ) : (
                   <>
                     {(!chats || chats.length === 0) ? (
-                      <div className="profile-empty-note">У вас ещё нет чатов</div>
+                      selectedGame ? (
+                        <div className="profile-empty-note">У вас ещё нет чатов по этой игре</div>
+                      ) : (
+                        <div className="profile-empty-note">У вас ещё нет чатов</div>
+                      )
                     ) : (
                       <ul className="profile-chats-list">
                         <AnimatePresence mode="popLayout" initial={false}>
-                          {visibleChats.map((c) => (
+                          {chats.map((c) => (
                             <motion.li
                               key={c.id}
                               layout

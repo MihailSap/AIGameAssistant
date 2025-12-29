@@ -4,15 +4,13 @@
 }
 
 .profile-message {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 600;
-    margin-top: 70px;
-    color: var(--text);
+    margin: 70px auto;
 }
 
-.chats-panel .profile-message {
-    margin: 0;
+.spinner.profile {
+    width: 45px;
+    height: 45px;
+    border-width: 4px;
 }
 
 .profile-grid {

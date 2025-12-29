@@ -70,12 +70,20 @@ export const gameApi = {
     }
   },
 
-  getCategories: async () => {
+  getAllPaged: async (page, size, filter = null, category = null, sortBy="title") => {
     try {
-      const resp = await apiClient.get("/api/games/categories");
+      const params = {};
+
+      if (page != null) params.page = page;
+      if (size != null) params.size = size;
+      if (filter != null) params.filter = filter;
+      if (category != null) params.category = category;
+      if (sortBy != null) params.sortBy = sortBy;
+
+      const resp = await apiClient.get("/api/games/paged", { params });
       return resp.data;
     } catch (error) {
-      console.error("Error get games categories:", error);
+      console.error("Error get games:", error);
       throw error;
     }
   }

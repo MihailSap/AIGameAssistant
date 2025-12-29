@@ -3,6 +3,8 @@
     flex-direction: column;
     gap: 20px;
     overflow: hidden;
+    height: 100%;
+    padding: 0 20px 20px 20px;
 }
 
 .rules-sidebar .file-viewer-root {
@@ -52,6 +54,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 100%;
 }
 
 .fv-center,
@@ -60,9 +63,9 @@
     color: var(--text);
     font-weight: 700;
     font-size: 28px;
-    height: 30vh;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .fv-error {
@@ -91,6 +94,7 @@
 .rules-sidebar .fv-pdf-wrap {
     padding-left: 0;
     max-height: 74vh;
+    height: 100%;
 }
 
 .rules-sidebar .fv-google-frame {
