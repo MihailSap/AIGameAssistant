@@ -1,16 +1,6 @@
 import { apiClient } from "./axios";
 
 export const favouriteApi = {
-  getAll: async () => {
-    try {
-      const resp = await apiClient.get("/api/favourites");
-      return resp.data;
-    } catch (error) {
-      console.error("Error get favourites:", error);
-      throw error;
-    }
-  },
-
   getAllPaged: async (page, size, filter = null, category = null, sortBy="title") => {
     try {
       const params = {};

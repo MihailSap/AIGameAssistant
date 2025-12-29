@@ -40,16 +40,6 @@ export const userApi = {
     }
   },
 
-  getAll: async () => {
-    try {
-      const resp = await apiClient.get("/api/users");
-      return resp.data;
-    } catch (error) {
-      console.error("Error getting all users:", error);
-      throw error;
-    }
-  },
-
   getAllPaged: async (page, size, filter = null) => {
     try {
       const params = {};

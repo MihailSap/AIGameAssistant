@@ -60,16 +60,6 @@ export const gameApi = {
     }
   },
 
-  getAll: async () => {
-    try {
-      const resp = await apiClient.get("/api/games");
-      return resp.data;
-    } catch (error) {
-      console.error("Error get all games:", error);
-      throw error;
-    }
-  },
-
   getAllPaged: async (page, size, filter = null, category = null, sortBy="title") => {
     try {
       const params = {};
