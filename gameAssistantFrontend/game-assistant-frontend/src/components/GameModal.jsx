@@ -10,7 +10,7 @@ import "../css/GameModal.css";
 import useBlobUrl from "../hooks/useBlobUrl";
 import { API_BASE_URL } from "../api/axios";
 
-export default function GameModal({ game, onClose, onFavouriteChange }) {
+export default function GameModal({ game, onClose, onFavouriteChange, visibleCount }) {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
 
@@ -65,9 +65,9 @@ export default function GameModal({ game, onClose, onFavouriteChange }) {
 
         (async () => {
             try {
-                const favs = await favouriteApi.getAll();
+                const favs = await favouriteApi.getAllPaged(0, visibleCount);
                 if (cancelled) return;
-                const exists = Array.isArray(favs) && favs.some(f => String(f.id) === String(gameData.id));
+                const exists = Array.isArray(favs?.content) && favs.content.some(f => String(f.id) === String(gameData.id));
                 if (mountedRef.current) setIsFavourite(Boolean(exists));
             } catch (err) { }
         })();
@@ -75,7 +75,7 @@ export default function GameModal({ game, onClose, onFavouriteChange }) {
         return () => {
             cancelled = true;
         };
-    }, [gameData, isAuthenticated]);
+    }, [gameData, isAuthenticated, visibleCount]);
 
     useEffect(() => {
         attemptedRef.current = false;

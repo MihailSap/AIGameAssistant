@@ -282,6 +282,7 @@ export default function MainPage() {
           game={selectedGame}
           onClose={() => setSelectedGame(null)}
           onFavouriteChange={handleFavouriteChange}
+          visibleCount={visibleCount}
         />
       )}
     </div>
