@@ -48,11 +48,6 @@
   justify-content: center;
 }
 
-.loading-text {
-  color: var(--muted-text);
-  font-size: 20px;
-}
-
 .gm-btn-row {
   display: flex;
   gap: 30px;
