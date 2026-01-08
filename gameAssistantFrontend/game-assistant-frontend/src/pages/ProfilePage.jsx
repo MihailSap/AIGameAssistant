@@ -75,7 +75,7 @@ export default function ProfilePage() {
     (async () => {
       setGamesLoading(true);
       try {
-        let games = await gameApi.getAllPaged();
+        let games = await gameApi.getAllPaged(0, 1000);
         if (!mounted) return;
         games = games.content.map(g => ({ id: g.id, title: g.title }));
         setGames(games);
