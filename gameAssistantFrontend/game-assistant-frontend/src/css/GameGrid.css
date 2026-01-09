@@ -30,6 +30,24 @@
     grid-template-columns: repeat(5, 1fr);
 }
 
+.games-grid-loading, .games-grid-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 70px 0;
+    width: 100%;
+    text-align: center;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--danger);
+}
+
+.spinner.grid {
+    width: 60px;
+    height: 60px;
+    border-width: 6px;
+}
+
 @media(max-width:1399px) {
     .games-grid {
         grid-template-columns: repeat(4, 1fr);

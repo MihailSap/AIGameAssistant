@@ -26,7 +26,7 @@ export const chatApi = {
 
   continueChat: async (id, prompt, model) => {
     try {
-      const resp = await apiClient.put(`/api/chat/${id}`, {prompt, model});
+      const resp = await apiClient.put(`/api/chat/${id}`, { prompt, model });
       return resp?.data;
     } catch (error) {
       console.error("Error continuing chat:", error);
@@ -44,32 +44,17 @@ export const chatApi = {
     }
   },
 
-  getMarkdownParsed: async (id) => {
+  getAllChatPaged: async (page, size, gameId = null) => {
     try {
-      const resp = await apiClient.get(`/api/chat/md/${id}`);
-      return resp?.data;
-    } catch (error) {
-      console.error("Error get markdown rules:", error);
-      throw error;
-    }
-  },
+      const params = {};
 
-  getChatPreviewsByGame: async (gameId) => {
-    try {
-      const resp = await apiClient.get(`/api/chat/by-game/${gameId}`);
+      if (page != null) params.page = page;
+      if (size != null) params.size = size;
+      if (gameId != null) params.gameId = gameId;
+      const resp = await apiClient.get("/api/chat/paged", { params });
       return resp?.data;
     } catch (error) {
       console.error("Error get chat previews by game:", error);
-      throw error;
-    }
-  },
-
-  getChatPreviewsByUser: async () => {
-    try {
-      const resp = await apiClient.get(`/api/chat/by-user`);
-      return resp?.data;
-    } catch (error) {
-      console.error("Error get chat previews by user:", error);
       throw error;
     }
   },

@@ -3,7 +3,6 @@ import { apiClient } from "./axios";
 export const modelApi = {
     updateUser: async (id, model) => {
         try {
-            console.log(id, model);
             const resp = await apiClient.patch(`/api/users/${encodeURIComponent(id)}/model`, null, { params: { model } });
             return resp.data;
         } catch (error) {

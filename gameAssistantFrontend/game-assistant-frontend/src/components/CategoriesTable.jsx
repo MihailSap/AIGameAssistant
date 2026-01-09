@@ -69,7 +69,7 @@ export default function CategoriesTable({ categories = [], onAdd, onDelete }) {
                     title="Добавить категорию"
                     aria-label="Добавить категорию"
                 >
-                    +
+                    ＋
                 </button>
             </div>
 

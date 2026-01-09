@@ -1,30 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import "../css/AdminPage.css";
 import "../css/AdminTable.css";
 
-const PAGE_SIZE = 10;
-
-export default function UsersTable({ users = [], currentUser = null, onDelete, onEnabled, onToggleAdmin, search = "" }) {
-  const [page, setPage] = useState(1);
-
-  const filtered = useMemo(() => {
-    const q = (search || "").trim();
-    if (q.length < 2) return users;
-    const qq = q.toLowerCase();
-    return users.filter(u => (u.login || "").toLowerCase().includes(qq) || (u.email || "").toLowerCase().includes(qq));
-  }, [users, search]);
-
-  const totalPages = Math.max(1, Math.ceil((filtered.length || 0) / PAGE_SIZE));
-  useEffect(() => {
-    setPage((p) => {
-      const next = 1;
-      return next;
-    });
-  }, [search, users]);
-
-  const start = (page - 1) * PAGE_SIZE;
-  const pageSlice = filtered.slice(start, start + PAGE_SIZE);
-
+export default function UsersTable({ users = [], currentUser = null, onDelete, onEnabled, onToggleAdmin, currentPage, pageCount, setPage }) {
   return (
     <div>
       <div className="table-wrap">
@@ -39,7 +17,7 @@ export default function UsersTable({ users = [], currentUser = null, onDelete, o
             </tr>
           </thead>
           <tbody>
-            {pageSlice.map((u, idx) => {
+            {users.map((u, idx) => {
               const isCurrent = currentUser && u.id === currentUser.id;
               const rowClass = isCurrent ? "row-current" : (u.isAdmin ? "row-admin" : "");
               return (
@@ -70,18 +48,18 @@ export default function UsersTable({ users = [], currentUser = null, onDelete, o
       <div className="table-pagination">
         <button
           className="btn pagination-btn"
-          disabled={page <= 1 || totalPages <= 1}
+          disabled={currentPage <= 1 || pageCount <= 1}
           onClick={() => setPage(p => Math.max(1, p - 1))}
         >
           ←
         </button>
 
-        <div className="pagination-indicator">{page} / {totalPages}</div>
+        <div className="pagination-indicator">{currentPage} / {pageCount}</div>
 
         <button
           className="btn pagination-btn"
-          disabled={page >= totalPages || totalPages <= 1}
-          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+          disabled={currentPage >= pageCount || pageCount <= 1}
+          onClick={() => setPage(p => Math.min(pageCount, p + 1))}
         >
           →
         </button>

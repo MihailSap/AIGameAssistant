@@ -24,12 +24,15 @@ function groupSessionsByTime(sessions) {
     startOfYesterday.setDate(startOfToday.getDate() - 1);
     const startOfWeek = new Date(startOfToday);
     startOfWeek.setDate(startOfToday.getDate() - 7);
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thirtyDaysAgo = new Date(startOfToday);
+    thirtyDaysAgo.setDate(startOfToday.getDate() - 30);
+
     const groups = new Map();
-    const push = (name, item) => {
-        if (!groups.has(name)) groups.set(name, []);
-        groups.get(name).push(item);
+    const push = (key, item) => {
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(item);
     };
+
     sessions.forEach(s => {
         const time = new Date(s.lastUseTime || s.createdAt || Date.now());
         if (time >= startOfToday) {
@@ -40,23 +43,20 @@ function groupSessionsByTime(sessions) {
             push("Вчера", s);
             return;
         }
-        if (time >= startOfWeek) {
+        if (time >= startOfWeek && time < startOfYesterday) {
             push("Последняя неделя", s);
             return;
         }
-        if (time >= startOfMonth) {
-            push("В этом месяце", s);
+        if (time >= thirtyDaysAgo && time < startOfWeek) {
+            push("Последний месяц", s);
             return;
         }
-        const monthName = time.toLocaleString(undefined, { month: "long", year: "numeric" });
-        push(monthName, s);
+        push("Ранее", s);
     });
-    const order = ["Сегодня", "Вчера", "Последняя неделя", "В этом месяце"];
-    const rest = Array.from(groups.keys()).filter(k => !order.includes(k));
-    rest.sort((a, b) => new Date(a) - new Date(b));
+
+    const order = ["Сегодня", "Вчера", "Последняя неделя", "Последний месяц", "Ранее"];
     const final = [];
     order.forEach(k => { if (groups.has(k)) final.push([k, groups.get(k)]); });
-    rest.forEach(k => final.push([k, groups.get(k)]));
     return final;
 }
 
@@ -70,6 +70,7 @@ export default function ChatPage() {
     const [loading, setLoading] = useState(true);
     const [gameLoading, setGameLoading] = useState(true);
     const [chatsLoading, setChatsLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [chatLoading, setChatLoading] = useState(false);
     const [modelChanging, setModelChanging] = useState(false);
     const [chatError, setChatError] = useState(null);
@@ -78,6 +79,8 @@ export default function ChatPage() {
     const [currentUser, setCurrentUser] = useState(null);
 
     const [sessions, setSessions] = useState([]);
+    const [visibleCount, setVisibleCount] = useState(10);
+    const [absoluteCount, setAbsoluteCount] = useState(0);
     const [activeSession, setActiveSession] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -93,28 +96,28 @@ export default function ChatPage() {
 
     const [confirmState, setConfirmState] = useState({ open: false, text: "", onConfirm: null });
 
-    const refreshAllSessions = async (useGame = game) => {
-        setChatsLoading(true);
+    const refreshAllSessions = async (useGame = game, isLoadMore) => {
+        isLoadMore ? setLoadingMore(true) : setChatsLoading(true);
         let mapped = [];
         try {
             if (!useGame || !useGame.id) {
                 setSessions([]);
                 return [];
             }
-            const previews = await chatApi.getChatPreviewsByGame(useGame.id);
-            mapped = (Array.isArray(previews) ? previews : []).map(p => ({
+            const previews = await chatApi.getAllChatPaged(0, visibleCount, useGame.id);
+            mapped = (Array.isArray(previews?.content) ? previews.content : []).map(p => ({
                 id: p.id != null ? String(p.id) : makeId("s"),
                 title: p.title || "Чат",
                 lastUseTime: p.lastUseTime ? new Date(p.lastUseTime).toISOString() : new Date().toISOString(),
                 createdAt: p.lastUseTime ? new Date(p.lastUseTime).toISOString() : new Date().toISOString(),
             }));
-            mapped.sort((a, b) => new Date(b.lastUseTime) - new Date(a.lastUseTime));
+            setAbsoluteCount(previews?.totalElements || 0);
             setError(null);
         } catch (err) {
             mapped = [];
             setError("Ошибка при загрузке чатов");
         } finally {
-            setChatsLoading(false);
+            isLoadMore ? setLoadingMore(false) : setChatsLoading(false);
             setSessions(mapped);
             return mapped;
         }
@@ -155,9 +158,15 @@ export default function ChatPage() {
                 const user = await userApi.getAuthenticated();
                 if (!mounted) return;
                 setCurrentUser(user);
-                setSelectedModel(user.model || 'Yandex-GPT');
+                console.log(user);
+                if (user.model) {
+                    setSelectedModel(user.model);
+                } else {
+                    const userModel = await modelApi.getMain();
+                    setSelectedModel(userModel || 'YANDEX_GPT');
+                }
             } catch (err) {
-                setError("Ошибка при получении данных пользователя")
+                setError("Ошибка при получении данных пользователя");
                 if (!mounted) return;
                 setCurrentUser(null);
                 setSelectedModel(null);
@@ -208,6 +217,13 @@ export default function ChatPage() {
         return () => { mounted = false; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [game, routeChatId]);
+
+    useEffect(() => {
+        (async () => {
+            await refreshAllSessions(game, true);
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visibleCount]);
 
     useEffect(() => {
         return () => {
@@ -560,7 +576,7 @@ export default function ChatPage() {
                         fetchItems={() => modelApi.getAll()}
                         cacheKey="models"
                         value={selectedModel}
-                        onChange={modelChanging ? () => {} : handleChangeModel}
+                        onChange={modelChanging ? () => { } : handleChangeModel}
                         allowNull={false}
                         placeholder="Выберите модель"
                         ariaLabel="Модель нейросети"
@@ -594,26 +610,34 @@ export default function ChatPage() {
                                 </div>
                             </div>
 
+                            {chatsLoading && <div className="sidebar-spinner-container"><div className="spinner chat" /></div>}
+
                             <div className="chat-sessions-list">
-                                {chatsLoading && sessions.length === 0 && <div className="sidebar-muted-empty">Загрузка...</div>}
                                 {!chatsLoading && sessions.length === 0 && <div className="sidebar-muted-empty">Ещё нет ни одного чата</div>}
-                                {grouped.map(([groupName, items]) => (
-                                    <div key={groupName} className="session-group">
-                                        <h3 className="session-group-title">{groupName}</h3>
-                                        <div className="session-group-list">
-                                            {items.map(s => (
-                                                <ChatSidebarItem
-                                                    key={s.id}
-                                                    session={s}
-                                                    active={s.id === activeSession?.id}
-                                                    onSelect={handleSidebarSelect}
-                                                    onDelete={handleDeleteSession}
-                                                />
-                                            ))}
+                                {!chatsLoading && sessions.length !== 0 && (
+                                    grouped.map(([groupName, items]) => (
+                                        <div key={groupName} className="session-group">
+                                            <h3 className="session-group-title">{groupName}</h3>
+                                            <div className="session-group-list">
+                                                {items.map(s => (
+                                                    <ChatSidebarItem
+                                                        key={s.id}
+                                                        session={s}
+                                                        active={s.id === activeSession?.id}
+                                                        onSelect={handleSidebarSelect}
+                                                        onDelete={handleDeleteSession}
+                                                    />
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
+                            {((!chatsLoading && visibleCount < absoluteCount) || loadingMore) && (
+                                <div className="load-more-container">
+                                    <button className="btn btn-load-more-chats" disabled={loadingMore} onClick={() => setVisibleCount(v => v + 10)}>{loadingMore ? "Загрузка..." : "Загрузить ещё"}</button>
+                                </div>
+                            )}
                         </aside>
                     )}
                     <main className="chat-main">
@@ -635,7 +659,7 @@ export default function ChatPage() {
                             <div className="chat-main-inner">
                                 <div className="chat-dialog-container">
                                     {chatError && <div className="chat-muted">{chatError}</div>}
-                                    {chatLoading && !chatError && <div className="chat-muted">Загрузка...</div>}
+                                    {chatLoading && !chatError && <div className="chat-muted"><div className="spinner chat" /></div>}
                                     {!chatLoading && !chatError && messages.length === 0 && !sending && !activeSession && <div className="chat-muted">Чем я могу помочь?</div>}
                                     {!chatLoading && !chatError &&
                                         <div className="chat-messages" ref={messagesRef}>
@@ -709,13 +733,11 @@ export default function ChatPage() {
                                 <h2 className="sidebar-title">Правила игры</h2>
                             </div>
 
-                            <div className="chat-sessions-list">
-                                <FileViewer
-                                    fileType="pdf"
-                                    fileTitle={game?.rulesFileTitle}
-                                    isPrintTitle={false}
-                                />
-                            </div>
+                            <FileViewer
+                                fileType="pdf"
+                                fileTitle={game?.rulesFileTitle}
+                                isPrintTitle={false}
+                            />
                         </aside>
                     )}
                 </div >

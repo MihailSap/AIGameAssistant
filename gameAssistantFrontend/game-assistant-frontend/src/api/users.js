@@ -40,12 +40,18 @@ export const userApi = {
     }
   },
 
-  getAll: async () => {
+  getAllPaged: async (page, size, filter = null) => {
     try {
-      const resp = await apiClient.get("/api/users");
+      const params = {};
+
+      if (page != null) params.page = page;
+      if (size != null) params.size = size;
+      if (filter != null) params.filter = filter;
+
+      const resp = await apiClient.get("/api/users/paged", { params });
       return resp.data;
     } catch (error) {
-      console.error("Error getting all users:", error);
+      console.error("Error getting users:", error);
       throw error;
     }
   },

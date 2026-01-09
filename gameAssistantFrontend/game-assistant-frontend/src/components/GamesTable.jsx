@@ -1,31 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import "../css/AdminPage.css";
 import "../css/AdminTable.css";
 
-const PAGE_SIZE = 10;
-
-export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFile, onOpenFile, search = "" }) {
-    const [page, setPage] = useState(1);
-
-    const filtered = useMemo(() => {
-        const q = (search || "").trim();
-        if (q.length < 2) return games;
-        const qq = q.toLowerCase();
-        return (games || []).filter(g =>
-            (g.title || "").toLowerCase().includes(qq) ||
-            (g.description || "").toLowerCase().includes(qq)
-        );
-    }, [games, search]);
-
-    const totalPages = Math.max(1, Math.ceil((filtered.length || 0) / PAGE_SIZE));
-
-    useEffect(() => {
-        setPage(1);
-    }, [search, games]);
-
-    const start = (page - 1) * PAGE_SIZE;
-    const pageSlice = filtered.slice(start, start + PAGE_SIZE);
-
+export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFile, onOpenFile, currentPage, pageCount, setPage }) {
     return (
         <div>
             <div className="table-wrap">
@@ -42,7 +19,7 @@ export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFil
                         </tr>
                     </thead>
                     <tbody>
-                        {pageSlice.map((g, idx) => (
+                        {games.map((g, idx) => (
                             <tr key={g.id ?? idx}>
                                 <td>{g.id}</td>
                                 <td>{g.title.length > 20 ? g.title.slice(0, 20) + "…" : g.title}</td>
@@ -80,18 +57,18 @@ export default function GamesTable({ games = [], onEdit, onDelete, onDownloadFil
             <div className="table-pagination">
                 <button
                     className="btn pagination-btn"
-                    disabled={page <= 1 || totalPages <= 1}
+                    disabled={currentPage <= 1 || pageCount <= 1}
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                 >
                     ←
                 </button>
 
-                <div className="pagination-indicator">{page} / {totalPages}</div>
+                <div className="pagination-indicator">{currentPage} / {pageCount}</div>
 
                 <button
                     className="btn pagination-btn"
-                    disabled={page >= totalPages || totalPages <= 1}
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage >= pageCount || pageCount <= 1}
+                    onClick={() => setPage(p => Math.min(pageCount, p + 1))}
                 >
                     →
                 </button>

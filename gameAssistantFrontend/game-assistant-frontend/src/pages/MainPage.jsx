@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, /*useRef*/ } from "react";
+import React, { useLayoutEffect, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { gameApi } from "../api/game";
 import { categoryApi } from "../api/category";
@@ -17,81 +17,94 @@ import "../css/MainPage.css";
 export default function MainPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+
+  const computeIncrement = () => {
+    if (typeof window === "undefined") return 10;
+    const w = window.innerWidth;
+    if (w < 549) return 3;
+    if (w < 799) return 4;
+    if (w < 1099) return 6;
+    if (w < 1399) return 8;
+    return 10;
+  };
+
+  const initialIncrement = computeIncrement();
+
   const [games, setGames] = useState([]);
-  const [favourites, setFavourites] = useState([]);
+  const [topGames, setTopGames] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingFavs, setLoadingFavs] = useState(false);
+  const [gameLoading, setGameLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
+  const [gameError, setGameError] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 280);
-  const [visibleCount, setVisibleCount] = useState(10);
+
+  const [incrementCount, setIncrementCount] = useState(() => initialIncrement);
+  const [pagesLoaded, setPagesLoaded] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(() => initialIncrement);
+  const [absoluteCount, setAbsoluteCount] = useState(0);
   const [selectedGame, setSelectedGame] = useState(null);
 
   const [showFavourites, setShowFavourites] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const data = await gameApi.getAll();
-        if (isAuthenticated) {
-          const authUser = await userApi.getAuthenticated();
-          if (mounted) setUserInfo(authUser);
+  const visibleCountRef = useRef(visibleCount);
+  const incrementCountRef = useRef(incrementCount);
+
+  const refreshAllGames = async (isLoadMore = false) => {
+    isLoadMore ? setLoadingMore(true) : setGameLoading(true);
+    try {
+      let data = null;
+      if (showFavourites) {
+        if (!isAuthenticated) {
+          setGames([]);
+          setAbsoluteCount(0);
+          return;
         }
-        if (!mounted) return;
-        setGames(Array.isArray(data) ? data : []);
-        setError(null);
-      } catch (err) {
-        setError(err?.response?.data?.message || err?.message || "Ошибка при загрузке игр");
-      } finally {
-        if (mounted) setLoading(false);
+        data = await favouriteApi.getAllPaged(0, visibleCount, (debouncedSearch || "").trim() || null, selectedCategory || null);
+      } else {
+        data = await gameApi.getAllPaged(0, visibleCount, (debouncedSearch || "").trim() || null, selectedCategory || null);
       }
-    };
-    load();
-    return () => (mounted = false);
-  }, [isAuthenticated]);
+      setGames(Array.isArray(data?.content) ? data.content : []);
+      setAbsoluteCount(data?.totalElements || 0);
+      setError(null);
+    } catch (err) {
+      setGameError(err?.response?.data?.message || err?.message || "Ошибка при загрузке игр");
+    } finally {
+      isLoadMore ? setLoadingMore(false) : setGameLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    let cancelled = false;
-    const loadFavs = async () => {
-      if (!isAuthenticated) {
-        setFavourites([]);
-        return;
-      }
-      setLoadingFavs(true);
-      try {
-        const favs = await favouriteApi.getAll();
-        if (cancelled) return;
-        setFavourites(Array.isArray(favs) ? favs : []);
-      } catch (err) {
-        setFavourites([]);
-      } finally {
-        if (!cancelled) setLoadingFavs(false);
-      }
-    };
-    loadFavs();
-    return () => { cancelled = true; };
-  }, [isAuthenticated]);
+  useEffect(() => { incrementCountRef.current = incrementCount; }, [incrementCount]);
+  useEffect(() => { visibleCountRef.current = visibleCount; }, [visibleCount]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    let raf = 0;
+
     const calc = () => {
+      if (typeof window === "undefined") return;
       const w = window.innerWidth;
-      let increment = 10;
-      if (w < 549) increment = 3;
-      else if (w < 799) increment = 4;
-      else if (w < 1099) increment = 6;
-      else if (w < 1399) increment = 8;
-      else increment = 10;
-      setVisibleCount(increment);
+      let newInc = 10;
+      if (w < 549) newInc = 3;
+      else if (w < 799) newInc = 4;
+      else if (w < 1099) newInc = 6;
+      else if (w < 1399) newInc = 8;
+      else newInc = 10;
+
+      const prevInc = incrementCountRef.current || initialIncrement;
+      if (prevInc === newInc) return;
+
+      const currentVisible = visibleCountRef.current || prevInc;
+      const pages = Math.max(1, Math.ceil(currentVisible / prevInc));
+      setPagesLoaded(pages);
+      setIncrementCount(newInc);
     };
 
     calc();
 
-    let raf = 0;
     const onResize = () => {
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(calc);
@@ -105,7 +118,71 @@ export default function MainPage() {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", onResize);
     };
-  }, [debouncedSearch, showFavourites]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await gameApi.getAllPaged(0, 10);
+        if (!mounted) return;
+        setTopGames(Array.isArray(data?.content) ? data.content : []);
+        setError(null);
+      } catch (err) {
+        setError(err?.response?.data?.message || err?.message || "Ошибка при загрузке топ-10 игр");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => (mounted = false);
+  }, []);
+
+  useEffect(() => {
+    setVisibleCount(Math.max(1, pagesLoaded) * incrementCount);
+  }, [pagesLoaded, incrementCount]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      await refreshAllGames();
+      if (!mounted) return;
+    })();
+    return () => (mounted = false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, selectedCategory, showFavourites]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      await refreshAllGames(true);
+      if (!mounted) return;
+    })();
+    return () => (mounted = false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleCount]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!isAuthenticated) {
+        return;
+      }
+      setLoading(true);
+      try {
+        const authUser = await userApi.getAuthenticated();
+        if (!mounted) return;
+        setUserInfo(authUser);
+        setError(null);
+      } catch (err) {
+        setError(err?.response?.data?.message || err?.message || "Ошибка при загрузке данных пользователя");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => (mounted = false);
+  }, [isAuthenticated]);
 
   const handleSelectFavourites = (isShowFavourites) => {
     if (!isAuthenticated) {
@@ -113,55 +190,21 @@ export default function MainPage() {
       return;
     }
     setShowFavourites(isShowFavourites);
-  }
+    setPagesLoaded(1);
+  };
 
   const handleFavouriteChange = (gameObj, isNowFavourite) => {
-    if (!gameObj || !gameObj.id) return;
-    setFavourites(prev => {
+    if (!gameObj || !gameObj.id || !showFavourites) return;
+    setGames(prev => {
       const exists = prev.some(f => String(f.id) === String(gameObj.id));
-      if (isNowFavourite && !exists) return [gameObj, ...prev];
+      if (isNowFavourite && !exists) return [gameObj, ...prev].sort((a, b) => {
+        const ta = (a?.title ?? '').trim();
+        const tb = (b?.title ?? '').trim();
+        return ta.localeCompare(tb, 'ru', { sensitivity: 'base', numeric: true });
+      });
       if (!isNowFavourite && exists) return prev.filter(f => String(f.id) !== String(gameObj.id));
       return prev;
     });
-  };
-
-  const filterGames = (list) => {
-    const q = (debouncedSearch || "").trim();
-    let out = list.slice();
-    if (q.length >= 2) {
-      const qq = q.toLowerCase();
-      out = out.filter(g => (g.title || "").toLowerCase().includes(qq) || (g.description || "").toLowerCase().includes(qq));
-    }
-    if (selectedCategory) {
-      out = out.filter(g => g.categories.includes(selectedCategory));
-    }
-    return out;
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filtered = useMemo(() => filterGames(games), [games, debouncedSearch, selectedCategory]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filteredFavourites = useMemo(() => filterGames(favourites), [favourites, debouncedSearch, selectedCategory]);
-
-  const sourceList = (showFavourites ? filteredFavourites : filtered)
-    .slice()
-    .sort((a, b) => {
-      const ta = (a?.title ?? '').trim();
-      const tb = (b?.title ?? '').trim();
-      return ta.localeCompare(tb, 'ru', { sensitivity: 'base', numeric: true });
-    });
-  const visibleGames = sourceList.slice(0, visibleCount);
-  const canLoadMore = visibleCount < sourceList.length;
-
-  const handleLoadMore = () => {
-    const w = window.innerWidth;
-    let increment = 10;
-    if (w < 549) increment = 3;
-    else if (w < 799) increment = 4;
-    else if (w < 1099) increment = 6;
-    else if (w < 1399) increment = 8;
-    else increment = 10;
-    setVisibleCount(prev => Math.min(sourceList.length, prev + increment));
   };
 
   return (
@@ -185,7 +228,7 @@ export default function MainPage() {
           <>
             <div className="hero-anchor">
               <Hero
-                topGames={games.slice(0, 10)}
+                topGames={topGames}
                 onOpenGame={(g) => setSelectedGame(g)}
               />
             </div>
@@ -196,7 +239,7 @@ export default function MainPage() {
                   fetchItems={() => categoryApi.getAll().then(list => Array.isArray(list) ? list.map(c => c.name) : [])}
                   cacheKey="categories"
                   value={selectedCategory}
-                  onChange={(v) => setSelectedCategory(v)}
+                  onChange={(v) => { setSelectedCategory(v); setPagesLoaded(1); }}
                   allowNull={true}
                   placeholder="Категория игр"
                 />
@@ -211,19 +254,21 @@ export default function MainPage() {
               </div>
 
               <div className="games-area">
-                {isAuthenticated && showFavourites && (
-                  loadingFavs ? <div className="catalog-info">Загрузка избранных...</div> : null
-                )}
-
-                {sourceList && sourceList.length ? (
-                  <GameGrid games={visibleGames} onOpenGame={(g) => setSelectedGame(g)} />
+                {games && games.length ? (
+                  <GameGrid games={games} onOpenGame={(g) => setSelectedGame(g)} loading={gameLoading} error={gameError} />
                 ) : (
                   <div className="catalog-info">{games.length === 0 ? "Игр пока нет" : "Ничего не найдено"}</div>
                 )}
 
-                {canLoadMore && (
+                {(visibleCount < absoluteCount || loadingMore) && (
                   <div className="load-more-wrap">
-                    <button className="btn load-more yellow" onClick={handleLoadMore}>Загрузить ещё</button>
+                    <button
+                      className="btn load-more"
+                      disabled={loadingMore}
+                      onClick={() => setPagesLoaded(p => p + 1)}
+                    >
+                      {loadingMore ? "Загрузка..." : "Загрузить ещё"}
+                    </button>
                   </div>
                 )}
               </div>
@@ -237,6 +282,7 @@ export default function MainPage() {
           game={selectedGame}
           onClose={() => setSelectedGame(null)}
           onFavouriteChange={handleFavouriteChange}
+          visibleCount={visibleCount}
         />
       )}
     </div>
