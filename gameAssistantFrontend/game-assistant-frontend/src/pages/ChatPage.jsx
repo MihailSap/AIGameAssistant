@@ -158,9 +158,15 @@ export default function ChatPage() {
                 const user = await userApi.getAuthenticated();
                 if (!mounted) return;
                 setCurrentUser(user);
-                setSelectedModel(user.model || 'Yandex-GPT');
+                console.log(user);
+                if (user.model) {
+                    setSelectedModel(user.model);
+                } else {
+                    const userModel = await modelApi.getMain();
+                    setSelectedModel(userModel || 'YANDEX_GPT');
+                }
             } catch (err) {
-                setError("Ошибка при получении данных пользователя")
+                setError("Ошибка при получении данных пользователя");
                 if (!mounted) return;
                 setCurrentUser(null);
                 setSelectedModel(null);
@@ -216,7 +222,7 @@ export default function ChatPage() {
         (async () => {
             await refreshAllSessions(game, true);
         })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visibleCount]);
 
     useEffect(() => {
