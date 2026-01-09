@@ -1,11 +1,14 @@
 package ru.project.gameAssistantBackend.service.impl;
 
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.project.gameAssistantBackend.service.FileServiceI;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -18,6 +21,10 @@ import java.nio.file.Paths;
 public class FileServiceImpl implements FileServiceI {
 
     public final String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
+
+    private static final int MAX_WIDTH = 1200;
+
+    private static final float IMAGE_QUALITY = 0.1f;
 
     public FileServiceImpl() {
         try {
@@ -35,8 +42,15 @@ public class FileServiceImpl implements FileServiceI {
         try {
             Files.createDirectories(Paths.get(uploadDir));
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            if(fileName.endsWith(".png")){
+                fileName = fileName.replace(".png", ".jpg");
+            }
             File targetFile = new File(uploadDir, fileName);
-            file.transferTo(targetFile);
+            if (isImage(file)) {
+                saveCompressedImage(file, targetFile);
+            } else {
+                file.transferTo(targetFile);
+            }
             System.out.println("Saving file to: " + targetFile.getAbsolutePath());
             return fileName;
         } catch (IOException e) {
@@ -71,5 +85,19 @@ public class FileServiceImpl implements FileServiceI {
         } catch (IOException e) {
             throw new RuntimeException("Ошибка чтения файла: " + real, e);
         }
+    }
+
+    private void saveCompressedImage(MultipartFile file, File targetFile) throws IOException {
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+        Thumbnails.of(originalImage)
+                .size(MAX_WIDTH, MAX_WIDTH)
+                .outputFormat("jpg")
+                .outputQuality(IMAGE_QUALITY)
+                .toFile(targetFile);
+    }
+
+    private boolean isImage(MultipartFile file) {
+        return file.getContentType() != null &&
+                file.getContentType().startsWith("image/");
     }
 }

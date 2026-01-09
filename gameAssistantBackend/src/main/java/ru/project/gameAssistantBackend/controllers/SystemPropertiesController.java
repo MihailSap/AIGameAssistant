@@ -33,7 +33,6 @@ public class SystemPropertiesController {
         return systemPropertiesServiceImpl.getSystemProperties().getPrompt();
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/model")
     public Model getModel() throws SystemPropertiesNotFoundException {
         return systemPropertiesServiceImpl.getSystemProperties().getModel();

@@ -19,7 +19,7 @@ public class GameMapper {
         return new GameResponseDTO(
                 game.getId(),
                 game.getTitle(),
-                trimDesc(game.getDescription()),
+                game.getDescription(),
                 mapToCategories(categories),
                 game.getImageFileTitle(),
                 game.getRulesFileTitle());
@@ -38,7 +38,7 @@ public class GameMapper {
         return new GamePreviewDTO(
                 game.getId(),
                 game.getTitle(),
-                game.getDescription(),
+                trimDesc(game.getDescription()),
                 mapToCategories(categories),
                 game.getImageFileTitle()
         );
